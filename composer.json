@@ -1,0 +1,56 @@
+{
+  "name": "xvii/satelles-nexus-utilis",
+  "description": "Utilidades TCP.",
+  "license": "MIT",
+  "homepage": "https://github.com/Tabula17/satelles-nexus-utilis",
+  "keywords": [
+    "tcp",
+    "http",
+    "websockets",
+    "sockets",
+    "networking",
+    "async",
+    "event-driven"
+  ],
+  "authors": [
+    {
+      "name": "Martín Panizzo",
+      "email": "code.tabula17@gmail.com.com"
+    }
+  ],
+  "extra": {
+    "branch-alias": {
+      "dev-main": "1.0.x-dev"
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "Tabula17\\Satelles\\Nexus\\Utilis\\": "src/"
+    }
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://tabula17.repo.repman.io"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "xvii/satelles-utilis-proelio": "@dev",
+    "php": ">=8.4",
+    "ext-swoole": ">=6.1",
+    "ext-posix": "*",
+    "ext-pdo": "*"
+  },
+  "require-dev": {
+    "swoole/ide-helper": "@dev",
+    "monolog/monolog": "^3.0@dev",
+    "bramus/monolog-colored-line-formatter": "dev-master"
+  },
+  "suggest": {
+    "ext-sockets": "Sockets extension for TCP/UDP connections",
+    "ext-redis": "Redis extension for caching",
+    "ext-memcached": "Memcached extension for caching",
+    "monolog/monolog": "Logging"
+  }
+}
