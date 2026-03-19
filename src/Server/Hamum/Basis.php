@@ -240,21 +240,21 @@ class Basis extends Server
                     $protocolManager->runOnCloseConnection($server, $fd, $reactorId);
                 }
             }
-            $handlers = array_merge(...array_values(array_map(static fn($collection) => $collection->toArray(), ($this->connectHandlers))));
+            $handlers = array_merge(...array_values(array_map(static fn($collection) => $collection->toArray(), ($this->closeHandlers))));
             foreach($handlers as $handler) {
                 $this?->logger?->debug("Handling connect event with handler for protocol");
                 $handler($server, $fd, $reactorId);
             }
         });
-        $this->on('receive`', function (Server $server, int $fd, int $reactorId, string $data) {
+        $this->on('receive', function (Server $server, int $fd, int $reactorId, string $data) {
             $this?->logger?->debug("Received data: {$data} from {$fd} from {$reactorId}");
             $handlers = array_merge(...array_values(array_map(static fn($collection) => $collection->toArray(), ($this->receiveHandlers))));
             foreach($handlers as $handler) {
                 $this?->logger?->debug("Handling receive event with handler for protocols");
-                $handler($server, $fd, $reactorId);
+                $handler($server, $fd, $reactorId, $data);
             }
         });
-        $this->on('packet`', function (Server $server, string $data, array $clientInfo) {
+        $this->on('packet', function (Server $server, string $data, array $clientInfo) {
             $this?->logger?->debug("Received packet: {$data} from {$clientInfo['address']}:{$clientInfo['port']}");
             $handlers = array_merge(...array_values(array_map(static fn($collection) => $collection->toArray(), ($this->packetHandlers))));
             foreach($handlers as $handler) {
