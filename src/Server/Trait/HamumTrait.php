@@ -35,6 +35,7 @@ trait HamumTrait
     }
 
     private array $registeredHandlers = [];
+    private array $definedHandlers = [];
 
     private function traitAllowed(): bool
     {
@@ -82,17 +83,18 @@ trait HamumTrait
             'connect',
             'disconnect'
         ];
-        if (!($this instanceof HttpServer) && $this instanceof TcpUdpServer) {
-            return in_array($event_name, array_merge($baseEvents, $tcpEvents), true);
-        }
-        if (!($this instanceof WebSocketServer) && $this instanceof HttpServer) {
-            return in_array($event_name, array_merge($baseEvents, $httpEvents), true);
-        }
+
         if ($this instanceof WebSocketServer) {
-            return in_array($event_name, array_merge($baseEvents, $httpEvents, $websocketEvents), true);
+            $allEvents = array_merge($baseEvents, $httpEvents, $websocketEvents);
+        } elseif ($this instanceof HttpServer) {
+            $allEvents = array_merge($baseEvents, $httpEvents);
+        } elseif ($this instanceof TcpUdpServer) {
+            $allEvents = array_merge($baseEvents, $tcpEvents);
+        } else {
+            return false;
         }
 
-        return false;
+        return in_array($event_name, $allEvents, true);
     }
 
     abstract protected function init(): void;
@@ -103,6 +105,16 @@ trait HamumTrait
             $this->logger?->error("Server type is not supported by this trait. Can't override start() method.");
             $this?->logger?->debug(str_repeat('-', 100));
             return false;
+        }
+        $vars = get_class_vars(get_class($this));
+        foreach ($vars as $key => $value) {
+            if (str_ends_with($key, 'Handler')) {
+                $event_name = strtolower(str_replace('Handler', '', $key));
+                $this->definedHandlers[$event_name] = [
+                    'property' => $key,
+                    'handler' => "handle" . ucfirst($event_name) . "Event"
+                ];
+            }
         }
 
         $this->init();
@@ -205,29 +217,20 @@ trait HamumTrait
 
     private function registerEventHandlers(string $event_name): void
     {
-        $handlers = 0;
-        $handlerName = '';
-        // Get all properties of the current class
-        $vars = get_class_vars(get_class($this));
-        foreach ($vars as $key => $value) {
-            // Compare the requested property name (strtolower($var))
-            // with the actual property names (strtolower($key))
-            if (str_ends_with($key, 'Handler') && str_starts_with(strtolower($key), strtolower($event_name))) {
-                // Return the value using the correct, case-sensitive key
-                $handlers = count($this->$key);
-                $handlerName = "handle" . ucfirst($key) . "Event";
-                break;
+        if (isset($this->definedHandlers[strtolower($event_name) ])) {
+            $handlerName = $this->definedHandlers[strtolower($event_name)]['handler'];
+            $property = $this->definedHandlers[strtolower($event_name)]['property'];
+            $handlers = count($this->$property);
+            if ($handlers > 0 && !isset($this->registeredHandlers[$event_name]) && method_exists($this, $handlerName)) {
+                $this->logger?->debug("Registering event handlers for event $event_name. Handlers found: $handlers");
+                $this->registeredHandlers[$event_name] = true;
+                $this->on($event_name, $this->$handlerName(...));
             }
-        }
-        if ($handlers > 0 && !isset($this->registeredHandlers[$event_name]) && method_exists($this, $handlerName)) {
-            $this->logger?->debug("Registering event handlers for event $event_name. Handlers found: $handlers");
-            $this->registeredHandlers[$event_name] = true;
-            $this->on($event_name, $this->$handlerName(...));
-        }
-        if ($handlers === 0 && isset($this->registeredHandlers[$event_name])) {
-            $this->logger?->debug("No handlers found for event $event_name. Unregistering event handler.");
-            unset($this->registeredHandlers[$event_name]);
-            $this->off($event_name, $this->$handlerName(...));
+            if ($handlers === 0 && isset($this->registeredHandlers[$event_name])) {
+                $this->logger?->debug("No handlers found for event $event_name. Unregistering event handler.");
+                unset($this->registeredHandlers[$event_name]);
+                $this->off($event_name, $this->$handlerName(...));
+            }
         }
 
     }
@@ -236,14 +239,11 @@ trait HamumTrait
     {
         $vars = get_class_vars(get_class($this));
         $handlers = [];
-        foreach ($vars as $key => $value) {
-            // Compare the requested property name (strtolower($var))
-            // with the actual property names (strtolower($key))
-            if (str_ends_with($key, 'Handler') && str_starts_with(strtolower($key), strtolower($event_name))) {
-                $handlers = array_merge(...array_values(array_map(static fn($collection) => $collection->toArray(), ($this->$key ?? [new CallableCollection()]))));
-            }
+        if (isset($this->definedHandlers[strtolower($event_name) ])) {
+            $property = $this->definedHandlers[strtolower($event_name)]['property'];
+            $handlers = array_merge(...array_values(array_map(static fn($collection) => $collection->toArray(), ($this->$property ?? [new CallableCollection()]))));
         }
-        return $action ? array_filter($handlers, static fn($handler) => array_key_exists($action, $handler)) : $handlers;
+        return $handlers;
     }
 
 

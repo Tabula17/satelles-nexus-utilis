@@ -2,6 +2,7 @@
 
 namespace Tabula17\Satelles\Nexus\Utilis\Server\Hamum;
 
+use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server;
 use Tabula17\Satelles\Nexus\Utilis\Server\Trait\HamumTrait;
 use Tabula17\Satelles\Utilis\Collection\CallableCollection;
@@ -169,14 +170,15 @@ abstract class Filum extends Server
         $this->registerEventHandlers('message');
     }
 
-    public function handleMessageEvent(Server $server, int $fd, int $reactorId, string $data): void
+    public function handleMessageEvent(Server $server, Frame $frame): void
     {
-        $this?->logger?->debug("Handling message event for fd {$fd} with data: {$data}");
+        $data = json_decode($frame->data, true);
+        $this?->logger?->debug("Handling message event for with data: {$data}");
 
         $protocolAction = json_validate($data) ? json_decode($data, true)['action'] : '';
         $eventHandlers = array_merge($this->getEventActionHandlers('message', $protocolAction) , $this->getEventActionHandlers('message', '*'));
         foreach ($eventHandlers as $callback) {
-            $callback($server, $fd, $reactorId, $data);
+            $callback($server, $data);
         }
     }
 
