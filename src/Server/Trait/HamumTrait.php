@@ -53,7 +53,6 @@ trait HamumTrait
             'workerstart',
             'workerstop',
             'workerexit',
-            'close',
             'task',
             'finish',
             'pipemessage',
@@ -64,6 +63,7 @@ trait HamumTrait
             'afterreload'
         ];
         $tcpEvents = [
+            'close',
             'packet',
             'receive',
             'connect'
@@ -71,6 +71,7 @@ trait HamumTrait
         //not onConnect/onReceive
         //add onRequest
         $httpEvents = [
+            'close',
             'request',
         ];
         //add onBeforeHandshakeResponse, onHandShake, onMessage, onOpen, onDisconnect
@@ -308,7 +309,6 @@ trait HamumTrait
             $taskAction = json_validate($data) ? json_decode($data, true)['action'] : '';
             $results = [];
             $results['raw'] = $data;
-            var_dump($task->data, $task);
             $taskHandlers = array_merge($this->getEventActionHandlers('task', $taskAction), $this->getEventActionHandlers('task', '*'));
             $this?->logger?->debug("Found task handlers for action {$taskAction}");
             foreach ($taskHandlers as $protocol => $handler) {

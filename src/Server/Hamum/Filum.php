@@ -2,6 +2,8 @@
 
 namespace Tabula17\Satelles\Nexus\Utilis\Server\Hamum;
 
+use Swoole\Http\Request;
+use Swoole\Http\Response;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server;
 use Tabula17\Satelles\Nexus\Utilis\Server\Trait\HamumTrait;
@@ -36,10 +38,10 @@ abstract class Filum extends Server
         $this->set($options);
     }
 
-    public function handleRequestEvent(string $protocolAction, $request, $response): void
+    public function handleRequestEvent(Request $request, Response $response): void
     {
-        $this?->logger?->debug("Handling request event with protocolAction: {$protocolAction}");
-        $eventHandlers = array_merge($this->getEventActionHandlers('request', $protocolAction), $this->getEventActionHandlers('request', '*'));
+        $this?->logger?->debug("Handling request event with protocolAction: {$request->server['request_uri']}");
+        $eventHandlers = array_merge($this->getEventActionHandlers('request', $request->server['request_uri']), $this->getEventActionHandlers('request', '*'));
         foreach ($eventHandlers as $callback) {
             $callback($request, $response);
         }
@@ -51,12 +53,12 @@ abstract class Filum extends Server
             $this->requestHandlers[$protocolAction] = new CallableCollection();
         }
         $this->requestHandlers[$protocolAction]->offsetSet($protocol, $callback);
-        $this->registerEventHandlers('Request');
+        $this->registerEventHandlers('request');
     }
 
     public function getRequestHandlers(string $protocolAction): ?array
     {
-        return $this->getEventActionHandlers('Request', $protocolAction);
+        return $this->getEventActionHandlers('request', $protocolAction);
     }
 
     public function hasRequestHandlers(string $protocolAction): bool
@@ -68,7 +70,7 @@ abstract class Filum extends Server
     {
         $this->requestHandlers[$protocolAction]?->clear();
         unset($this->requestHandlers[$protocolAction]);
-        $this->registerEventHandlers('Request');
+        $this->registerEventHandlers('request');
     }
 
     public function registerReceiveHandlers(string $protocolAction, callable $callback, $protocol = 'generic'): void
