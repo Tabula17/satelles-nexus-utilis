@@ -2,9 +2,10 @@
 
 namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request;
 
-use Tabula17\Satelles\Nexus\Utilis\Server\HookableServer;
+use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ProtocolManagerInterface;
 
 interface RequestHandlerInterface
 {
-    public function handle(int $fd, HookableServer $server): void;
+    public function handle(int $fd, HamumServerInterface $server, ProtocolManagerInterface $protocolManager): void;
 }

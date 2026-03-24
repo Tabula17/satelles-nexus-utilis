@@ -7,7 +7,7 @@ use Tabula17\Satelles\Nexus\Utilis\Server\Trait\HamumTrait;
 use Tabula17\Satelles\Utilis\Collection\CallableCollection;
 use Tabula17\Satelles\Utilis\Config\TCPServerConfig;
 
-abstract class Graphema extends Server
+abstract class Graphema extends Server implements HamumServerInterface
 {
     use HamumTrait;
     private array $requestHandlers = [];

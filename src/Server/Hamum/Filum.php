@@ -10,7 +10,7 @@ use Tabula17\Satelles\Nexus\Utilis\Server\Trait\HamumTrait;
 use Tabula17\Satelles\Utilis\Collection\CallableCollection;
 use Tabula17\Satelles\Utilis\Config\TCPServerConfig;
 
-abstract class Filum extends Server
+abstract class Filum extends Server implements HamumServerInterface
 {
     use HamumTrait;
 

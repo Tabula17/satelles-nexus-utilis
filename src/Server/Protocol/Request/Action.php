@@ -20,37 +20,21 @@ use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
 class Action extends AbstractDescriptor
 {
     const string PROTOCOL = 'generic';
-    // PUB-SUB RELATED
-    /*    protected(set) string $subscribe = 'subscribe';
-        protected(set) string $unsubscribe = 'unsubscribe';
-        protected(set) string $publish = 'publish';
-        protected(set) string $listChannels = 'list_channels';*/
-    // END PUB-SUB RELATED
-
-    // RPC RELATED
-    //  protected(set) string $rpc = 'rpc';
-    // protected(set) string $listRpcMethods = 'list_rpc_methods';
-    // END RPC RELATED
-
-    // FILE RELATED
-    /*    protected(set) string $sendFile = 'send_file';
-        protected(set) string $requestFile = 'request_file';
-        protected(set) string $startFileTransfer = 'start_file_transfer';
-        protected(set) string $fileChunk = 'file_chunk';
-        protected(set) string $listFiles = 'list_files';
-        protected(set) string $deleteFile = 'delete_file';
-        protected(set) string $getTransferInfo = 'get_transfer_info';*/
-    // END FILE RELATED
-
-    // AUTH RELATED
-    //protected(set) string $authenticate = 'authenticate';
-
-    // END AUTH RELATED
     private array $resolvers {
         set(array $resolvers) {
             $resolvers = array_filter($resolvers, fn($resolver) => $this->offsetExists($resolver), ARRAY_FILTER_USE_KEY);
             $this->resolvers = $resolvers;
         }
+    }
+
+    public function addResolver(string $name, string|callable $resolver): void
+    {
+        if (!$this->offsetExists($name)) {
+            return;
+        }
+        $resolvers = $this->resolvers ?? [];
+        $resolvers[$name] = $resolver;
+        $this->resolvers = $resolvers;
     }
 
     public function getProtocolFor(array $data)
@@ -71,7 +55,7 @@ class Action extends AbstractDescriptor
             }
             return new Base($data);
         }
-        throw new UnexpectedValueException('No action rpcProtocol {' . ($data['action'] ?? 'noType') . '} detected. Must be one of: ' . implode(', ', $this->toArray()) . '');
+        throw new UnexpectedValueException('No action for protocol ' . static::PROTOCOL . ' -> {' . ($data['action'] ?? 'noType') . '} detected. Must be one of: ' . implode(', ', $this->toArray()) . '');
     }
 
     private function getNamespace(): string

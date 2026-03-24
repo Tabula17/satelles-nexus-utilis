@@ -3,6 +3,7 @@
 namespace Tabula17\Satelles\Nexus\Utilis\Server\Trait;
 
 use Swoole\Server;
+use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ProtocolManagerCollection;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ProtocolManagerInterface;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request\Action;
@@ -55,8 +56,9 @@ trait MatrixTrait
         }
         $this->protocolManagers->offsetSet($protocol, $manager);
         if ($this instanceof Server) {
-            if (in_array(HamumTrait::class, class_uses($this))) {
+            if ($this instanceof HamumServerInterface) {
                 $this->on('beforestart', $manager->initializeOnStart(...));
+                $this->on('beforestart', $manager->registerProtocolHandlers(...));
             }
             $this->on('workerStart', $manager->initializeOnWorkers(...));
             $this->on('workerStop', $manager->cleanUpResources(...));
