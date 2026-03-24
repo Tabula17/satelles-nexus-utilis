@@ -18,7 +18,7 @@ interface ProtocolManagerInterface
         get;
     }
     public function initializeOnStart(HamumServerInterface $server): void;
-    public function initializeOnWorkers(HamumServerInterface $server, int $workerId);
+    public function initializeOnWorkers(HamumServerInterface $server, int $workerId): void;
     public function runOnOpenConnection(...$args): void; // HamumServerInterface $server, int $fd, int $reactorId but WS -> HamumServerInterface $server, Request $request
     public function runOnCloseConnection(HamumServerInterface $server, int $fd, int $reactorId): void;
     public function cleanUpResources(HamumServerInterface $server, int $fd = 0): void;
