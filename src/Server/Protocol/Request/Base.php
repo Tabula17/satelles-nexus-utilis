@@ -3,9 +3,12 @@
 namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request;
 
 use Tabula17\Satelles\Nexus\Utilis\Exception\UnexpectedValueException;
+use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ProtocolManagerInterface;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
 
-class Base extends AbstractDescriptor
+class Base extends AbstractDescriptor implements RequestHandlerInterface
 {
 
     protected(set) string $action {
@@ -23,5 +26,10 @@ class Base extends AbstractDescriptor
     )
     {
         parent::__construct($values);
+    }
+
+    public function handle(int $fd, HamumServerInterface $server, ProtocolManagerInterface $protocolManager): Status
+    {
+        return Status::unknown;
     }
 }

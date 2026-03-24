@@ -3,6 +3,7 @@
 namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request;
 
 use Tabula17\Satelles\Nexus\Utilis\Exception\UnexpectedValueException;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
 
 /**
@@ -37,25 +38,37 @@ class Action extends AbstractDescriptor
         $this->resolvers = $resolvers;
     }
 
-    public function getProtocolFor(array $data)
+    public function getProtocolFor(array $data): RequestHandlerInterface|Status
     {
         if (isset($data['action']) && in_array($data['action'], $this->toArray())) {
             $resolver = array_search($data['action'], $this->toArray(), true);
+            $class = Base::class;
+
             if (isset($this->resolvers[$resolver])) {
                 if (is_callable($this->resolvers[$resolver])) {
-                    return $this->resolvers[$resolver]($data);
+                    $result = $this->resolvers[$resolver]($data);
+                    if ($result instanceof RequestHandlerInterface) {
+                        return $result;
+                    }
+                    if ($result instanceof Status) {
+                        return $result;
+                    }
+                    throw new UnexpectedValueException('Resolver for ' . $data['action'] . ' must return an instance of ' . RequestHandlerInterface::class . ' or ' . Status::class);
                 }
-                if (is_string($this->resolvers[$resolver]) && class_exists($this->resolvers[$resolver])) {
-                    return new $this->resolvers[$resolver]($data);
+                if (is_string($this->resolvers[$resolver]) && class_exists($this->resolvers[$resolver]) && is_a($this->resolvers[$resolver], RequestHandlerInterface::class, true)) {
+                    //return new $this->resolvers[$resolver]($data);
+                    $class = $this->resolvers[$resolver];
+                }
+            } else {
+                $className = $this->getNamespace() . '\\' . str_replace(' ', '', ucwords(str_replace('_', ' ', $data['action'])));
+                if (class_exists($className) && is_a($className, RequestHandlerInterface::class, true)) {
+                    // return new $className($data);
+                    $class = $className;
                 }
             }
-            $className = $this->getNamespace() . '\\' . str_replace(' ', '', ucwords(str_replace('_', ' ', $data['action'])));
-            if (class_exists($className)) {
-                return new $className($data);
-            }
-            return new Base($data);
+            return new $class($data);
         }
-        throw new UnexpectedValueException('No action for protocol ' . static::PROTOCOL . ' -> {' . ($data['action'] ?? 'noType') . '} detected. Must be one of: ' . implode(', ', $this->toArray()) . '');
+        throw new UnexpectedValueException('No action for protocol ' . static::PROTOCOL . ' -> {' . ($data['action'] ?? 'noType') . '} detected. Must be one of: ' . implode(', ', $this->toArray()));
     }
 
     private function getNamespace(): string
