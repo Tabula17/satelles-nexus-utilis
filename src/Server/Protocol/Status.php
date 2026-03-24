@@ -40,5 +40,13 @@ enum Status: string
         $currentStatus = self::cases();
         return array_filter($currentStatus, static fn($status) => $status->isValid());
     }
+    public static function successValues(): array
+    {
+        return [
+            self::accepted,
+            self::success,
+            self::ok
+        ];
+    }
 
 }
