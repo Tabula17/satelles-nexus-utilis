@@ -17,15 +17,6 @@ class Base extends AbstractDescriptor
             $this->action = $action;
         }
     }
-    //protected(set) string $channel;
-    //protected(set) ?string $message;
-    /*protected(set) ?string $token;
-    protected(set) array|AbstractDescriptor $data = [] {
-        set(array|AbstractDescriptor $data) {
-            $this->data = $data instanceof AbstractDescriptor ? $data->toArray() : $data;
-        }
-    }*/
-
     public function __construct(
         ?array                                    $values = [],
         private readonly array|Action $protocol = new Action()
