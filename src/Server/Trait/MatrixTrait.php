@@ -93,4 +93,8 @@ trait MatrixTrait
         $this->protocolManagers->offsetGet($protocol)->cleanUpResources();
         $this->protocolManagers->offsetUnset($protocol);
     }
+    public function getProtocolManagers(): ProtocolManagerCollection
+    {
+        return $this->protocolManagers;
+    }
 }
