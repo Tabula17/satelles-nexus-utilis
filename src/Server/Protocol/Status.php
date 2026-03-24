@@ -48,5 +48,9 @@ enum Status: string
             self::ok
         ];
     }
+    public function isSuccess(): bool
+    {
+        return in_array($this, self::successValues(), true);
+    }
 
 }
