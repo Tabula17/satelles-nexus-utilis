@@ -7,6 +7,7 @@ use Tabula17\Satelles\Nexus\Utilis\Server\Pars\TictacusCollection;
 
 trait CronosTrait
 {
+    final public const bool CRONOS_ENABLED = true;
     private TictacusCollection $managedTasks;
 
     public function getManagedTasks(): TictacusCollection
