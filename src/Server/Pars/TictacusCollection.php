@@ -29,10 +29,13 @@ class TictacusCollection extends TypedCollection
             $this->offsetUnset($id);
         }
     }
-
     public function findBy(string $key, mixed $value)
     {
         return $this->find(fn(TictacusDescriptor $config) => $config->$key === $value);
+    }
+    public function collect(string $key): array
+    {
+        return array_filter(array_map(static fn(TictacusDescriptor $config) => $config->$key, $this->values));
     }
 
 }

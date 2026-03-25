@@ -33,6 +33,14 @@ trait CronosTrait
         $this->tasks->offsetUnset($id);
         return Timer::clear($id);
     }
+    public function removeTicksByOwner(string $owner): void
+    {
+        $tasksToRemove = $this->tasks->getForOwner($owner);
+        foreach ($tasksToRemove as $id => $task) {
+            Timer::clear($id);
+            $this->tasks->offsetUnset($id);
+        }
+    }
     public function removeAllTicks(): void
     {
         $this->tasks->clear();
