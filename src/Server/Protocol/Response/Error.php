@@ -2,7 +2,7 @@
 
 namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response;
 
-class Error extends Base implements ResponseInterface
+class Error extends Base
 {
     protected(set) ?string $message;
     protected(set) ?string $code;

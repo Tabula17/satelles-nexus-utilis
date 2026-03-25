@@ -4,7 +4,7 @@ namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response;
 
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
 
-class Message extends Base implements ResponseInterface
+class Message extends Base
 {
     protected(set) string $channel;
     protected(set) array|AbstractDescriptor $data = [] {

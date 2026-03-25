@@ -23,7 +23,15 @@ class Type extends AbstractDescriptor
                 $this->resolvers = $resolvers;
             }
         }
-
+        public function addResolver(string $name, string|callable $resolver): void
+        {
+            if (!$this->offsetExists($name)) {
+                return;
+            }
+            $resolvers = $this->resolvers ?? [];
+            $resolvers[$name] = $resolver;
+            $this->resolvers = $resolvers;
+        }
     /**
      * @throws UnexpectedValueException
      */
