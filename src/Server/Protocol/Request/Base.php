@@ -28,7 +28,7 @@ class Base extends AbstractDescriptor implements RequestHandlerInterface
         parent::__construct($values);
     }
 
-    public function handle(int $fd, HamumServerInterface $server, ProtocolManagerInterface $protocolManager): Status
+    public function handle(int $fd, array $data, HamumServerInterface $server, ?ProtocolManagerInterface $protocolManager = null): Status
     {
         return Status::unknown;
     }
