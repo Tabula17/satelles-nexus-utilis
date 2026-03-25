@@ -3,6 +3,8 @@
 namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request;
 
 use Tabula17\Satelles\Nexus\Utilis\Exception\UnexpectedValueException;
+use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ProtocolManagerInterface;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
 
@@ -38,19 +40,16 @@ class Action extends AbstractDescriptor
         $this->resolvers = $resolvers;
     }
 
-    public function getProtocolFor(array $data): RequestHandlerInterface|Status
+    public function getProtocolFor(array $data, ?HamumServerInterface $server = null, ?ProtocolManagerInterface $protocolManager = null): RequestHandlerInterface|Status
     {
         if (isset($data['action']) && in_array($data['action'], $this->toArray())) {
             $resolver = array_search($data['action'], $this->toArray(), true);
             $class = Base::class;
 
             if (isset($this->resolvers[$resolver])) {
-                if (is_callable($this->resolvers[$resolver])) {
-                    $result = $this->resolvers[$resolver]($data);
-                    if ($result instanceof RequestHandlerInterface) {
-                        return $result;
-                    }
-                    if ($result instanceof Status) {
+                if (is_callable($this->resolvers[$resolver])) { // if callable, execute and check return type. pass arguments as handler expects
+                    $result = $this->resolvers[$resolver]($data, $server, $protocolManager);
+                    if ($result instanceof RequestHandlerInterface || $result instanceof Status) {
                         return $result;
                     }
                     throw new UnexpectedValueException('Resolver for ' . $data['action'] . ' must return an instance of ' . RequestHandlerInterface::class . ' or ' . Status::class);

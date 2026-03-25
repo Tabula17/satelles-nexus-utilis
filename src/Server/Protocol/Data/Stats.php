@@ -12,4 +12,5 @@ class Stats extends AbstractDescriptor
     protected(set) string $server_time;
     protected(set) int $client_fd;
     protected(set) string $origin_server;
+    protected(set) ?string $publisher;
 }
