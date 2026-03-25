@@ -20,6 +20,13 @@ trait CronosTrait
         if (!isset($this->managedTasks)) {
             $this->managedTasks = new TictacusCollection();
         }
+        $wrappedCallback = function(...$args) use ($callback) {
+            try {
+                $callback(...$args);
+            } catch (\Throwable $e) {
+                $this->logger?->error("Error en timer: " . $e->getMessage());
+            }
+        };
         $properties = $properties ?? [];
         if (!isset($properties['owner'])) {
             $class = explode('\\', get_class($this));
@@ -28,7 +35,7 @@ trait CronosTrait
         $properties['interval'] = $interval;
         $properties['added'] = microtime(true);
 
-        $id = Timer::tick($interval, $callback, $properties);
+        $id = Timer::tick($interval, $wrappedCallback, $properties);
         $this->managedTasks->offsetSet($id, $properties);
         return $id;
     }
