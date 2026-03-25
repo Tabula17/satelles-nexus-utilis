@@ -2,9 +2,9 @@
 
 namespace Tabula17\Satelles\Nexus\Utilis\Server\Pars;
 
-use Tabula17\Satelles\Utilis\Collection\TypedCollection;
+use Tabula17\Satelles\Utilis\Collection\GenericCollection;
 
-class TictacusCollection extends TypedCollection
+class TictacusCollection extends GenericCollection
 {
 
     protected static function getType(): string
