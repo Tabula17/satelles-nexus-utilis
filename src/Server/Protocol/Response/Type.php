@@ -27,7 +27,7 @@ class Type extends AbstractDescriptor
     /**
      * @throws UnexpectedValueException
      */
-    public function getProtocolFor(array $data): Base|ResponseInterface
+    public function getProtocolFor(array $data): ResponseInterface
     {
         if (isset($data['type']) && in_array($data['type'], $this->toArray())) {
             $resolver = array_search($data['type'], $this->toArray(), true);

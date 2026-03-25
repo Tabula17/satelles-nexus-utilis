@@ -6,7 +6,7 @@ use Tabula17\Satelles\Nexus\Utilis\Exception\UnexpectedValueException;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Data\Stats;
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
 
-class Base extends AbstractDescriptor
+class Base extends AbstractDescriptor implements ResponseInterface
 {
     protected(set) string $id;
     protected(set) string $type {
