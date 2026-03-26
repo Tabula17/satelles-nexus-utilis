@@ -250,13 +250,13 @@ trait HamumTrait
 
     private function getEventActionHandlers(string $event_name, ?string $action): array
     {
-        $vars = get_class_vars(get_class($this));
+        //$vars = get_class_vars(get_class($this));
         $handlers = [];
         if (isset($this->definedHandlers[strtolower($event_name)])) {
             $property = $this->definedHandlers[strtolower($event_name)]['property'];
             $handlers = array_merge(...array_values(array_map(static fn($collection) => $collection->toArray(), ($this->$property ?? [new CallableCollection()]))));
         }
-        return $action ? $handlers[$action] : $handlers;
+        return $action && isset($handlers[$action]) ? $handlers[$action] : $handlers;
     }
 
 
