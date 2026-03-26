@@ -2,6 +2,7 @@
 
 namespace Tabula17\Satelles\Nexus\Utilis\Server\Trait;
 
+use Psr\Log\LoggerInterface;
 use Swoole\Server;
 use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ProtocolManagerCollection;
@@ -12,6 +13,7 @@ use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\Type;
 trait MatrixTrait
 {
 
+    public ?LoggerInterface $logger;
     private ?ProtocolManagerCollection $protocolManagers;
 
     public function getActionsByProtocol(?string $protocol): array
@@ -51,10 +53,12 @@ trait MatrixTrait
 
     public function addProtocolManager(string $protocol, ProtocolManagerInterface $manager): void
     {
-
+        $this->logger?->debug("Adding protocol manager for protocol {$protocol}");
         $this->getProtocolManagers()->offsetSet($protocol, $manager);
         if ($this instanceof Server) {
+            $this->logger?->debug("Registering protocol manager events");
             if ($this instanceof HamumServerInterface) {
+                $this->logger?->debug("Registering protocol manager events for HamumServer");
                 $this->on('beforestart', $manager->initializeOnStart(...));
                 $this->on('beforestart', $manager->registerProtocolHandlers(...));
             }
@@ -91,6 +95,7 @@ trait MatrixTrait
         $this->getProtocolManagers()->offsetGet($protocol)->cleanUpResources();
         $this->getProtocolManagers()->offsetUnset($protocol);
     }
+
     public function getProtocolManagers(): ProtocolManagerCollection
     {
         if (!isset($this->protocolManagers)) {
