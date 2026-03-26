@@ -150,6 +150,7 @@ abstract class Filum extends Server implements HamumServerInterface
 
     public function registerMessageHandlers(string $protocolAction, callable $callback, $protocol = 'generic'): void
     {
+        $this->logger?->debug("Registering message handler for protocolAction: {$protocolAction}, protocol: {$protocol}");
         if (!isset($this->messageHandlers[$protocolAction]) || !($this->messageHandlers[$protocolAction] instanceof CallableCollection)) {
             $this->messageHandlers[$protocolAction] = new CallableCollection();
         }

@@ -105,6 +105,7 @@ trait HamumTrait
         }
         $vars = get_class_vars(get_class($this));
         foreach ($vars as $key => $value) {
+            $this->logger?->debug("Finding handlers on properties -> property: $key");
             if (str_ends_with($key, 'Handler')) {
                 $event_name = strtolower(str_replace('Handler', '', $key));
                 $this->definedHandlers[$event_name] = [
@@ -215,6 +216,7 @@ trait HamumTrait
 
     private function registerEventHandlers(string $event_name): void
     {
+        $this->logger?->debug("Registering event handlers for event $event_name");
         if (isset($this->definedHandlers[strtolower($event_name) ])) {
             $handlerName = $this->definedHandlers[strtolower($event_name)]['handler'];
             $property = $this->definedHandlers[strtolower($event_name)]['property'];
