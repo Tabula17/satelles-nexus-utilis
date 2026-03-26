@@ -26,7 +26,7 @@ class Action extends AbstractDescriptor
     private array $resolvers {
         set(array $resolvers) {
             //array_search($resolver, $this->toArray(), true)
-            $resolvers = array_filter($resolvers, fn($resolver) => $this->offsetExists(array_search($resolver, $this->toArray(), true)), ARRAY_FILTER_USE_KEY);
+            $resolvers = array_filter($resolvers, fn($resolver) => array_key_exists($resolver, $this->toArray()), ARRAY_FILTER_USE_KEY);
             $this->resolvers = $resolvers;
         }
     }

@@ -19,7 +19,7 @@ class Type extends AbstractDescriptor
     ]
         {
             set(array $resolvers) {
-                $resolvers = array_filter($resolvers, fn($resolver) => $this->offsetExists(array_search($resolver, $this->toArray(), true)), ARRAY_FILTER_USE_KEY);
+                $resolvers = array_filter($resolvers, fn($resolver) => array_key_exists($resolver, $this->toArray()), ARRAY_FILTER_USE_KEY);
                 $this->resolvers = $resolvers;
             }
         }
