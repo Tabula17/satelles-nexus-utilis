@@ -82,6 +82,7 @@ class Action extends AbstractDescriptor
                     // return new $className($data);
                     $class = $className;
                 }
+                trigger_error("Action '{$data['action']} ({$resolver})' has no resolver or Custom class defined ('{$className}'). Using default class '{$class}'", E_USER_WARNING);
             }
             return new $class($data);
         }
