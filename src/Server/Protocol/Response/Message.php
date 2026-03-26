@@ -21,14 +21,14 @@ class Message extends Base
         if (empty($values)) {
             $values = [];
         }
-        $values['type'] = $responseTypes->get('message');
+        $values['type'] = $responseTypes->message;
         parent::__construct($values, $responseTypes);
     }
 
     public function isValid(): bool
     {
         return $this->type &&
-            $this->type === $this->responseTypes->get('message') &&
+            $this->type === $this->responseTypes->message &&
             $this->channel &&
             $this->data && !empty($this->data instanceof AbstractDescriptor ? $this->data->getInitialized() : $this->data);
     }
