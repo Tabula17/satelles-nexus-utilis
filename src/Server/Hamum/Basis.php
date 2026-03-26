@@ -7,28 +7,13 @@ use Tabula17\Satelles\Nexus\Utilis\Server\Trait\HamumTrait;
 use Tabula17\Satelles\Utilis\Collection\CallableCollection;
 use Tabula17\Satelles\Utilis\Config\TCPServerConfig;
 
-abstract class Basis extends Server implements HamumServerInterface
+abstract class Basis extends AbstractHamum
 {
     use HamumTrait;
 
     private array $connectHandlers = [];
     private array $receiveHandlers = [];
     private array $packetHandlers = [];
-
-    public function __construct(TCPServerConfig $config)
-    {
-        parent::__construct($config->host, $config->port, $config->mode ?? SWOOLE_BASE, $config->type ?? SWOOLE_SOCK_TCP);
-        $sslEnabled = isset($config->ssl) && $config->ssl->enabled;
-        $options = $sslEnabled ? array_merge($config->options, $config->ssl->toArray()) : $config->options;
-        if ($sslEnabled) {
-            unset($options['enabled']);
-        }
-        $this->set($options);
-        $this->init();
-    }
-    abstract public function init(): void;
-
-
     public function registerReceiveHandlers(string $protocolAction, callable $callback, $protocol = 'generic'): void
     {
         if (!isset($this->receiveHandlers[$protocolAction]) || !($this->receiveHandlers[$protocolAction] instanceof CallableCollection)) {
