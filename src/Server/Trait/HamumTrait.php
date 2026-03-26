@@ -129,7 +129,7 @@ trait HamumTrait
                 unset($this->hookedEvents['beforestart'][$k]);
             }
         }
-        if($this->setting['task_worker_num'] > 0 && empty($this->taskHandlers)) {
+        if ($this->setting['task_worker_num'] > 0 && empty($this->taskHandlers)) {
             $this?->logger?->debug('No task handlers found. Registering task event handler.');
             $this->on('task', $this->handleTaskEvent(...));
         }
@@ -225,13 +225,13 @@ trait HamumTrait
     private function registerEventHandlers(string $event_name): void
     {
         $this->logger?->debug("Registering event handlers for event $event_name");
-        if (isset($this->definedHandlers[strtolower($event_name) ])) {
+        if (isset($this->definedHandlers[strtolower($event_name)])) {
             $this->logger?->debug("Event $event_name is defined. Registering event handlers.");
             $handlerName = $this->definedHandlers[strtolower($event_name)]['handler'];
             $property = $this->definedHandlers[strtolower($event_name)]['property'];
             $handlers = count($this->$property);
             $this->logger?->debug("Handlers found: $handlers on property $property.");
-            if(!method_exists($this, $handlerName)) {
+            if (!method_exists($this, $handlerName)) {
                 $this->logger?->error("Method $handlerName does not exist on class " . get_class($this));
             }
             if ($handlers > 0 && !isset($this->registeredHandlers[$event_name]) && method_exists($this, $handlerName)) {
@@ -252,11 +252,11 @@ trait HamumTrait
     {
         $vars = get_class_vars(get_class($this));
         $handlers = [];
-        if (isset($this->definedHandlers[strtolower($event_name) ])) {
+        if (isset($this->definedHandlers[strtolower($event_name)])) {
             $property = $this->definedHandlers[strtolower($event_name)]['property'];
             $handlers = array_merge(...array_values(array_map(static fn($collection) => $collection->toArray(), ($this->$property ?? [new CallableCollection()]))));
         }
-        return $handlers;
+        return $action ? $handlers[$action] : $handlers;
     }
 
 
