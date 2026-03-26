@@ -25,9 +25,6 @@ class Type extends AbstractDescriptor
         }
         public function addResolver(string $name, string|callable $resolver): void
         {
-            if (!$this->offsetExists($name)) {
-                return;
-            }
             $resolvers = $this->resolvers ?? [];
             $resolvers[$name] = $resolver;
             $this->resolvers = $resolvers;
