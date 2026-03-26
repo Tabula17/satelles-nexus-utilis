@@ -18,7 +18,7 @@ trait MatrixTrait
     {
         $actions = [];
         /** @var ProtocolManagerInterface $protocolManager */
-        foreach ($this->protocolManagers as $protocolManager) {
+        foreach ($this->getProtocolManagers() as $protocolManager) {
             $actions[$protocolManager->protocol::getProtocolName()] = $protocolManager->protocol->toArray();
         }
         return isset($protocol) ? ($actions[$protocol] ?? []) : $actions;
@@ -28,7 +28,7 @@ trait MatrixTrait
     {
         $types = [];
         /** @var ProtocolManagerInterface $protocolManager */
-        foreach ($this->protocolManagers as $protocolManager) {
+        foreach ($this->getProtocolManagers() as $protocolManager) {
             $types[$protocolManager->protocol::getProtocolName()] = $protocolManager->responses->toArray();
         }
         return isset($protocol) ? ($types[$protocol] ?? []) : $types;
@@ -38,7 +38,7 @@ trait MatrixTrait
     {
         $protocols = [];
         /** @var ProtocolManagerInterface $protocolManager */
-        foreach ($this->protocolManagers as $protocolManager) {
+        foreach ($this->getProtocolManagers() as $protocolManager) {
             foreach ($protocolManager->protocol->toArray() as $protocolAction) {
                 if (!isset($protocols[$protocolAction])) {
                     $protocols[$protocolAction] = [];
@@ -51,10 +51,8 @@ trait MatrixTrait
 
     public function addProtocolManager(string $protocol, ProtocolManagerInterface $manager): void
     {
-        if (!isset($this->protocolManagers)) {
-            $this->protocolManagers = new ProtocolManagerCollection();
-        }
-        $this->protocolManagers->offsetSet($protocol, $manager);
+
+        $this->getProtocolManagers()->offsetSet($protocol, $manager);
         if ($this instanceof Server) {
             if ($this instanceof HamumServerInterface) {
                 $this->on('beforestart', $manager->initializeOnStart(...));
@@ -70,12 +68,12 @@ trait MatrixTrait
 
     public function getProtocolManager(string $protocol): ?ProtocolManagerInterface
     {
-        return $this->protocolManagers?->offsetGet($protocol);
+        return $this->getProtocolManagers()?->offsetGet($protocol);
     }
 
     public function hasProtocolManager(string $protocol): bool
     {
-        return $this->protocolManagers->offsetExists($protocol);
+        return $this->getProtocolManagers()->offsetExists($protocol);
     }
 
     public function getRequestProtocol(string $protocol): ?Action
@@ -90,11 +88,14 @@ trait MatrixTrait
 
     public function removeProtocolManager(string $protocol): void
     {
-        $this->protocolManagers->offsetGet($protocol)->cleanUpResources();
-        $this->protocolManagers->offsetUnset($protocol);
+        $this->getProtocolManagers()->offsetGet($protocol)->cleanUpResources();
+        $this->getProtocolManagers()->offsetUnset($protocol);
     }
     public function getProtocolManagers(): ProtocolManagerCollection
     {
+        if (!isset($this->protocolManagers)) {
+            $this->protocolManagers = new ProtocolManagerCollection();
+        }
         return $this->protocolManagers;
     }
 }
