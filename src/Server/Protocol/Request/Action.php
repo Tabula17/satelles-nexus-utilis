@@ -62,7 +62,7 @@ class Action extends AbstractDescriptor
     public function getProtocolFor(array $data, ?int $fd, ?HamumServerInterface $server = null, ?ProtocolManagerInterface $protocolManager = null): RequestHandlerInterface|Status
     {
         if (isset($data['action']) && in_array($data['action'], $this->toArray())) {
-            $resolver = $this->getKeyFromValue($data['action']);//array_search($data['action'], $this->toArray(), true);
+            $resolver = $data['action'];//$this->getKeyFromValue($data['action']);//array_search($data['action'], $this->toArray(), true);
             $class = Generic::class;
 
             if (isset($this->resolvers[$resolver])) {
