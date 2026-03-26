@@ -2,6 +2,7 @@
 
 namespace Tabula17\Satelles\Nexus\Utilis\Server\Hamum;
 
+use Psr\Log\LoggerInterface;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\WebSocket\Frame;
@@ -10,7 +11,7 @@ use Tabula17\Satelles\Nexus\Utilis\Server\Trait\HamumTrait;
 use Tabula17\Satelles\Utilis\Collection\CallableCollection;
 use Tabula17\Satelles\Utilis\Config\TCPServerConfig;
 
-abstract class Filum extends AbstractHamum
+abstract class Filum extends Server implements HamumServerInterface
 {
     use HamumTrait;
 
@@ -27,6 +28,18 @@ abstract class Filum extends AbstractHamum
     private array $openHandlers = [];
     private array $disconnectHandlers = [];
 
+    public function __construct(TCPServerConfig $config, public ?LoggerInterface $logger = null)
+    {
+        parent::__construct($config->host, $config->port, $config->mode ?? SWOOLE_BASE, $config->type ?? SWOOLE_SOCK_TCP);
+        $sslEnabled = isset($config->ssl) && $config->ssl->enabled;
+        $options = $sslEnabled ? array_merge($config->options, $config->ssl->toArray()) : $config->options;
+        if ($sslEnabled) {
+            unset($options['enabled']);
+        }
+        $this->set($options);
+        $this->init();
+    }
+    abstract protected function init(): void;
     public function handleRequestEvent(Request $request, Response $response): void
     {
         $this?->logger?->debug("Handling request event with protocolAction: {$request->server['request_uri']}");

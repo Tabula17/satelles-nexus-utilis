@@ -28,11 +28,7 @@ trait HamumTrait
     // private array $packetHandlers = [];
     // private array $connectHandlers = [];
     private array $closeHandlers = [];
-    public ?LoggerInterface $logger {
-        set {
-            $this->logger = $value;
-        }
-    }
+    public ?LoggerInterface $logger;
 
     private array $registeredHandlers = [];
     private array $definedHandlers = [];
