@@ -25,11 +25,13 @@ class Action extends AbstractDescriptor
     const string PROTOCOL = 'generic';
     private array $resolvers {
         set(array $resolvers) {
-            $resolvers = array_filter($resolvers, fn($resolver) => $this->offsetExists($resolver), ARRAY_FILTER_USE_KEY);
+            //array_search($resolver, $this->toArray(), true)
+            $resolvers = array_filter($resolvers, fn($resolver) => $this->offsetExists(array_search($resolver, $this->toArray(), true)), ARRAY_FILTER_USE_KEY);
             $this->resolvers = $resolvers;
         }
     }
 
+    //private function
     public function addResolver(string $name, string|callable $resolver): void
     {
         if (!$this->offsetExists($name)) {
@@ -39,18 +41,22 @@ class Action extends AbstractDescriptor
         $resolvers[$name] = $resolver;
         $this->resolvers = $resolvers;
     }
+
     public function hasResolver(string $name): bool
     {
         return isset($this->resolvers[$name]);
     }
+
     public function getResolver(string $name): string|callable|null
     {
         return $this->resolvers[$name] ?? null;
     }
+
     public function getResolvers(): array
     {
         return $this->resolvers;
     }
+
     public function getProtocolFor(array $data, ?int $fd, ?HamumServerInterface $server = null, ?ProtocolManagerInterface $protocolManager = null): RequestHandlerInterface|Status
     {
         if (isset($data['action']) && in_array($data['action'], $this->toArray())) {
