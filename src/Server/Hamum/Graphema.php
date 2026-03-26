@@ -21,7 +21,9 @@ abstract class Graphema extends Server implements HamumServerInterface
             unset($options['enabled']);
         }
         $this->set($options);
+        $this->init();
     }
+    abstract public function init(): void;
 
     public function handleRequestEvent(string $protocolAction, $request, $response): void
     {

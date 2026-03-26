@@ -98,7 +98,7 @@ trait HamumTrait
         return in_array($event_name, $allEvents, true);
     }
 
-    abstract protected function init(): void;
+    abstract protected function onBeforeStart(): void;
 
     public function start(): bool
     {

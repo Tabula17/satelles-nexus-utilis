@@ -24,7 +24,9 @@ abstract class Basis extends Server implements HamumServerInterface
             unset($options['enabled']);
         }
         $this->set($options);
+        $this->init();
     }
+    abstract public function init(): void;
 
 
     public function registerReceiveHandlers(string $protocolAction, callable $callback, $protocol = 'generic'): void

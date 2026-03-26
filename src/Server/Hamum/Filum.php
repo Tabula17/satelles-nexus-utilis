@@ -36,8 +36,9 @@ abstract class Filum extends Server implements HamumServerInterface
             unset($options['enabled']);
         }
         $this->set($options);
+        $this->init();
     }
-
+    abstract public function init(): void;
     public function handleRequestEvent(Request $request, Response $response): void
     {
         $this?->logger?->debug("Handling request event with protocolAction: {$request->server['request_uri']}");
