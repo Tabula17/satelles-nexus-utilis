@@ -44,7 +44,7 @@ class Action extends AbstractDescriptor
     {
         if (isset($data['action']) && in_array($data['action'], $this->toArray())) {
             $resolver = array_search($data['action'], $this->toArray(), true);
-            $class = Base::class;
+            $class = self::class;
 
             if (isset($this->resolvers[$resolver])) {
                 if (is_callable($this->resolvers[$resolver])) { // if callable, execute and check return type. pass arguments as handler expects
