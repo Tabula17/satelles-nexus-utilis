@@ -53,7 +53,7 @@ trait MatrixTrait
 
     public function addProtocolManager(string $protocol, ProtocolManagerInterface $manager): void
     {
-        $this->logger?->debug("Adding protocol manager for protocol {$protocol}");
+        $this->logger?->debug("Adding protocol manager for protocol {$protocol}. Server class: " . get_class($this) . ".");
         $this->getProtocolManagers()->offsetSet($protocol, $manager);
         if ($this instanceof Server) {
             $this->logger?->debug("Registering protocol manager events");
