@@ -104,20 +104,22 @@ trait HamumTrait
             return false;
         }
 
-        $this->onBeforeStart();
-        $this->logger?->debug('Server->Template fn->onBeforeStart executed');
 
         $vars = get_class_vars(get_class($this));
         foreach ($vars as $key => $value) {
             $this->logger?->debug("Finding handlers on properties -> property: $key");
-            if (str_ends_with($key, 'Handler')) {
-                $event_name = strtolower(str_replace('Handler', '', $key));
+            if (str_ends_with($key, 'Handlers')) {
+                $event_name = strtolower(str_replace('Handlers', '', $key));
                 $this->definedHandlers[$event_name] = [
                     'property' => $key,
                     'handler' => "handle" . ucfirst($event_name) . "Event"
                 ];
             }
         }
+
+
+        $this->onBeforeStart();
+        $this->logger?->debug('Server->Template fn->onBeforeStart executed. Now look for callbacks on server->beforestart');
 
         foreach ($this->hookedEvents['beforestart'] ?? [] as $k => $callback) {
             $this?->logger?->debug('Executing callback ' . $k . ' on server->beforestart');
