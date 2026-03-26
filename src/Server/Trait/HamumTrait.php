@@ -129,6 +129,10 @@ trait HamumTrait
                 unset($this->hookedEvents['beforestart'][$k]);
             }
         }
+        if($this->setting['task_worker_num'] > 0 && empty($this->taskHandlers)) {
+            $this?->logger?->debug('No task handlers found. Registering task event handler.');
+            $this->on('task', $this->handleTaskEvent(...));
+        }
 
         $this?->logger?->debug('Server->beforestart executed');
         $this?->logger?->debug(str_repeat('-', 100));
