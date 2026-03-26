@@ -178,10 +178,11 @@ abstract class Filum extends Server implements HamumServerInterface
     public function handleMessageEvent(Server $server, Frame $frame): void
     {
         $this?->logger?->debug("Handling message event for fd {$frame->fd} with raw data: {$frame->data}");
-        $data = json_decode($frame->data, true);
+        $data = json_validate($frame->data) ? json_decode($frame->data, true) : ['message' => $frame->data];
         $this?->logger?->debug("Handling message event for with data: {$data}");
 
-        $protocolAction = json_validate($data) ? json_decode($data, true)['action'] : '';
+        $protocolAction = $data['action'] ?? '';
+
         $eventHandlers = array_merge($this->getEventActionHandlers('message', $protocolAction) , $this->getEventActionHandlers('message', '*'));
         foreach ($eventHandlers as $callback) {
             $callback($server, $data);
