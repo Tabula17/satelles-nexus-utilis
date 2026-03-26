@@ -47,6 +47,10 @@ class Action extends AbstractDescriptor
     {
         return $this->resolvers[$name] ?? null;
     }
+    public function getResolvers(): array
+    {
+        return $this->resolvers;
+    }
     public function getProtocolFor(array $data, ?int $fd, ?HamumServerInterface $server = null, ?ProtocolManagerInterface $protocolManager = null): RequestHandlerInterface|Status
     {
         if (isset($data['action']) && in_array($data['action'], $this->toArray())) {
