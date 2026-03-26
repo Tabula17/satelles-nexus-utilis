@@ -103,6 +103,10 @@ trait HamumTrait
             $this?->logger?->debug(str_repeat('-', 100));
             return false;
         }
+
+        $this->onBeforeStart();
+        $this->logger?->debug('Server->Template fn->onBeforeStart executed');
+
         $vars = get_class_vars(get_class($this));
         foreach ($vars as $key => $value) {
             $this->logger?->debug("Finding handlers on properties -> property: $key");
@@ -114,8 +118,6 @@ trait HamumTrait
                 ];
             }
         }
-
-        $this->init();
 
         foreach ($this->hookedEvents['beforestart'] ?? [] as $k => $callback) {
             $this?->logger?->debug('Executing callback ' . $k . ' on server->beforestart');
