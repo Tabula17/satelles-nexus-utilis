@@ -53,10 +53,12 @@ class Action extends AbstractDescriptor
     {
         return $this->resolvers;
     }
+
     public function getKeyFromValue(string $value): string
     {
         return array_search($value, $this->toArray(), true);
     }
+
     public function getProtocolFor(array $data, ?int $fd, ?HamumServerInterface $server = null, ?ProtocolManagerInterface $protocolManager = null): RequestHandlerInterface|Status
     {
         if (isset($data['action']) && in_array($data['action'], $this->toArray())) {
@@ -81,8 +83,10 @@ class Action extends AbstractDescriptor
                 if (class_exists($className) && is_a($className, RequestHandlerInterface::class, true)) {
                     // return new $className($data);
                     $class = $className;
+                } else {
+                    $resolvers = implode(', ', array_keys($this->resolvers));
+                    trigger_error("Action '{$data['action']} ({$resolver} -> [{$resolvers}])' has no resolver  or Custom class defined ('{$className}'). Using default class '{$class}'", E_USER_WARNING);
                 }
-                trigger_error("Action '{$data['action']} ({$resolver})' has no resolver or Custom class defined ('{$className}'). Using default class '{$class}'", E_USER_WARNING);
             }
             return new $class($data);
         }
