@@ -116,16 +116,16 @@ trait HamumTrait
 
         $this->init();
 
-        foreach ($this->hookedEvents['beforeStart'] ?? [] as $k => $callback) {
-            $this?->logger?->debug('Executing callback ' . $k . ' on server->beforeStart');
+        foreach ($this->hookedEvents['beforestart'] ?? [] as $k => $callback) {
+            $this?->logger?->debug('Executing callback ' . $k . ' on server->beforestart');
             if (is_callable($callback)) {
                 $callback($this);
             } else {
-                unset($this->hookedEvents['beforeStart'][$k]);
+                unset($this->hookedEvents['beforestart'][$k]);
             }
         }
 
-        $this?->logger?->debug('Server->beforeStart executed');
+        $this?->logger?->debug('Server->beforestart executed');
         $this?->logger?->debug(str_repeat('-', 100));
         return parent::start();
     }
@@ -143,6 +143,7 @@ trait HamumTrait
             $this->logger?->error("Server type is not supported by this trait. Can't override on() method.");
             return false;
         }
+        $event_name = strtolower($event_name);
         $hookedCallback = $this->onEvent($event_name, $callback, $cleanQueue, $this->worker_id);
         if (is_bool($hookedCallback)) {
             return $hookedCallback;
@@ -206,7 +207,7 @@ trait HamumTrait
             }
         };
         if (strtolower($event_name) === 'beforestart') {
-            //swoole doesn't allow hooking beforeStart event, so we handle it internally and skip registering it in swoole's event system
+            //swoole doesn't allow hooking beforestart event, so we handle it internally and skip registering it in swoole's event system
             return true;
         }
         return $hookedCallback;
