@@ -26,7 +26,7 @@ class Action extends AbstractDescriptor
     private array $resolvers {
         set(array $resolvers) {
             //array_search($resolver, $this->toArray(), true)
-            $resolvers = array_filter($resolvers, fn($resolver) => $this->offsetExists(array_search($resolver, $this->toArray(), true)), ARRAY_FILTER_USE_KEY);
+            $resolvers = array_filter($resolvers, fn($resolver) => $this->offsetExists($this->getKeyFromValue($resolver)), ARRAY_FILTER_USE_KEY);
             $this->resolvers = $resolvers;
         }
     }
@@ -60,7 +60,7 @@ class Action extends AbstractDescriptor
     public function getProtocolFor(array $data, ?int $fd, ?HamumServerInterface $server = null, ?ProtocolManagerInterface $protocolManager = null): RequestHandlerInterface|Status
     {
         if (isset($data['action']) && in_array($data['action'], $this->toArray())) {
-            $resolver = array_search($data['action'], $this->toArray(), true);
+            $resolver = $this->getKeyFromValue($data['action']);//array_search($data['action'], $this->toArray(), true);
             $class = Generic::class;
 
             if (isset($this->resolvers[$resolver])) {
@@ -75,6 +75,7 @@ class Action extends AbstractDescriptor
                     //return new $this->resolvers[$resolver]($data);
                     $class = $this->resolvers[$resolver];
                 }
+                trigger_error("Action '{$data['action']} ({$resolver})' has resolver but it's not a valid class or callable. Using default class '{$class}'", E_USER_WARNING);
             } else {
                 $className = $this->getNamespace() . '\\' . str_replace(' ', '', ucwords(str_replace('_', ' ', $data['action'])));
                 if (class_exists($className) && is_a($className, RequestHandlerInterface::class, true)) {

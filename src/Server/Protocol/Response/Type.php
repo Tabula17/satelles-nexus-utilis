@@ -19,23 +19,45 @@ class Type extends AbstractDescriptor
     ]
         {
             set(array $resolvers) {
-                $resolvers = array_filter($resolvers, fn($resolver) => $this->offsetExists(array_search($resolver, $this->toArray(), true)), ARRAY_FILTER_USE_KEY);
+                $resolvers = array_filter($resolvers, fn($resolver) => $this->offsetExists($this->getKeyFromValue($resolver)), ARRAY_FILTER_USE_KEY);
                 $this->resolvers = $resolvers;
             }
         }
-        public function addResolver(string $name, string|callable $resolver): void
-        {
-            $resolvers = $this->resolvers ?? [];
-            $resolvers[$name] = $resolver;
-            $this->resolvers = $resolvers;
-        }
+
+    public function addResolver(string $name, string|callable $resolver): void
+    {
+        $resolvers = $this->resolvers ?? [];
+        $resolvers[$name] = $resolver;
+        $this->resolvers = $resolvers;
+    }
+
+    public function hasResolver(string $name): bool
+    {
+        return isset($this->resolvers[$name]);
+    }
+
+    public function getResolver(string $name): string|callable|null
+    {
+        return $this->resolvers[$name] ?? null;
+    }
+
+    public function getResolvers(): array
+    {
+        return $this->resolvers;
+    }
+
+    public function getKeyFromValue(string $value): string
+    {
+        return array_search($value, $this->toArray(), true);
+    }
+
     /**
      * @throws UnexpectedValueException
      */
     public function getProtocolFor(array $data): ResponseInterface
     {
         if (isset($data['type']) && in_array($data['type'], $this->toArray())) {
-            $resolver = array_search($data['type'], $this->toArray(), true);
+            $resolver = $this->getKeyFromValue($data['type']);//array_search($data['type'], $this->toArray(), true);
             if (isset($this->resolvers[$resolver])) {
                 if (is_callable($this->resolvers[$resolver])) {
                     return $this->resolvers[$resolver]($data);
