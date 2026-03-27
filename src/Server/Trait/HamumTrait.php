@@ -108,9 +108,10 @@ trait HamumTrait
     final public function checkPort(): bool
     {
         $port = $this->port;
+        $addr = $this->host;
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        if (@socket_bind($socket, '127.0.0.1', 0)) { // Port 0 lets the OS pick an available port
-            socket_getsockname($socket, $addr, $port);
+        if (@socket_bind($socket, $addr, $port)) { // Port 0 lets the OS pick an available port
+            //socket_getsockname($socket, $addr, $port); // Get the actual port number
             $this->logger?->debug("✅ Listen on $addr:$port is available.");
             socket_close($socket);
             return true;
