@@ -94,7 +94,14 @@ trait HamumTrait
         return in_array($event_name, $allEvents, true);
     }
 
-    final public function canConnectTo(string $host, int $port, $timeout = 5): bool
+    /**
+     * Check if can connect to a port on a specific host.
+     * @param string $host
+     * @param int $port
+     * @param $timeout
+     * @return bool
+     */
+    final public static function canConnectTo(string $host, int $port, $timeout = 5): bool
     {
         $serverConn = @stream_socket_client("tcp://$host:$port", $errno, $errstr, $timeout);
         if ($serverConn) {
@@ -105,29 +112,38 @@ trait HamumTrait
         return false; // Port is not responding or is blocked
     }
 
-    final public function checkPort(int $timeout = 5): bool
+    /**
+     * Check if a port is available for your new script to bind to.
+     * @param string $host
+     * @param int $port
+     * @param int $timeout
+     * @return bool
+     */
+    final public static function checkPort(string $host, int $port, int $timeout = 5): bool
     {
-        $port = $this->port;
-        $host = $this->host;
-        $this->logger?->debug("📡 Checking if port $port is available on host $host");
+
         $connection = @fsockopen($host, $port, $errno, $errstr, $timeout);
         if (is_resource($connection)) {
             fclose($connection); // Close the connection immediately
             return false; // Port is NOT available for your new script to bind to
         }
-        $this->logger?->debug("✅ Listen on $host:$port is available.");
         return true;
-        /*
-        //Search available port
+    }
+
+    /**
+     * Search for an available port on the specified address.
+     * @param string $addr
+     * @return int|null
+     */
+    final public static function searchAvailablePort(string $addr): ?int
+    {
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         if (@socket_bind($socket, $addr, 0)) { // Port 0 lets the OS pick an available port
             socket_getsockname($socket, $addr, $port); // Get the actual port number
-            $this->logger?->debug("✅ Listen on $addr:$port is available.");
             socket_close($socket);
-            return true;
+            return $port;
         }
-        return false;
-        */
+        return null;
     }
 
     abstract protected function onBeforeStart(): void;
@@ -136,11 +152,6 @@ trait HamumTrait
     {
         if (!$this->traitAllowed()) {
             $this->logger?->error("Server type is not supported by this trait. Can't override start() method.");
-            $this?->logger?->debug(str_repeat('-', 100));
-            return false;
-        }
-        if(!$this->checkPort(2)) {
-            $this?->logger?->error("Port {$this->port} is not available. Please check your configuration and try again.");
             $this?->logger?->debug(str_repeat('-', 100));
             return false;
         }
