@@ -94,7 +94,7 @@ trait HamumTrait
         return in_array($event_name, $allEvents, true);
     }
 
-    final public function checkHostAndPort($host, $port, $timeout = 5): bool
+    final public function canConnectTo(string $host, int $port, $timeout = 5): bool
     {
         $serverConn = @stream_socket_client("tcp://$host:$port", $errno, $errstr, $timeout);
         if ($serverConn) {
@@ -105,18 +105,28 @@ trait HamumTrait
         return false; // Port is not responding or is blocked
     }
 
-    final public function checkPort(): bool
+    final public function checkPort(int $timeout = 5): bool
     {
         $port = $this->port;
-        $addr = $this->host;
+        $host = $this->host;
+        $connection = @fsockopen($host, $port, $errno, $errstr, $timeout);
+        if (is_resource($connection)) {
+            fclose($connection); // Close the connection immediately
+            return false; // Port is NOT available for your new script to bind to
+        }
+        $this->logger?->debug("✅ Listen on $host:$port is available.");
+        return true;
+        /*
+        //Search available port
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        if (@socket_bind($socket, $addr, $port)) { // Port 0 lets the OS pick an available port
-            //socket_getsockname($socket, $addr, $port); // Get the actual port number
+        if (@socket_bind($socket, $addr, 0)) { // Port 0 lets the OS pick an available port
+            socket_getsockname($socket, $addr, $port); // Get the actual port number
             $this->logger?->debug("✅ Listen on $addr:$port is available.");
             socket_close($socket);
             return true;
         }
         return false;
+        */
     }
 
     abstract protected function onBeforeStart(): void;
