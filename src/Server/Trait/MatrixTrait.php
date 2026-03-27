@@ -103,4 +103,9 @@ trait MatrixTrait
         }
         return $this->protocolManagers;
     }
+
+    public function getProtocols(): array
+    {
+        return array_keys($this->getProtocolManagers()->toArray());
+    }
 }
