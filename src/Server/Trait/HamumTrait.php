@@ -94,12 +94,41 @@ trait HamumTrait
         return in_array($event_name, $allEvents, true);
     }
 
+    final public function checkHostAndPort($host, $port, $timeout = 5): bool
+    {
+        $serverConn = @stream_socket_client("tcp://$host:$port", $errno, $errstr, $timeout);
+        if ($serverConn) {
+            fclose($serverConn);
+            return true; // Port is open and available
+        }
+
+        return false; // Port is not responding or is blocked
+    }
+
+    final public function checkPort(): bool
+    {
+        $port = $this->port;
+        $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        if (@socket_bind($socket, '127.0.0.1', 0)) { // Port 0 lets the OS pick an available port
+            socket_getsockname($socket, $addr, $port);
+            $this->logger?->debug("Port $port is available.");
+            socket_close($socket);
+            return true;
+        }
+        return false;
+    }
+
     abstract protected function onBeforeStart(): void;
 
     public function start(): bool
     {
         if (!$this->traitAllowed()) {
             $this->logger?->error("Server type is not supported by this trait. Can't override start() method.");
+            $this?->logger?->debug(str_repeat('-', 100));
+            return false;
+        }
+        if(!$this->checkPort()) {
+            $this?->logger?->error("Port {$this->port} is not available. Please check your configuration and try again.");
             $this?->logger?->debug(str_repeat('-', 100));
             return false;
         }
