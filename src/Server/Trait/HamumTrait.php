@@ -109,6 +109,7 @@ trait HamumTrait
     {
         $port = $this->port;
         $host = $this->host;
+        $this->logger?->debug("📡 Checking if port $port is available on host $host");
         $connection = @fsockopen($host, $port, $errno, $errstr, $timeout);
         if (is_resource($connection)) {
             fclose($connection); // Close the connection immediately
@@ -138,7 +139,7 @@ trait HamumTrait
             $this?->logger?->debug(str_repeat('-', 100));
             return false;
         }
-        if(!$this->checkPort()) {
+        if(!$this->checkPort(2)) {
             $this?->logger?->error("Port {$this->port} is not available. Please check your configuration and try again.");
             $this?->logger?->debug(str_repeat('-', 100));
             return false;
