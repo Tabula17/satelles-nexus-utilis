@@ -40,7 +40,8 @@
     "php": ">=8.4",
     "ext-swoole": ">=6.1",
     "ext-posix": "*",
-    "ext-pdo": "*"
+    "ext-pdo": "*",
+    "ext-sockets": "*"
   },
   "require-dev": {
     "swoole/ide-helper": "@dev",
@@ -48,7 +49,6 @@
     "bramus/monolog-colored-line-formatter": "dev-master"
   },
   "suggest": {
-    "ext-sockets": "Sockets extension for TCP/UDP connections",
     "ext-redis": "Redis extension for caching",
     "ext-memcached": "Memcached extension for caching",
     "monolog/monolog": "Logging"

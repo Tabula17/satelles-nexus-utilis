@@ -111,7 +111,7 @@ trait HamumTrait
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         if (@socket_bind($socket, '127.0.0.1', 0)) { // Port 0 lets the OS pick an available port
             socket_getsockname($socket, $addr, $port);
-            $this->logger?->debug("Port $port is available.");
+            $this->logger?->debug("✅ Listen on $addr:$port is available.");
             socket_close($socket);
             return true;
         }
