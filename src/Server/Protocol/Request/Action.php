@@ -100,7 +100,7 @@ class Action extends AbstractDescriptor
             return new $class($data);
         }
         trigger_error('No action for protocol ' . static::PROTOCOL . ' -> {' . ($data['action'] ?? 'noType') . '} detected. Must be one of: ' . implode(', ', $this->toArray()), E_USER_WARNING);
-        return Status::error;
+        return Status::undefined;
     }
 
     private function getNamespace(): string
