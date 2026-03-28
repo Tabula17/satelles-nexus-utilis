@@ -165,6 +165,11 @@ abstract class Filum extends Server implements HamumServerInterface
         return $this->messageHandlers[$protocolAction]?->toArray();
     }
 
+    public function getMessageHandlerForProtocol(string $protocolAction, string $protocol): ?callable
+    {
+        return $this->messageHandlers[$protocolAction]?->get($protocol);
+    }
+
     public function hasMessageHandlers(string $protocolAction): bool
     {
         return $this->messageHandlers[$protocolAction]->offsetExists($protocolAction) && $this->messageHandlers[$protocolAction]->count() > 0;
@@ -188,7 +193,6 @@ abstract class Filum extends Server implements HamumServerInterface
             try {
                 $callback($server, $frame->fd, $data);
             } catch (\Throwable $e) {
-                var_dump($eventHandlers);
                 $this?->logger?->error("Error handling message event for protocol {$protocol} with action: {$protocolAction}: {$e->getMessage()}");
             }
         }
