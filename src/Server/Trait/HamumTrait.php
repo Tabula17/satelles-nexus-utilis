@@ -276,23 +276,23 @@ trait HamumTrait
 
     private function registerEventHandlers(string $event_name): void
     {
-        $this->logger?->debug("Registering event handlers for event $event_name");
+        $this->logger?->debug("🖖🏻Registering event handlers for event $event_name");
         if (isset($this->definedHandlers[strtolower($event_name)])) {
-            $this->logger?->debug("Event $event_name is defined. Registering event handlers.");
+            $this->logger?->debug("🖖🏻Event $event_name is defined. Registering event handlers.");
             $handlerName = $this->definedHandlers[strtolower($event_name)]['handler'];
             $property = $this->definedHandlers[strtolower($event_name)]['property'];
             $handlers = count($this->$property);
-            $this->logger?->debug("Handlers found: $handlers on property $property.");
             if (!method_exists($this, $handlerName)) {
                 $this->logger?->error("Method $handlerName does not exist on class " . get_class($this));
             }
+            $this->logger?->debug("🖖🏻Handlers found: $handlers on property $property. Managed by $handlerName.");
             if ($handlers > 0 && !isset($this->registeredHandlers[$event_name]) && method_exists($this, $handlerName)) {
-                $this->logger?->debug("Registering event handlers for event $event_name. Handlers found: $handlers");
+                $this->logger?->debug("🖖🏻Registering event handlers for event $event_name. Handlers found: $handlers");
                 $this->registeredHandlers[$event_name] = true;
                 $this->on($event_name, $this->$handlerName(...));
             }
             if ($handlers === 0 && isset($this->registeredHandlers[$event_name])) {
-                $this->logger?->debug("No handlers found for event $event_name. Unregistering event handler.");
+                $this->logger?->debug("🖖🏻No handlers found for event $event_name. Unregistering event handler.");
                 unset($this->registeredHandlers[$event_name]);
                 $this->off($event_name, $this->$handlerName(...));
             }
