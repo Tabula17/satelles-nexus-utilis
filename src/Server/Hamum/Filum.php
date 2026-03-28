@@ -167,7 +167,7 @@ abstract class Filum extends Server implements HamumServerInterface
 
     public function getMessageHandlerForProtocol(string $protocolAction, string $protocol): ?callable
     {
-        return $this->messageHandlers[$protocolAction]?->get($protocol);
+        return $this->messageHandlers[$protocolAction]?->offsetGet($protocol);
     }
 
     public function hasMessageHandlers(string $protocolAction): bool
