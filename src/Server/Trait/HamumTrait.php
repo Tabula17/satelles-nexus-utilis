@@ -307,7 +307,12 @@ trait HamumTrait
         if (isset($this->definedHandlers[strtolower($event_name)])) {
             $this->logger?->debug("🫟Found handlers for event '$event_name'. Looking for handlers for action '$action'");
             $property = $this->definedHandlers[strtolower($event_name)]['property'];
-            $handlers = array_merge(...array_values(array_map(static fn($collection) => isset($action) ? $collection->filterKeys(static fn($k) => $k === $action || $k === '*')->toArray() : $collection->toArray(), ($this->$property ?? [new CallableCollection()]))));
+            $filterFn = function ($k) use ($action) {
+                $this->logger?->debug("🫟Filtering handlers for action '$action'. Checking key '$k'");
+                return $k === $action || $k === '*';
+            };
+            //$handlers = array_merge(...array_values(array_map(static fn($collection) => isset($action) ? $collection->filterKeys(static fn($k) => $k === $action || $k === '*')->toArray() : $collection->toArray(), ($this->$property ?? [new CallableCollection()]))));
+            $handlers = array_merge(...array_values(array_map(static fn($collection) => isset($action) ? $collection->filterKeys($filterFn) : $collection, ($this->$property ?? [new CallableCollection()]))));
         }
         $this->logger?->debug("🫟🫟Handlers found for event '$event_name' and action '$action': " . count($handlers));
         return $handlers;
