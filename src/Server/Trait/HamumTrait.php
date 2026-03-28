@@ -305,15 +305,11 @@ trait HamumTrait
         //$vars = get_class_vars(get_class($this));
         $handlers = [];
         if (isset($this->definedHandlers[strtolower($event_name)])) {
+            $this->logger?->debug("🫟Found handlers for event '$event_name'. Looking for handlers for action '$action'");
             $property = $this->definedHandlers[strtolower($event_name)]['property'];
-            $handlers = array_merge(...array_values(array_map(static fn($collection) => $collection->toArray(), ($this->$property ?? [new CallableCollection()]))));
+            $handlers = array_merge(...array_values(array_map(static fn($collection) => isset($action) ? $collection->filterKeys(static fn($k) => $k === $action || $k === '*')->toArray() : $collection->toArray(), ($this->$property ?? [new CallableCollection()]))));
         }
-        if(isset($action, $handlers[$action])) {
-            $this->logger?->debug("🫟Found handlers for event '$event_name' and action '$action'. Handlers: " . count($handlers[$action]));
-        } else {
-            $this->logger?->debug("🚫No handlers found for event '$event_name' and action '$action'. Returning all handlers for event '$event_name'. Handlers: " . count($handlers));
-        }
-        return $action && isset($handlers[$action]) ? $handlers[$action] : $handlers;
+        return $handlers;
     }
 
 
