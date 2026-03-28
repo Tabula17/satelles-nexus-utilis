@@ -76,7 +76,7 @@ class Type extends AbstractDescriptor
 
             return new $class($data);
         }
-        throw new UnexpectedValueException('No response rpcProtocol detected. Must be one of: ' . implode(', ', $this->toArray()) . '');
+        throw new UnexpectedValueException('No response protocol ' . self::PROTOCOL . ' detected. Must be one of: ' . implode(', ', $this->toArray()) . '');
     }
 
     private function getNamespace(): string
