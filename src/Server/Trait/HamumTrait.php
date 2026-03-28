@@ -308,9 +308,9 @@ trait HamumTrait
             $this->logger?->debug("🫟Found handlers for event '$event_name'. Looking for handlers for action '$action'");
             $property = $this->definedHandlers[strtolower($event_name)]['property'];
             $this->logger?->debug("🫟Handlers found for event '$event_name': " . count($this->$property) . " on property $property. Actions defined: " . implode(',', array_keys(($this->$property ?? [new CallableCollection()]))));
-            if (isset($action, $this->$property[$action])) {
-                $this->logger?->debug("$action -> " . implode(', ', (array_keys($this->$property[$action]->toArray()) ?? [])) ?? 'no handlers found');
-                $handlers = array_values($this->$property[$action]->toArray());
+            if (isset($action)) {
+                $this->logger?->debug("$action -> " . implode(', ', (array_keys($this->$property[$action]?->toArray()) ?? [])) ?? 'no handlers found');
+                $handlers = array_values($this->$property[$action]?->toArray() ?? []);
             } else {
                 //$handlers = array_merge(...array_values(array_map(static fn($collection) => isset($action) ? $collection->filterKeys(static fn($k) => $k === $action || $k === '*')->toArray() : $collection->toArray(), ($this->$property ?? [new CallableCollection()]))));
                 $handlers = array_merge(...array_values(array_map(static fn($collection) => $collection->toArray(), ($this->$property ?? [new CallableCollection()]))));
