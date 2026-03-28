@@ -39,7 +39,9 @@ abstract class Filum extends Server implements HamumServerInterface
         $this->set($options);
         $this->init();
     }
+
     abstract protected function init(): void;
+
     public function handleRequestEvent(Request $request, Response $response): void
     {
         $this?->logger?->debug("Handling request event with protocolAction: {$request->server['request_uri']}");
@@ -179,12 +181,15 @@ abstract class Filum extends Server implements HamumServerInterface
     {
         $this?->logger?->debug("Handling message event for fd {$frame->fd} with raw data: {$frame->data}");
         $data = json_validate($frame->data) ? json_decode($frame->data, true) : ['data' => $frame->data];
-
         $protocolAction = $data['action'] ?? '';
-
-        $eventHandlers = array_merge($this->getEventActionHandlers('message', $protocolAction) , $this->getEventActionHandlers('message', '*'));
+        $this?->logger?->debug("Looking handler for message event with protocolAction: {$protocolAction}");
+        $eventHandlers = array_merge($this->getEventActionHandlers('message', $protocolAction), $this->getEventActionHandlers('message', '*'));
         foreach ($eventHandlers as $callback) {
-            $callback($server, $frame->fd, $data);
+            try {
+                $callback($server, $frame->fd, $data);
+            } catch (\Throwable $e) {
+                $this?->logger?->error("Error handling message event with protocolAction: {$protocolAction}: {$e->getMessage()}");
+            }
         }
     }
 
