@@ -309,6 +309,7 @@ trait HamumTrait
             $property = $this->definedHandlers[strtolower($event_name)]['property'];
             $handlers = array_merge(...array_values(array_map(static fn($collection) => isset($action) ? $collection->filterKeys(static fn($k) => $k === $action || $k === '*')->toArray() : $collection->toArray(), ($this->$property ?? [new CallableCollection()]))));
         }
+        $this->logger?->debug("🫟🫟Handlers found for event '$event_name' and action '$action': " . count($handlers));
         return $handlers;
     }
 
