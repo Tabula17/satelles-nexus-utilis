@@ -319,7 +319,7 @@ trait HamumTrait
                 return $k === $action || $k === '*';
             };
             $mappedFn = array_map(static fn($collection) => $collection->toArray(), ($this->$property ?? [new CallableCollection()]));
-            $this->logger?->debug("🫟Mapped handlers for event '$event_name': " . implode(',', array_keys(($mappedFn)));
+            $this->logger?->debug("🫟Mapped handlers for event '$event_name': " . implode(',', array_keys(($mappedFn))));
             //$handlers = array_merge(...array_values(array_map(static fn($collection) => isset($action) ? $collection->filterKeys(static fn($k) => $k === $action || $k === '*')->toArray() : $collection->toArray(), ($this->$property ?? [new CallableCollection()]))));
             $handlers = array_merge(...array_values($mappedFn));
         }
