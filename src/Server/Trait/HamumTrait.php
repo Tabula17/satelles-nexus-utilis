@@ -308,8 +308,8 @@ trait HamumTrait
             $this->logger?->debug("🫟Found handlers for event '$event_name'. Looking for handlers for action '$action'");
             $property = $this->definedHandlers[strtolower($event_name)]['property'];
             $this->logger?->debug("🫟Handlers found for event '$event_name': " . count($this->$property) . " on property $property. Actions defined: " . implode(',', array_keys(($this->$property ?? [new CallableCollection()]))));
-            if (isset($action)) {
-                $this->logger?->debug("$action -> " . implode(', ', (array_keys($this->$property[$action]) ?? [])) ?? 'no handlers found');
+            if (isset($action, $this->$property[$action])) {
+                $this->logger?->debug("$action -> " . implode(', ', (array_keys($this->$property[$action]->toArray()) ?? [])) ?? 'no handlers found');
            }
 
 
