@@ -307,7 +307,7 @@ trait HamumTrait
         if (isset($this->definedHandlers[strtolower($event_name)])) {
             $this->logger?->debug("🫟Found handlers for event '$event_name'. Looking for handlers for action '$action'");
             $property = $this->definedHandlers[strtolower($event_name)]['property'];
-
+            $this->logger?->debug("🫟Handlers found for event '$event_name': " . count($this->$property) . " on property $property. Actions defined: " . implode(',', array_keys(($this->$property ?? [new CallableCollection()]))));
             $handlersValues = array_map(static fn($collection) => $collection->toArray(), ($this->$property ?? [new CallableCollection()]));
             if (isset($action)) {
                 $handlersValues = $handlersValues[$action] ?? [];
