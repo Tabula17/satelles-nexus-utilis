@@ -59,6 +59,15 @@ class Action extends AbstractDescriptor
         return array_search($value, $this->toArray(), true);
     }
 
+    /**
+     * Resolves and retrieves the appropriate protocol handler or status for the provided data and context.
+     *
+     * @param array $data The input data containing an 'action' key and other parameters.
+     * @param int|null $fd The file descriptor or connection ID (optional).
+     * @param HamumServerInterface|null $server An optional server instance, if required by the resolver.
+     * @param ProtocolManagerInterface|null $protocolManager An optional protocol manager instance, for advanced resolution.
+     * @return RequestHandlerInterface|Status Returns an instance of the appropriate protocol handler or a status object.
+     */
     public function getProtocolFor(array $data, ?int $fd, ?HamumServerInterface $server = null, ?ProtocolManagerInterface $protocolManager = null): RequestHandlerInterface|Status
     {
         if (isset($data['action']) && in_array($data['action'], $this->toArray())) {
@@ -90,7 +99,8 @@ class Action extends AbstractDescriptor
             }
             return new $class($data);
         }
-        throw new UnexpectedValueException('No action for protocol ' . static::PROTOCOL . ' -> {' . ($data['action'] ?? 'noType') . '} detected. Must be one of: ' . implode(', ', $this->toArray()));
+        trigger_error('No action for protocol ' . static::PROTOCOL . ' -> {' . ($data['action'] ?? 'noType') . '} detected. Must be one of: ' . implode(', ', $this->toArray()), E_USER_WARNING);
+        return Status::error;
     }
 
     private function getNamespace(): string
