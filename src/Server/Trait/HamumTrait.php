@@ -312,6 +312,9 @@ trait HamumTrait
                 if ($type === 'object') {
                     $type = get_class($k);
                 }
+                if ($type === 'array') {
+                    $type = 'array[' . implode(', ', array_keys($k)) . ']';
+                }
                 $this->logger?->debug("🫟Filtering handlers for action '$action'. Checking  '$type'");
                 return $k === $action || $k === '*';
             };
