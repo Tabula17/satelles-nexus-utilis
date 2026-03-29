@@ -321,7 +321,7 @@ trait HamumTrait
                 $handlers = array_merge(...array_values(array_map(static fn($collection) => $collection->toArray(), ($this->$property ?? [new CallableCollection()]))));
             }
         }
-        $this->logger?->debug("🫟🫟Handlers found for event '$event_name' and action '$action': " . count($handlers));
+        $this->logger?->debug("🫟Handlers found for event '$event_name' and action '$action': " . count($handlers));
         return $handlers;
     }
 
