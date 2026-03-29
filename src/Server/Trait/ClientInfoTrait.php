@@ -21,7 +21,7 @@ trait ClientInfoTrait
         $this->clientInfoTable->create();
     }
 
-    abstract public function getClientInfo(int $fd): array;
+    abstract public function getClientData(int $fd): array;
 
     private function setClientInfo(int $fd, array $data): void
     {
