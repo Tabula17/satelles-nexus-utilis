@@ -38,6 +38,19 @@ enum Status: string
             default => self::unknown,
         };
     }
+    public function httpCode(): int
+    {
+        return match ($this) {
+            self::accepted => 202,
+            self::rejected => 400,
+            self::pending => 202,
+            self::success => 200,
+            self::error => 500,
+            self::ok => 200,
+            self::undefined => 204,
+            self::unknown => 501
+        };
+    }
 
     public static function list(): array
     {
@@ -57,6 +70,11 @@ enum Status: string
     public function isSuccess(): bool
     {
         return in_array($this, self::successValues(), true);
+    }
+
+    public function isError(): bool
+    {
+        return !$this->isSuccess();
     }
 
 }
