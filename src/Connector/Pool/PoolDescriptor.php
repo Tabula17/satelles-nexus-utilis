@@ -14,7 +14,7 @@ use Tabula17\Satelles\Utilis\Config\ConnectionConfig;
 class PoolDescriptor extends AbstractDescriptor
 {
     protected(set) string $name;
-    protected(set) string $id;
+    protected(set) ?string $id;
     protected(set) ConnectionConfig $config
         {
             set(ConnectionConfig $config) {
@@ -67,7 +67,7 @@ class PoolDescriptor extends AbstractDescriptor
     protected(set) int $failedAttempts = 0;
     protected(set) int $maxFailedAttempts;
 
-    public function __construct(ConnectionConfig $config, int $poolSize = 3, int $maxFailedAttempts = 3, int $id = 0, private readonly string $poolClass = ConnectionPool::class)
+    public function __construct(ConnectionConfig $config, int $poolSize = 3, int $maxFailedAttempts = 3, ?string $id = null, private readonly string $poolClass = ConnectionPool::class)
     {
         $this->id = $id;
         $this->poolSize = $poolSize;
@@ -140,12 +140,15 @@ class PoolDescriptor extends AbstractDescriptor
     public function fill(): void
     {
         $this->pool->fill();
-        $this->status = Status::INACTIVE;
+        $this->status = Status::READY;
+        $this->used = 0;
     }
 
     public function close(): void
     {
         $this->pool?->close();
+        $this->status = Status::EMPTY;
+        $this->used = 0;
     }
 
     public function canConnect(): bool
@@ -156,8 +159,12 @@ class PoolDescriptor extends AbstractDescriptor
             $this->lastError = $this->config->lastConnectionError;
             $this->lastErrorAt = microtime(true);
             $this->status = Status::UNREACHABLE;
+            $this->pool->close();
         } else {
-            $this->status = Status::CONNECTED;
+            if ($this->status->hasFailure()) {
+                $this->resetFailedAttempts();
+                $this->fill();
+            }
             $this->setIfActive();
         }
         return $status;
@@ -169,7 +176,7 @@ class PoolDescriptor extends AbstractDescriptor
             return;
         }
         if ($this->available()) {
-            $this->status = $this->used === 0 ? Status::INACTIVE : Status::ACTIVE;
+            $this->status = $this->used === 0 ? Status::READY : Status::ACTIVE;
         } else {
             $this->status = Status::FULL;
         }
@@ -184,6 +191,26 @@ class PoolDescriptor extends AbstractDescriptor
 
     public function canRetry(): bool
     {
-        return $this->failedAttempts < $this->maxFailedAttempts;
+        // -1 means infinite retries, 0 means no retries
+        return $this->maxFailedAttempts < 0 || $this->failedAttempts < $this->maxFailedAttempts;
+    }
+
+    public function recreate(): static
+    {
+        /*
+    public function __construct(
+        ConnectionConfig $config, int $poolSize = 3,
+        int $maxFailedAttempts = 3, int $id = 0,
+         private readonly string $poolClass = ConnectionPool::class)
+    {
+        $this->id = $id;
+        $this->poolSize = $poolSize;
+        $this->config = $config;
+        $this->status = Status::EMPTY;
+        $this->maxFailedAttempts = $maxFailedAttempts;
+        parent::__construct();
+    }
+         */
+        return new static($this->config, $this->poolSize, $this->maxFailedAttempts, null, $this->poolClass);
     }
 }

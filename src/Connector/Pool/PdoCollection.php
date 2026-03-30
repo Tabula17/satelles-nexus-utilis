@@ -2,7 +2,6 @@
 
 namespace Tabula17\Satelles\Nexus\Utilis\Connector\Pool;
 
-use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Swoole\Database\PDOProxy;
 use Tabula17\Satelles\Utilis\Collection\GenericCollection;
@@ -44,8 +43,20 @@ class PdoCollection extends GenericCollection
         if ($value instanceof PoolDescriptor) {
             $this->loadPool($value);
         } else {
-            trigger_error("Invalid type for PdoCollection: " . gettype($value), E_USER_WARNING);
+            trigger_error("Invalid type for PoolDescriptor: " . gettype($value), E_USER_WARNING);
         }
+    }
+
+    public function recreatePool(string $poolName): ?string
+    {
+        $newPool = $this->getPoolDescriptor($poolName)?->recreate();
+        foreach ($this->getPoolsByName($poolName) as $pool) {
+            $this->remove($pool);
+        }
+        if ($newPool) {
+            return $this->loadPool($newPool);
+        }
+        return null;
     }
 
     public function countByPool(string $poolName): int

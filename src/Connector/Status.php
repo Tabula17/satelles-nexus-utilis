@@ -10,18 +10,10 @@ enum Status:string
     case FAILED = 'failed';
     case UNREACHABLE = 'unreachable';
     case ACTIVE = 'active';
-    case INACTIVE = 'inactive';
+    case READY = 'ready';
     case FULL = 'full';
     case EMPTY = 'empty';
 
-    public function isConnected(): bool
-    {
-        return $this === self::CONNECTED;
-    }
-    public function isDisconnected(): bool
-    {
-        return $this === self::DISCONNECTED || $this === self::INACTIVE;
-    }
     public function isActive(): bool
     {
         return $this === self::ACTIVE || $this === self::CONNECTED;
