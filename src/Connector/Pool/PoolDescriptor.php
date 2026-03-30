@@ -67,7 +67,7 @@ class PoolDescriptor extends AbstractDescriptor
     protected(set) int $failedAttempts = 0;
     protected(set) int $maxFailedAttempts;
 
-    public function __construct(ConnectionConfig $config, int $poolSize = 3, int $maxFailedAttempts = 3, int $id = 0, private readonly string $poolClass = ConnectionConfig::class)
+    public function __construct(ConnectionConfig $config, int $poolSize = 3, int $maxFailedAttempts = 3, int $id = 0, private readonly string $poolClass = ConnectionPool::class)
     {
         $this->id = $id;
         $this->poolSize = $poolSize;
