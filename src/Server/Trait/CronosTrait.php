@@ -20,7 +20,7 @@ trait CronosTrait
         if (!isset($this->managedTasks)) {
             $this->managedTasks = new TictacusCollection();
         }
-        $wrappedCallback = function(...$args) use ($callback) {
+        $wrappedCallback = function (...$args) use ($callback) {
             try {
                 $callback(...$args);
             } catch (\Throwable $e) {
@@ -34,9 +34,11 @@ trait CronosTrait
         }
         $properties['interval'] = $interval;
         $properties['added'] = microtime(true);
-        $this->logger?->debug("⏱️ Timer agregado: " . $properties['owner'] . " - " . $interval/1000 . " segundos");
         $id = Timer::tick($interval, $wrappedCallback, $properties);
         $this->managedTasks->offsetSet($id, $properties);
+
+        $this->logger?->debug("⏱️ Timer agregado: " . $properties['owner'] . " - Intervalo: " . $interval / 1000 . " segundos | ID: " . $id . " | Total timers: " . count($this->managedTasks) . " | Params: " . json_encode($properties) . "");
+
         return $id;
     }
 
