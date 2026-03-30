@@ -3,7 +3,7 @@
 namespace Tabula17\Satelles\Nexus\Utilis\Connector\Pool;
 
 use Psr\Log\LoggerInterface;
-use Swoole\Database\PDOConfig;
+use Swoole\ConnectionPool;
 use Swoole\Database\PDOProxy;
 use Tabula17\Satelles\Nexus\Utilis\Exception\ExceptionDefinitions;
 use Tabula17\Satelles\Nexus\Utilis\Exception\InvalidArgumentException;
@@ -27,7 +27,7 @@ class PoolConnectorManager
     {
     }
 
-    public function loadConnection(ConnectionConfig $config, int $poolSize = 3): void
+    public function loadConnection(ConnectionConfig $config, int $poolSize = 3, string $poolClass = ConnectionPool::class): void
     {
         try {
             if (isset($config->maxConnections) && ($config->maxConnections > 0)) {
@@ -43,6 +43,7 @@ class PoolConnectorManager
                 config: $config,
                 poolSize: $poolSize,
                 maxFailedAttempts: $this->maxRetries,
+                poolClass: $poolClass
             );
             $pool = $this->pools->getPoolById($this->pools->loadPool($conn));
             $canConnect = false;
