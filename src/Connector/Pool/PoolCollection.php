@@ -129,7 +129,12 @@ class PoolCollection extends GenericCollection
             $poolId = $this->loadPool(new PoolDescriptor($this->getPoolDescriptor($poolName)->config));
             $pool = $this->getPoolById($poolId);
             $pool->fill();
-            $connection = $pool->getConnection();
+            if ($pool->canConnect()) {
+                $connection = $pool->getConnection();
+            } else {
+                $this->remove($pool);
+                trigger_error("Pool $poolName is unreachable", E_USER_WARNING);
+            }
         }
         return isset($connection, $poolId) ? [$connection, $poolId] : [null, null];
     }
@@ -164,6 +169,23 @@ class PoolCollection extends GenericCollection
         foreach ($this as $pool) {
             $pool->close();
         }
+    }
+
+    public function getStats(): array
+    {
+        $stats = [];
+        foreach ($this as $pool) {
+            $stats[] = $pool->getStats();
+        }
+        return $stats;
+    }
+
+    public function checkHealth(): array
+    {
+        foreach ($this as $pool) {
+            $pool->canConnect();
+        }
+        return $this->getStats();
     }
 
 }

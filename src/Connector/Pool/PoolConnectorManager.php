@@ -129,4 +129,14 @@ class PoolConnectorManager
         $this->pools->releaseConnection($connection, $this->usedConnections[spl_object_id($connection)]);
         unset($this->usedConnections[spl_object_id($connection)]);
     }
+
+    public function checkPoolHealth(): array
+    {
+        return $this->pools->checkHealth();
+    }
+
+    public function getPoolStats(): array
+    {
+        return $this->pools->getStats();
+    }
 }
