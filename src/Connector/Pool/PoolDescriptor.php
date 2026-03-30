@@ -170,7 +170,9 @@ class PoolDescriptor extends AbstractDescriptor
             $this->lastError = $this->config->lastConnectionError;
             $this->lastErrorAt = microtime(true);
             $this->status = Status::UNREACHABLE;
-            $this->silentClose($this->pool);
+            if (!$this->canRetry()) {
+                $this->silentClose($this->pool);
+            }
         } else {
             if ($this->status->hasFailure()) {
                 $this->resetFailedAttempts();
