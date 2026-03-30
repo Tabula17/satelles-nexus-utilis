@@ -5,13 +5,14 @@ namespace Tabula17\Satelles\Nexus\Utilis\Connector\Pool;
 use Psr\Log\LoggerInterface;
 use Swoole\ConnectionPool;
 use Swoole\Database\PDOProxy;
+use Tabula17\Satelles\Nexus\Utilis\Connector\CoetusNexuumInterface;
 use Tabula17\Satelles\Nexus\Utilis\Exception\ExceptionDefinitions;
 use Tabula17\Satelles\Nexus\Utilis\Exception\InvalidArgumentException;
 use Tabula17\Satelles\Utilis\Collection\ConnectionCollection;
 use Tabula17\Satelles\Utilis\Config\ConnectionConfig;
 use Tabula17\Satelles\Utilis\Trait\CoroutineHelper;
 
-class PoolConnectorManager
+class PoolConnectorManager implements CoetusNexuumInterface
 {
     use CoroutineHelper;
 
@@ -89,9 +90,9 @@ class PoolConnectorManager
         return $this->pools->getPoolById($poolId);
     }
 
-    public function getAvailablePoolsByName(): array
+    public function getAvailablePoolNames(): array
     {
-        return $this->pools->getAvailablePools()->collect('name');
+        return $this->getAvailablePools()->collect('name');
     }
 
     public function getAvailablePools(): PoolCollection
