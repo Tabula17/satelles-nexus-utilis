@@ -2,6 +2,8 @@
 
 namespace Tabula17\Satelles\Nexus\Utilis\Connector\Pool;
 
+use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Swoole\Database\PDOProxy;
 use Tabula17\Satelles\Utilis\Collection\GenericCollection;
 
@@ -12,6 +14,7 @@ class PdoCollection extends GenericCollection
     protected string $poolCollectionId;
     protected(set) int $maxPoolInstances = 10;
 
+    private LoggerInterface $logger;
 
     public function __construct(PoolDescriptor ...$pdoPool)
     {
@@ -21,11 +24,17 @@ class PdoCollection extends GenericCollection
         }
         $this->poolCollectionId = uniqid('pool:pdo:', false);
     }
+    public function setLogger(LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
+    }
 
     public function loadPool(PoolDescriptor $pool): int
     {
+        $this->logger->debug("Loading pool: {$pool->name}");
         $pool->setId($this->nextPoolId($pool->name));
         $this->offsetSet($pool->id, $pool);
+        $this->logger->debug("Pool loaded: {$pool->id}");
         return $pool->id;
     }
 
