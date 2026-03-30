@@ -3,8 +3,8 @@
 namespace Tabula17\Satelles\Nexus\Utilis\Connector\Pool;
 
 use PDO;
+use Swoole\ConnectionPool;
 use Swoole\Database\PDOConfig;
-use Swoole\Database\PDOPool;
 use Swoole\Database\PDOProxy;
 use Tabula17\Satelles\Nexus\Utilis\Connector\Status;
 use Tabula17\Satelles\Nexus\Utilis\Exception\RuntimeException;
@@ -19,34 +19,39 @@ class PoolDescriptor extends AbstractDescriptor
         {
             set(ConnectionConfig $config) {
                 $this->config = $config;
-                $pdoConfig = new PDOConfig()
-                    ->withDriver($config->driver->value)
-                    ->withHost($config->host);
-                if (isset($config->port)) {
-                    $pdoConfig->withPort($config->port);
+                $class = $this->poolClass ?? ConnectionPool::class;
+                if (str_contains($this->poolClass, 'PDO')) {
+                    $pdoConfig = new PDOConfig()
+                        ->withDriver($config->driver->value)
+                        ->withHost($config->host);
+                    if (isset($config->port)) {
+                        $pdoConfig->withPort($config->port);
+                    }
+                    if (isset($config->dbname)) {
+                        $pdoConfig->withDbname($config->dbname);
+                    }
+                    if (isset($config->username)) {
+                        $pdoConfig->withUsername($config->username);
+                    }
+                    if (isset($config->password)) {
+                        $pdoConfig->withPassword($config->password);
+                    }
+                    if (isset($config->charset)) {
+                        $pdoConfig->withCharset($config->charset);
+                    }
+                    if (isset($config->options)) {
+                        $pdoConfig->withOptions($config->options);
+                    }
+                    $this->pool = new $class($pdoConfig, $this->poolSize);
+                } else {
+                    $this->pool = new $class([$config, 'tcpConnector'], $this->poolSize);
                 }
-                if (isset($config->dbname)) {
-                    $pdoConfig->withDbname($config->dbname);
-                }
-                if (isset($config->username)) {
-                    $pdoConfig->withUsername($config->username);
-                }
-                if (isset($config->password)) {
-                    $pdoConfig->withPassword($config->password);
-                }
-                if (isset($config->charset)) {
-                    $pdoConfig->withCharset($config->charset);
-                }
-                if (isset($config->options)) {
-                    $pdoConfig->withOptions($config->options);
-                }
-                $this->pool = new PDOPool($pdoConfig);
                 $this->name = $config->name;
             }
         }
-    private(set) PDOPool $pool
+    private(set) ConnectionPool $pool
         {
-            set(PDOPool $pool) {
+            set(ConnectionPool $pool) {
                 if (!isset($this->config)) {
                     throw new RuntimeException("Cannot set pool without config");
                 }
@@ -54,7 +59,7 @@ class PoolDescriptor extends AbstractDescriptor
             }
         }
     protected(set) Status $status;
-    protected(set) int $poolSize;
+    protected(set) int $poolSize = 3;
     private(set) int $used = 0;
 
     public ?string $lastError = null;
@@ -62,11 +67,11 @@ class PoolDescriptor extends AbstractDescriptor
     protected(set) int $failedAttempts = 0;
     protected(set) int $maxFailedAttempts;
 
-    public function __construct(ConnectionConfig $config, int $poolSize = 3, int $maxFailedAttempts = 3, int $id = 0)
+    public function __construct(ConnectionConfig $config, int $poolSize = 3, int $maxFailedAttempts = 3, int $id = 0, private readonly string $poolClass = ConnectionConfig::class)
     {
         $this->id = $id;
-        $this->config = $config;
         $this->poolSize = $poolSize;
+        $this->config = $config;
         $this->status = Status::EMPTY;
         $this->maxFailedAttempts = $maxFailedAttempts;
         parent::__construct();
@@ -87,7 +92,7 @@ class PoolDescriptor extends AbstractDescriptor
         $this->status = $status;
     }
 
-    public function getPool(): PDOPool
+    public function getPool(): ConnectionPool
     {
         return $this->pool;
     }
