@@ -98,7 +98,7 @@ class PoolDescriptor extends AbstractDescriptor
         return $this->pool;
     }
 
-    public function getConnection(): false|PDO|PDOProxy
+    public function getConnection(): false|PDO|PDOProxy|callable
     {
         if ($this->status->isEmpty()) {
             trigger_error("Pool is empty. Fill it before using it.", E_USER_WARNING);

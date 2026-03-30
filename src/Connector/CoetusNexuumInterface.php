@@ -32,9 +32,9 @@ interface CoetusNexuumInterface
 
     public function getPoolNames(): array;
 
-    public function getConnection(string $poolName): ?PDOProxy;
+    public function getConnection(string $poolName): mixed;
 
-    public function releaseConnection(PDOProxy $connection): void;
+    public function releaseConnection(mixed $connection): void;
 
     public function checkPoolHealth(): array;
 

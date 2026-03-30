@@ -115,7 +115,7 @@ class PoolConnectorManager implements CoetusNexuumInterface
         return $this->pools->collect('name');
     }
 
-    public function getConnection(string $poolName): ?PDOProxy
+    public function getConnection(string $poolName): mixed
     {
         [$connection, $poolId] = $this->pools->getConnection($poolName);
         if (isset($connection, $poolId)) {
@@ -125,7 +125,7 @@ class PoolConnectorManager implements CoetusNexuumInterface
         return null;
     }
 
-    public function releaseConnection(PDOProxy $connection): void
+    public function releaseConnection(mixed $connection): void
     {
         $this->pools->releaseConnection($connection, $this->usedConnections[spl_object_id($connection)]);
         unset($this->usedConnections[spl_object_id($connection)]);
