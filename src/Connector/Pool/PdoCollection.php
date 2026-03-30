@@ -155,8 +155,4 @@ class PdoCollection extends GenericCollection
         }
     }
 
-    public function __destruct()
-    {
-        $this->close();
-    }
 }

@@ -58,7 +58,7 @@ class PoolDescriptor extends AbstractDescriptor
     private(set) int $used = 0;
 
     public ?string $lastError = null;
-    public ?int $lastErrorAt = null;
+    public ?float $lastErrorAt = null;
     protected(set) int $failedAttempts = 0;
     protected(set) int $maxFailedAttempts = 3;
 
