@@ -9,7 +9,7 @@ use Swoole\Database\PDOProxy;
 
 class PDOPoolExtended extends ConnectionPoolExtended
 {
-    public function __construct(protected PDOConfig $config,  protected  $size = self::DEFAULT_SIZE)
+    public function __construct(protected PDOConfig $config,  protected int $size = self::DEFAULT_SIZE)
     {
         parent::__construct(function () {
             $driver = $this->config->getDriver();
