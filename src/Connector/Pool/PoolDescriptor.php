@@ -60,14 +60,15 @@ class PoolDescriptor extends AbstractDescriptor
     public ?string $lastError = null;
     public ?float $lastErrorAt = null;
     protected(set) int $failedAttempts = 0;
-    protected(set) int $maxFailedAttempts = 3;
+    protected(set) int $maxFailedAttempts;
 
-    public function __construct(ConnectionConfig $config, int $poolSize = 3, int $id = 0)
+    public function __construct(ConnectionConfig $config, int $poolSize = 3, int $maxFailedAttempts = 3, int $id = 0)
     {
         $this->id = $id;
         $this->config = $config;
         $this->poolSize = $poolSize;
         $this->status = Status::EMPTY;
+        $this->maxFailedAttempts = $maxFailedAttempts;
         parent::__construct();
     }
 
@@ -136,6 +137,7 @@ class PoolDescriptor extends AbstractDescriptor
         $this->pool->fill();
         $this->status = Status::INACTIVE;
     }
+
     public function close(): void
     {
         $this->pool?->close();

@@ -15,11 +15,11 @@ class PoolConnectorManager
     private array $usedConnections = [];
 
     public function __construct(
-        protected PdoCollection  $pools = new PdoCollection(),
+        protected PdoCollection           $pools = new PdoCollection(),
         //   private readonly int     $maxPoolInstances = 3, <--- lo maneja PdoCollection
-        //private readonly float   $waitTimeout = 0.5,
-        //private readonly int     $maxRetries = 3,
-        private ?LoggerInterface $logger = null
+        private readonly float            $intervalRetry = 0.5,
+        private readonly int              $maxRetries = 3,
+        private readonly ?LoggerInterface $logger = null
     )
     {
     }
@@ -38,10 +38,17 @@ class PoolConnectorManager
             $this->logger?->debug("Connection delay: $config->dealy ms");
             $conn = new PoolDescriptor(
                 config: $config,
-                poolSize: $poolSize
+                poolSize: $poolSize,
+                maxFailedAttempts: $this->maxRetries,
             );
             $pool = $this->pools->getPoolById($this->pools->loadPool($conn));
-            if ($pool->canConnect()) {
+            $canConnect = false;
+            while (!$canConnect && $pool->canRetry()) {
+                $canConnect = $pool->canConnect();
+                $this->logger?->info("Attempt $pool->failedAttempts of $pool->maxFailedAttempts: Pool $config->name is unreachable, retrying in $this->intervalRetry seconds");
+                sleep($this->intervalRetry);
+            }
+            if ($canConnect) {
                 $this->logger?->info("Pool $config->name is ready");
                 $pool->fill();
             } else {
@@ -73,26 +80,31 @@ class PoolConnectorManager
     {
         return $this->pools->getPoolById($poolId);
     }
+
     public function getAvailablePoolsByName(): array
     {
         return $this->pools->getAvailablePools()->collect('name');
     }
+
     public function getAvailablePools(): array
     {
         return $this->pools->getAvailablePools()->collect('id');
     }
+
     public function getUnreachablePools(): array
     {
         return $this->pools->getUnreachablePools()->collect('id');
     }
+
     public function getFailedPools(): array
     {
         return $this->pools->getFailedPools()->collect('id');
     }
+
     public function getConnection(string $poolName): ?PDOProxy
     {
         [$connection, $poolId] = $this->pools->getConnection($poolName);
-        if(isset($connection, $poolId)) {
+        if (isset($connection, $poolId)) {
             $this->usedConnections[spl_object_id($connection)] = $poolId;
             return $connection;
         }
