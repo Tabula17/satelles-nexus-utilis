@@ -149,7 +149,7 @@ class PoolDescriptor extends AbstractDescriptor
         try {
             $this->pool?->close();
         } catch (\Throwable $e) { //in case of swoole pool it throws an exception if the pool is already closed, but in case of other pool implementations it may not throw an exception. So we catch any throwable to be safe.
-            trigger_error("Failed to close pool: " . $e->getMessage(), E_USER_NOTICE);
+            trigger_error("Failed to close pool, maybe already closed: " . $e->getMessage(), E_USER_NOTICE);
         }
         $this->status = Status::EMPTY;
         $this->used = 0;
