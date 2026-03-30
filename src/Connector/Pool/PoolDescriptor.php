@@ -228,10 +228,9 @@ class PoolDescriptor extends AbstractDescriptor
         return new static($this->config, $this->poolSize, $this->maxFailedAttempts, null, $this->poolClass);
     }
 
-    public function getStats(): array
+    public function getStats(): PoolStatsDescriptor
     {
-
-        return [
+        return new PoolStatsDescriptor([
             'name' => $this->name,
             'id' => $this->id,
             'config' => $this->config->getSafeData(),
@@ -246,6 +245,6 @@ class PoolDescriptor extends AbstractDescriptor
                 'time' => DateTime::createFromFormat('U.u', sprintf('%f', $this->lastErrorAt))->format('Y-m-d H:i:s.u'),
                 'attempts' => $this->failedAttempts
             ] : null,
-        ];
+        ]);
     }
 }

@@ -143,6 +143,6 @@ class PoolConnectorManager implements CoetusNexuumInterface
 
     public function getPoolStatByConn(mixed $connection): array
     {
-        return $this->pools->getPoolById($this->usedConnections[spl_object_id($connection)])?->getStats() ?? [];
+        return $this->pools->getPoolById($this->usedConnections[spl_object_id($connection)])?->getStats()->toArray()?? [];
     }
 }

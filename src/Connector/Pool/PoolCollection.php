@@ -174,8 +174,9 @@ class PoolCollection extends GenericCollection
     public function getStats(): array
     {
         $stats = [];
+        /** @var PoolDescriptor $pool */
         foreach ($this as $pool) {
-            $stats[] = $pool->getStats();
+            $stats[] = $pool->getStats()->toArray();
         }
         return $stats;
     }
@@ -188,4 +189,8 @@ class PoolCollection extends GenericCollection
         return $this->getStats();
     }
 
+    public function getPoolStats(string $poolName): PoolStatsDescriptor
+    {
+        return $this->getPoolDescriptor($poolName)->getStats();
+    }
 }
