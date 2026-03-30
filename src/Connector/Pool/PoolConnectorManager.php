@@ -67,10 +67,10 @@ class PoolConnectorManager
         }
     }
 
-    public function loadConnections(ConnectionCollection $configs): void
+    public function loadConnections(ConnectionCollection $configs, int $poolSize = 3, string $poolClass = ConnectionPool::class): void
     {
         foreach ($configs as $config) {
-            $this->loadConnection($config);
+            $this->loadConnection($config, $poolSize, $poolClass);
         }
     }
 
