@@ -77,7 +77,18 @@ class PoolConnectorManager
     {
         return $this->pools->getAvailablePools()->collect('name');
     }
-
+    public function getAvailablePools(): array
+    {
+        return $this->pools->getAvailablePools()->collect('id');
+    }
+    public function getUnreachablePools(): array
+    {
+        return $this->pools->getUnreachablePools()->collect('id');
+    }
+    public function getFailedPools(): array
+    {
+        return $this->pools->getFailedPools()->collect('id');
+    }
     public function getConnection(string $poolName): ?PDOProxy
     {
         [$connection, $poolId] = $this->pools->getConnection($poolName);
