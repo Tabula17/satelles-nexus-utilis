@@ -2,6 +2,7 @@
 
 namespace Tabula17\Satelles\Nexus\Utilis\Connector\Pool;
 
+use DateTime;
 use PDO;
 use Swoole\ConnectionPool;
 use Swoole\Database\PDOConfig;
@@ -44,7 +45,7 @@ class PoolDescriptor extends AbstractDescriptor
                     }
                     $this->pool = new $class($pdoConfig, $this->poolSize);
                 } else {
-                    $this->pool = new $class([$config, 'tcpConnector'], $this->poolSize);
+                    $this->pool = new $class([$config, 'getConnector'], $this->poolSize);
                 }
                 $this->name = $config->name;
             }
@@ -225,5 +226,26 @@ class PoolDescriptor extends AbstractDescriptor
     }
          */
         return new static($this->config, $this->poolSize, $this->maxFailedAttempts, null, $this->poolClass);
+    }
+
+    public function getStats(): array
+    {
+
+        return [
+            'name' => $this->name,
+            'id' => $this->id,
+            'config' => $this->config->getSafeData(),
+            'delay' => $this->config->dealy ?? 0,
+            'poolSize' => $this->poolSize,
+            'used' => $this->used,
+            'available' => $this->available(),
+            'status' => $this->status->value,
+            'poolClass' => $this->poolClass,
+            'lastError' => $this->status->hasFailure() ? [
+                'message' => $this->lastError ,
+                'time' => DateTime::createFromFormat('U.u', sprintf('%f',$this->lastErrorAt))->format('Y-m-d H:i:s.u'),
+                'attempts' => $this->failedAttempts
+            ]: null,
+        ];
     }
 }
