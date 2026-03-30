@@ -59,17 +59,17 @@ class PoolConnectorManager
         }
     }
 
-    public function getPools(string $poolName): PdoCollection
+    public function getPools(string $poolName): ?PdoCollection
     {
         return $this->pools->getPoolsByName($poolName);
     }
 
-    public function getPool(string $poolName): PoolDescriptor
+    public function getPool(string $poolName): ?PoolDescriptor
     {
         return $this->pools->getPoolDescriptor($poolName);
     }
 
-    public function getPoolById(string $poolId): PoolDescriptor
+    public function getPoolById(string $poolId): ?PoolDescriptor
     {
         return $this->pools->getPoolById($poolId);
     }

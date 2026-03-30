@@ -31,10 +31,10 @@ class PdoCollection extends GenericCollection
 
     public function loadPool(PoolDescriptor $pool): string
     {
-        $this->logger->debug("Loading pool: {$pool->name}");
+        $this->logger?->debug("Loading pool: {$pool->name}");
         $pool->setId($this->nextPoolId($pool->name));
         $this->offsetSet($pool->id, $pool);
-        $this->logger->debug("Pool loaded: {$pool->id}");
+        $this->logger?->debug("Pool loaded: {$pool->id}");
         return $pool->id;
     }
 
