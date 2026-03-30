@@ -146,13 +146,20 @@ class PoolDescriptor extends AbstractDescriptor
 
     public function close(): void
     {
-        try {
-            $this->pool?->close();
-        } catch (\Throwable $e) { //in case of swoole pool it throws an exception if the pool is already closed, but in case of other pool implementations it may not throw an exception. So we catch any throwable to be safe.
-            trigger_error("Failed to close pool, maybe already closed: " . $e->getMessage(), E_USER_NOTICE);
-        }
+        $this->silentClose($this->pool);
         $this->status = Status::EMPTY;
         $this->used = 0;
+    }
+
+    private function silentClose(?ConnectionPool $pool): void
+    {
+        if ($pool) {
+            try {
+                $pool->close();
+            } catch (\Throwable $e) {
+                trigger_error("Failed to close pool, maybe already closed: " . $e->getMessage(), E_USER_NOTICE);
+            }
+        }
     }
 
     public function canConnect(): bool
@@ -163,7 +170,7 @@ class PoolDescriptor extends AbstractDescriptor
             $this->lastError = $this->config->lastConnectionError;
             $this->lastErrorAt = microtime(true);
             $this->status = Status::UNREACHABLE;
-            $this->pool->close();
+            $this->silentClose($this->pool);
         } else {
             if ($this->status->hasFailure()) {
                 $this->resetFailedAttempts();
