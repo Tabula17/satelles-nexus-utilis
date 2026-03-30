@@ -29,7 +29,7 @@ class PdoCollection extends GenericCollection
         $this->logger = $logger;
     }
 
-    public function loadPool(PoolDescriptor $pool): int
+    public function loadPool(PoolDescriptor $pool): string
     {
         $this->logger->debug("Loading pool: {$pool->name}");
         $pool->setId($this->nextPoolId($pool->name));
