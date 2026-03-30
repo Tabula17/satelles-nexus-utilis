@@ -122,5 +122,6 @@ class PoolConnectorManager
     public function releaseConnection(PDOProxy $connection): void
     {
         $this->pools->releaseConnection($connection, $this->usedConnections[spl_object_id($connection)]);
+        unset($this->usedConnections[spl_object_id($connection)]);
     }
 }
