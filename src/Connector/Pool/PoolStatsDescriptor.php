@@ -33,4 +33,5 @@ class PoolStatsDescriptor extends AbstractDescriptor
     protected(set) string $status;
     protected(set) string $poolClass;
     protected(set) ?array $lastError;
+    protected(set) string $checkedOn;
 }

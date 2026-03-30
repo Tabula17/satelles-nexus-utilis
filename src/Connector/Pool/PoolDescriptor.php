@@ -245,6 +245,7 @@ class PoolDescriptor extends AbstractDescriptor
                 'time' => DateTime::createFromFormat('U.u', sprintf('%f', $this->lastErrorAt))->format('Y-m-d H:i:s.u'),
                 'attempts' => $this->failedAttempts
             ] : null,
+            'checkedOn' => date('Y-m-d H:i:s.u'),
         ]);
     }
 }
