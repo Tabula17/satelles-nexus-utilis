@@ -34,7 +34,7 @@ trait CronosTrait
         }
         $properties['interval'] = $interval;
         $properties['added'] = microtime(true);
-
+        $this->logger?->debug("⏱️ Timer agregado: " . $properties['owner'] . " - " . $interval/1000 . " segundos");
         $id = Timer::tick($interval, $wrappedCallback, $properties);
         $this->managedTasks->offsetSet($id, $properties);
         return $id;
