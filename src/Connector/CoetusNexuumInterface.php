@@ -39,4 +39,5 @@ interface CoetusNexuumInterface
     public function checkPoolHealth(): array;
 
     public function getPoolStats(): array;
+    public function getPoolStatByConn(mixed $connection): array;
 }
