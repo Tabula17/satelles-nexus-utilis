@@ -52,7 +52,7 @@ class PoolConnectorManager
         }
     }
 
-    public function loadConnections(array $configs): void
+    public function loadConnections(ConnectionCollection $configs): void
     {
         foreach ($configs as $config) {
             $this->loadConnection($config);
