@@ -184,7 +184,11 @@ class PoolCollection extends GenericCollection
     public function checkHealth(): array
     {
         foreach ($this as $pool) {
-            $pool->canConnect();
+            $status = $pool->canConnect();
+            if (!$status && !$pool->canRetry()) {
+                $this->recreatePool($pool->name);
+            }
+
         }
         return $this->getStats();
     }
