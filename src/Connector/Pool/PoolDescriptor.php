@@ -71,7 +71,7 @@ class PoolDescriptor extends AbstractDescriptor
         parent::__construct();
     }
 
-    public function setId(int $id): void
+    public function setId(string $id): void
     {
         $this->id = $id;
     }
