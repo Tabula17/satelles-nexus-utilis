@@ -135,7 +135,7 @@ class PoolDescriptor extends AbstractDescriptor
 
     public function available(): bool
     {
-        return $this->used < $this->poolSize;
+        return !$this->status->hasFailure() && $this->used < $this->poolSize;
     }
 
     public function fill(): void
@@ -242,10 +242,10 @@ class PoolDescriptor extends AbstractDescriptor
             'status' => $this->status->value,
             'poolClass' => $this->poolClass,
             'lastError' => $this->status->hasFailure() ? [
-                'message' => $this->lastError ,
-                'time' => DateTime::createFromFormat('U.u', sprintf('%f',$this->lastErrorAt))->format('Y-m-d H:i:s.u'),
+                'message' => $this->lastError,
+                'time' => DateTime::createFromFormat('U.u', sprintf('%f', $this->lastErrorAt))->format('Y-m-d H:i:s.u'),
                 'attempts' => $this->failedAttempts
-            ]: null,
+            ] : null,
         ];
     }
 }
