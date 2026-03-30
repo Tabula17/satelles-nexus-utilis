@@ -25,7 +25,7 @@ class PdoCollection extends GenericCollection
     public function loadPool(PoolDescriptor $pool): int
     {
         $pool->setId($this->nextPoolId($pool->name));
-        parent::add($pool);
+        $this->offsetSet($pool->id, $pool);
         return $pool->id;
     }
 
@@ -43,6 +43,7 @@ class PdoCollection extends GenericCollection
         $pools = $this->filter(static fn(PoolDescriptor $descriptor) => $descriptor->name === $poolName);
         return count($pools);
     }
+
     public function collect(string $key): array
     {
         return array_filter(array_map(static fn(PoolDescriptor $config) => $config->$key, $this->values));
