@@ -11,5 +11,7 @@ enum ExceptionDefinitions: string
     case HOST_CANNOT_BE_EMPTY = 'El host no puede estar vacío';
     case HOST_INVALID = 'El formato de host "%s" es inválido';
     case PORT_INVALID = 'El puerto debe estar entre 1 y 65535';
+    case DATABASE_DRIVER_NOT_SUPPORTED = 'El controlador "%s" no está soportado';
+    case DATABASE_DRIVER_NOT_FOUND = 'No se encontró el controlador "%s"';
 
 }
