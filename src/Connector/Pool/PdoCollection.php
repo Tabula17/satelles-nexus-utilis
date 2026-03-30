@@ -14,7 +14,7 @@ class PdoCollection extends GenericCollection
     protected string $poolCollectionId;
     protected(set) int $maxPoolInstances = 10;
 
-    private LoggerInterface $logger;
+    private ?LoggerInterface $logger = null;
 
     public function __construct(PoolDescriptor ...$pdoPool)
     {
@@ -24,6 +24,7 @@ class PdoCollection extends GenericCollection
         }
         $this->poolCollectionId = uniqid('pool:pdo:', false);
     }
+
     public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;
@@ -86,12 +87,12 @@ class PdoCollection extends GenericCollection
         }
     }
 
-    public function getPoolById(string $poolId): PoolDescriptor
+    public function getPoolById(string $poolId): ?PoolDescriptor
     {
         return $this->offsetGet($poolId);
     }
 
-    public function getPoolDescriptor(string $poolName): PoolDescriptor
+    public function getPoolDescriptor(string $poolName): ?PoolDescriptor
     {
         return $this->find(static fn(PoolDescriptor $descriptor) => $descriptor->name === $poolName);
     }
