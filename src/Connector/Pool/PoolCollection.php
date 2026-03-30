@@ -6,7 +6,7 @@ use Psr\Log\LoggerInterface;
 use Swoole\Database\PDOProxy;
 use Tabula17\Satelles\Utilis\Collection\GenericCollection;
 
-class PdoCollection extends GenericCollection
+class PoolCollection extends GenericCollection
 {
 
     protected string $type = PoolDescriptor::class;

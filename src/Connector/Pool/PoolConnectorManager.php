@@ -18,7 +18,7 @@ class PoolConnectorManager
     private array $usedConnections = [];
 
     public function __construct(
-        protected PdoCollection           $pools = new PdoCollection(),
+        protected PoolCollection          $pools = new PoolCollection(),
         //   private readonly int     $maxPoolInstances = 3, <--- lo maneja PdoCollection
         private readonly float            $intervalRetry = 0.5,
         private readonly int              $maxRetries = 3,
@@ -74,7 +74,7 @@ class PoolConnectorManager
         }
     }
 
-    public function getPools(string $poolName): ?PdoCollection
+    public function getPools(string $poolName): ?PoolCollection
     {
         return $this->pools->getPoolsByName($poolName);
     }
