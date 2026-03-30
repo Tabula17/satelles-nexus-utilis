@@ -79,7 +79,7 @@ class PdoCollection extends GenericCollection
 
     public function getPoolById(string $poolId): PoolDescriptor
     {
-        return $this->find(static fn(PoolDescriptor $descriptor) => $descriptor->id === $poolId);
+        return $this->offsetGet($poolId);
     }
 
     public function getPoolDescriptor(string $poolName): PoolDescriptor
