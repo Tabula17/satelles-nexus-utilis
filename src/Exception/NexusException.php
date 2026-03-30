@@ -2,7 +2,7 @@
 
 namespace Tabula17\Satelles\Nexus\Utilis\Exception;
 
-class UnexpectedValueException extends NexusException
+class NexusException extends \Exception
 {
 
 }
