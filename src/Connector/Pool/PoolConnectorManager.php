@@ -14,6 +14,7 @@ use Tabula17\Satelles\Utilis\Trait\CoroutineHelper;
 class PoolConnectorManager
 {
     use CoroutineHelper;
+
     private array $usedConnections = [];
 
     public function __construct(
@@ -46,9 +47,13 @@ class PoolConnectorManager
             $pool = $this->pools->getPoolById($this->pools->loadPool($conn));
             $canConnect = false;
             while (!$canConnect && $pool->canRetry()) {
+                $poolClass = get_class($pool->config);
+                $this->logger?->debug("Checking connection for $pool->name ($poolClass)");
                 $canConnect = $pool->canConnect();
-                $this->logger?->info("Attempt $pool->failedAttempts of $pool->maxFailedAttempts: Pool $config->name is unreachable, retrying in $this->intervalRetry seconds");
-                $this->safeSleep($this->intervalRetry);
+                if (!$canConnect) {
+                    $this->logger?->info("Attempt $pool->failedAttempts of $pool->maxFailedAttempts: Pool $config->name is unreachable, retrying in $this->intervalRetry seconds");
+                    $this->safeSleep($this->intervalRetry);
+                }
             }
             if ($canConnect) {
                 $this->logger?->info("Pool $config->name is ready");
