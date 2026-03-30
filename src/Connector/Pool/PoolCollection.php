@@ -67,7 +67,7 @@ class PoolCollection extends GenericCollection
 
     public function collect(string $key): array
     {
-        return array_filter(array_map(static fn(PoolDescriptor $config) => $config->$key, $this->values));
+        return array_unique(array_values(array_filter(array_map(static fn(PoolDescriptor $config) => $config->$key, $this->values))));
     }
 
     public function nextPoolId(string $poolName): string
