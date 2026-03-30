@@ -9,9 +9,11 @@ use Tabula17\Satelles\Nexus\Utilis\Exception\ExceptionDefinitions;
 use Tabula17\Satelles\Nexus\Utilis\Exception\InvalidArgumentException;
 use Tabula17\Satelles\Utilis\Collection\ConnectionCollection;
 use Tabula17\Satelles\Utilis\Config\ConnectionConfig;
+use Tabula17\Satelles\Utilis\Trait\CoroutineHelper;
 
 class PoolConnectorManager
 {
+    use CoroutineHelper;
     private array $usedConnections = [];
 
     public function __construct(
@@ -46,7 +48,7 @@ class PoolConnectorManager
             while (!$canConnect && $pool->canRetry()) {
                 $canConnect = $pool->canConnect();
                 $this->logger?->info("Attempt $pool->failedAttempts of $pool->maxFailedAttempts: Pool $config->name is unreachable, retrying in $this->intervalRetry seconds");
-                sleep($this->intervalRetry);
+                $this->safeSleep($this->intervalRetry);
             }
             if ($canConnect) {
                 $this->logger?->info("Pool $config->name is ready");
