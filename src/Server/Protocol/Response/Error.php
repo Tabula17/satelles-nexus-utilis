@@ -17,10 +17,7 @@ class Error extends Base
         }
         $values['type'] = $responseTypes->get('error');
         parent::__construct($values, $responseTypes);
+        $this->addValidator(fn() => $this->message && $this->type === $this->responseTypes->get('error'));
     }
 
-    public function isValid(): bool
-    {
-        return $this->type && $this->type === $this->responseTypes->get('error');
-    }
 }

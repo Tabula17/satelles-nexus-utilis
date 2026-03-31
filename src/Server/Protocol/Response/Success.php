@@ -16,10 +16,6 @@ class Success extends Base
         }
         $values['type'] = $responseTypes->get('success');
         parent::__construct($values, $responseTypes);
-    }
-
-    public function isValid(): bool
-    {
-       return $this->type && $this->type === $this->responseTypes->get('success');
+        $this->addValidator(fn() => $this->type === $this->responseTypes->get('success'));
     }
 }

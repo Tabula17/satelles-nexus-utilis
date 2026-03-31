@@ -23,13 +23,6 @@ class Message extends Base
         }
         $values['type'] = $responseTypes->message;
         parent::__construct($values, $responseTypes);
-    }
-
-    public function isValid(): bool
-    {
-        return $this->type &&
-            $this->type === $this->responseTypes->message &&
-            $this->channel &&
-            $this->data && !empty($this->data instanceof AbstractDescriptor ? $this->data->getInitialized() : $this->data);
+        $this->addValidator(fn() => $this->channel && $this->data && $this->type === $this->responseTypes->message);
     }
 }

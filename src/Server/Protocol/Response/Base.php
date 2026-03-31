@@ -4,6 +4,7 @@ namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response;
 
 use Tabula17\Satelles\Nexus\Utilis\Exception\UnexpectedValueException;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Data\Stats;
+use Tabula17\Satelles\Utilis\Collection\CallableCollection;
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
 
 class Base extends AbstractDescriptor implements ResponseInterface
@@ -31,12 +32,14 @@ class Base extends AbstractDescriptor implements ResponseInterface
     protected(set) string $status;
     protected(set) ?string $token;
     */
+    private CallableCollection $validators;
 
     public function __construct(
         ?array                      $values = [],
         private readonly array|Type $protocol = new Type()
     )
     {
+        $this->validators = new CallableCollection();
         if (empty($values)) {
             $values = [];
         }
@@ -46,8 +49,24 @@ class Base extends AbstractDescriptor implements ResponseInterface
         }
         parent::__construct($values);
     }
-    public function isValid(): bool
+
+    public function addValidator(callable $validator): void
     {
-        return (bool)$this->type;
+        $this->validators->addIfNotExist($validator);
+    }
+
+    public function removeValidator(callable $validator): void
+    {
+        $this->validators->remove($validator);
+    }
+
+    final public function isValid(): bool
+    {
+        foreach ($this->validators as $validator) {
+            if (!$validator($this)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
