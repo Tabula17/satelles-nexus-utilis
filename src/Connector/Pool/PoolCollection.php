@@ -4,7 +4,9 @@ namespace Tabula17\Satelles\Nexus\Utilis\Connector\Pool;
 
 use Psr\Log\LoggerInterface;
 use Swoole\Database\PDOProxy;
+use Tabula17\Satelles\Utilis\Collection\ConnectionCollection;
 use Tabula17\Satelles\Utilis\Collection\GenericCollection;
+use Tabula17\Satelles\Utilis\Config\ConnectionConfig;
 
 class PoolCollection extends GenericCollection
 {
@@ -13,10 +15,12 @@ class PoolCollection extends GenericCollection
     protected string $poolCollectionId;
     protected(set) int $maxPoolInstances = 10;
 
+    private ConnectionCollection $connections;
     private ?LoggerInterface $logger = null;
 
     public function __construct(PoolDescriptor ...$pdoPool)
     {
+        $this->connections = new ConnectionCollection();
         //$this->values = $pdoPool;
         foreach ($pdoPool as $pdo) {
             $this->loadPool($pdo);
@@ -34,6 +38,9 @@ class PoolCollection extends GenericCollection
         $this->logger?->debug("Loading pool: {$pool->name}");
         $pool->setId($this->nextPoolId($pool->name));
         $this->offsetSet($pool->id, $pool);
+        if (!$this->connections->offsetExists($pool->name)) {
+            $this->connections->offsetSet($pool->name, $pool->config);
+        }
         $this->logger?->debug("Pool loaded: {$pool->id}");
         return $pool->id;
     }
@@ -112,7 +119,10 @@ class PoolCollection extends GenericCollection
     {
         return $this->filter(static fn(PoolDescriptor $descriptor) => $descriptor->name === $poolName);
     }
-
+    public function getPoolConfig(string $poolName): ?ConnectionConfig
+    {
+        return $this->connections->offsetGet($poolName);
+    }
     public function getConnection(string $poolName): array //?PDOProxy
     {
         $pools = $this->getPoolsByName($poolName);
@@ -154,6 +164,9 @@ class PoolCollection extends GenericCollection
             }
         } elseif ($reduceTo < 1) {
             $this->remove($this->getPoolDescriptor($poolName));
+        }
+        if ($this->countByPool($poolName) === 0 && $this->connections->offsetExists($poolName)) {
+            $this->connections->offsetUnset($poolName);
         }
     }
 
