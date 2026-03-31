@@ -31,14 +31,14 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
                     $this->safeSleep($this->redisConfig->retryInterval);
                     continue;
                 }
-                $this->log("Conectado a Redis en {$this->redisConfig->host}:{$this->redisConfig->port}");
+                $this->logger->debug("Conectado a Redis en {$this->redisConfig->host}:{$this->redisConfig->port}");
                 // Suscribirse y procesar mensajes
                 $redis->subscribe($this->channels, function ($instance, $channel, $message) {
                     $this->dispatchToTaskWorker($channel, $message);
                 });
 
             } catch (Throwable $e) {
-                $this->log("Error en suscriptor: " . $e->getMessage(), 'error');
+                $this->logger->error("Error en suscriptor: " . $e->getMessage());
                 $this->safeSleep($this->redisConfig->retryInterval);
             }
         }
@@ -56,11 +56,8 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
             'data' => $message,
             'timestamp' => microtime(true)
         ];
-        $taskId = $this->server->task(json_encode($task), -1, fn($server, $taskId) => $this->log("Task Worker ID: {$taskId} completado", 'debug'));
-        $this->log(
-            "Mensaje en {$channel} enviado a Task Worker ID: {$taskId}",
-            'debug'
-        );
+        $taskId = $this->server->task(json_encode($task), -1, fn($server, $taskId) => $this->logger->debug("Task Worker ID: {$taskId} completado"));
+        $this->logger->debug( "Mensaje en {$channel} enviado a Task Worker ID: {$taskId}");
     }
     private function connectWithRetry(Redis $redis): bool
     {
@@ -76,7 +73,7 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
                     return true;
                 }
             } catch (Throwable $e) {
-                $this->log("Intento " . ($attempt + 1) . " fallido: " . $e->getMessage(), 'warning');
+                $this->logger->warning("Intento " . ($attempt + 1) . " fallido: " . $e->getMessage());
             }
 
             $attempt++;

@@ -35,7 +35,7 @@ abstract class AbstractSubscriberProcess
         }, false, 2, true); // redirect stdin/stdout/stderr = true
         $this->process->start();
         // Registrar el PID para limpieza posterior
-        $this->log("Subscriber process started for channels: " . implode(', ', $this->channels));
+        $this->logger->info("Subscriber process started for channels: " . implode(', ', $this->channels));
     }
 
     /**
@@ -46,7 +46,7 @@ abstract class AbstractSubscriberProcess
         if ($this->process && $this->running) {
             $this->running = false;
             Process::kill($this->process->pid, SIGTERM);
-            $this->log("Subscriber process stopped");
+            $this->logger->info("Subscriber process stopped");
         }
     }
 
@@ -68,20 +68,4 @@ abstract class AbstractSubscriberProcess
      * $this->server->notifyToWorkers($data);
      * }
      */
-    protected function log(string $message, string $level = 'info'): void
-    {
-        $logMessage = sprintf(
-            '[%s] [%s] %s',
-            date('Y-m-d H:i:s'),
-            strtoupper($level),
-            $message
-        );
-
-        // Si tienes logger configurado
-        if ($this->logger && method_exists($this->logger, $level)) {
-            $this->logger->$level($message);
-        } else {
-            echo $logMessage . PHP_EOL;
-        }
-    }
 }
