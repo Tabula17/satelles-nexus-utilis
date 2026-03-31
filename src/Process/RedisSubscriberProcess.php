@@ -2,6 +2,7 @@
 
 namespace Tabula17\Satelles\Nexus\Utilis\Process;
 
+use Psr\Log\LoggerInterface;
 use Swoole\Server;
 use Redis;
 use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
@@ -16,10 +17,11 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
     public function __construct(
         HamumServerInterface $server,
         array                $channels,
-        private readonly RedisConfig $redisConfig
+        private readonly RedisConfig $redisConfig,
+        ?LoggerInterface $logger = null
     )
     {
-        parent::__construct($server, $channels);
+        parent::__construct($server, $channels, $logger = null);
     }
 
     protected function execute(): void
@@ -31,14 +33,14 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
                     $this->safeSleep($this->redisConfig->retryInterval);
                     continue;
                 }
-                $this->logger->debug("Conectado a Redis en {$this->redisConfig->host}:{$this->redisConfig->port}");
+                $this->logger?->debug("Conectado a Redis en {$this->redisConfig->host}:{$this->redisConfig->port}");
                 // Suscribirse y procesar mensajes
                 $redis->subscribe($this->channels, function ($instance, $channel, $message) {
                     $this->dispatchToTaskWorker($channel, $message);
                 });
 
             } catch (Throwable $e) {
-                $this->logger->error("Error en suscriptor: " . $e->getMessage());
+                $this->logger?->error("Error en suscriptor: " . $e->getMessage());
                 $this->safeSleep($this->redisConfig->retryInterval);
             }
         }
@@ -56,8 +58,8 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
             'data' => $message,
             'timestamp' => microtime(true)
         ];
-        $taskId = $this->server->task(json_encode($task), -1, fn($server, $taskId) => $this->logger->debug("Task Worker ID: {$taskId} completado"));
-        $this->logger->debug( "Mensaje en {$channel} enviado a Task Worker ID: {$taskId}");
+        $taskId = $this->server->task(json_encode($task), -1, fn($server, $taskId) => $this->logger?->debug("Task Worker ID: {$taskId} completado"));
+        $this->logger?->debug( "Mensaje en {$channel} enviado a Task Worker ID: {$taskId}");
     }
     private function connectWithRetry(Redis $redis): bool
     {
@@ -73,7 +75,7 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
                     return true;
                 }
             } catch (Throwable $e) {
-                $this->logger->warning("Intento " . ($attempt + 1) . " fallido: " . $e->getMessage());
+                $this->logger?->warning("Intento " . ($attempt + 1) . " fallido: " . $e->getMessage());
             }
 
             $attempt++;

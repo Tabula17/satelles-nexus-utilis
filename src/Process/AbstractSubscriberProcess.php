@@ -35,7 +35,7 @@ abstract class AbstractSubscriberProcess
         }, false, 2, true); // redirect stdin/stdout/stderr = true
         $this->process->start();
         // Registrar el PID para limpieza posterior
-        $this->logger->info("Subscriber process started for channels: " . implode(', ', $this->channels));
+        $this->logger?->info("Subscriber process started for channels: " . implode(', ', $this->channels));
     }
 
     /**
@@ -46,7 +46,7 @@ abstract class AbstractSubscriberProcess
         if ($this->process && $this->running) {
             $this->running = false;
             Process::kill($this->process->pid, SIGTERM);
-            $this->logger->info("Subscriber process stopped");
+            $this->logger?->info("Subscriber process stopped");
         }
     }
 
