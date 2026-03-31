@@ -410,6 +410,7 @@ trait HamumTrait
                 $this?->logger?->debug("Found task handlers for action {$taskAction}");
                 foreach ($taskHandlers as $protocol => $handler) {
                     $this?->logger?->debug("Handling task for action {$taskAction} [{$protocol}] with data: {$data}");
+                    var_export($handler);
                     $results[$protocol] = $handler($server, $data);
                 }
 
