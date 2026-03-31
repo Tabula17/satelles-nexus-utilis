@@ -5,6 +5,7 @@ namespace Tabula17\Satelles\Nexus\Utilis\Process;
 use Psr\Log\LoggerInterface;
 use Swoole\Server;
 use Redis;
+use Tabula17\Satelles\Nexus\Utilis\Exception\RuntimeException;
 use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
 use Tabula17\Satelles\Utilis\Config\RedisConfig;
 use Tabula17\Satelles\Utilis\Trait\CoroutineHelper;
@@ -22,7 +23,7 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
     )
     {
         $this->origin = 'task:subscriber:redis';
-        parent::__construct($server, $channels, $logger = null);
+        parent::__construct($server, $channels, $logger);
     }
 
     protected function execute(): void
@@ -65,7 +66,7 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
             'timestamp' => microtime(true)
         ];
         $taskId = $this->server->task(json_encode($task), -1, fn($server, $taskId) => $this->logger?->debug("Task Worker ID: {$taskId} completado"));
-        $this->logger?->debug("Mensaje en {$channel} enviado a Task Worker ID: {$taskId}");
+        $this->logger?->debug("🍭 Mensaje en {$channel} enviado a Task Worker ID: {$taskId}");
     }
 
     private function connectWithRetry(Redis $redis): bool
@@ -77,7 +78,7 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
             try {
                 if ($redis->connect($this->redisConfig->host, $this->redisConfig->port, 5)) {
                     if ($this->redisConfig->password && !$redis->auth($this->redisConfig->password)) {
-                        throw new \RuntimeException("Autenticación fallida");
+                        throw new RuntimeException("🍭 Autenticación fallida");
                     }
                     return true;
                 }
@@ -96,7 +97,7 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
 
     public function init(): void
     {
-        $this->logger?->info("Configurando eventos de suscriptor de Redis en {$this->redisConfig->host}:{$this->redisConfig->port}");
+        $this->logger?->info("🍭 Configurando eventos de suscriptor de Redis en {$this->redisConfig->host}:{$this->redisConfig->port}");
         $this->server->on('managerStart', fn() => $this->start());
         $this->server->on('managerStop', fn() => $this->stop());
     }
