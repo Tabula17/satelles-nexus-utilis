@@ -7,6 +7,7 @@ use Swoole\Server as TcpUdpServer;
 use Swoole\Http\Server as HttpServer;
 use Swoole\WebSocket\Server as WebSocketServer;
 use Swoole\Server\Task;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
 use Tabula17\Satelles\Utilis\Collection\CallableCollection;
 
 trait HamumTrait
@@ -147,6 +148,19 @@ trait HamumTrait
     }
 
     abstract protected function onBeforeStart(): void;
+
+    protected function notifyToWorkers(mixed $message, ?int $worker_id = null): array
+    {
+        $output = [];
+        if ($worker_id !== null) {
+            $output[$worker_id] = $this->sendMessage($message, $worker_id) ? Status::success : Status::error;
+        } else {
+            for ($i = 0; $i < $this->setting['worker_num']; $i++) {
+                $output[$i] = $this->sendMessage($message, $i) ? Status::success : Status::error;
+            }
+        }
+        return $output;
+    }
 
     public function start(): bool
     {
@@ -311,7 +325,7 @@ trait HamumTrait
             if (isset($action)) {
                 if (isset($this->$property[$action])) {
                     $this->logger?->debug("🫟Handlers found for event '$event_name' and action '$action': " . count($this->$property[$action]) . " on property $property");
-                   // $this->logger?->debug("$action -> " . implode(', ', (array_keys($this->$property[$action]->toArray()))) ?? 'no handlers found');
+                    // $this->logger?->debug("$action -> " . implode(', ', (array_keys($this->$property[$action]->toArray()))) ?? 'no handlers found');
                     $handlers = array_values($this->$property[$action]?->toArray() ?? []);
                 } else {
                     $this->logger?->debug("🫟No handlers found for event '$event_name' and action '$action' on property $property");
