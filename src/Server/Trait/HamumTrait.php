@@ -197,7 +197,7 @@ trait HamumTrait
         }
         if ($this->setting['task_worker_num'] > 0 && empty($this->taskHandlers)) {
             $this?->logger?->debug('No task handlers found. Registering task event handler.');
-            $this->on('task', $this->handleTaskEvent(...));
+            parent::on('task', $this->handleTaskEvent(...));
         }
 
         $this?->logger?->debug('Server->beforestart executed');
@@ -410,8 +410,6 @@ trait HamumTrait
                 $this?->logger?->debug("Found task handlers for action {$taskAction}");
                 foreach ($taskHandlers as $protocol => $handler) {
                     $this?->logger?->debug("Handling task for action {$taskAction} [{$protocol}] with data: {$data}");
-                    var_export($handler);
-                    exit();
                     $results[$protocol] = $handler($server, $data);
                 }
 
