@@ -77,7 +77,7 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
         while ($attempt < $maxAttempts && $this->running) {
             try {
                 if ($redis->connect($this->redisConfig->host, $this->redisConfig->port, 5)) {
-                    if ($this->redisConfig->password && !$redis->auth($this->redisConfig->password)) {
+                    if (isset($this->redisConfig->password) && !$redis->auth($this->redisConfig->password)) {
                         throw new RuntimeException("🍭 Autenticación fallida");
                     }
                     return true;
