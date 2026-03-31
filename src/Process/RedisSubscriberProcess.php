@@ -3,7 +3,6 @@
 namespace Tabula17\Satelles\Nexus\Utilis\Process;
 
 use Psr\Log\LoggerInterface;
-use Swoole\Server;
 use Redis;
 use Tabula17\Satelles\Nexus\Utilis\Exception\RuntimeException;
 use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
@@ -39,14 +38,14 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
                     $this->safeSleep($interval);
                     continue;
                 }
-                $this->logger?->debug("Conectado a Redis en {$this->redisConfig->host}:{$this->redisConfig->port}");
+                $this->logger?->debug("🍭 Conectado a Redis en {$this->redisConfig->host}:{$this->redisConfig->port}");
                 // Suscribirse y procesar mensajes
                 $redis->subscribe($this->channels, function ($instance, $channel, $message) {
                     $this->dispatchToTaskWorker($channel, $message);
                 });
 
             } catch (Throwable $e) {
-                $this->logger?->error("Error en suscriptor: " . $e->getMessage());
+                $this->logger?->error("🍭 Error en suscriptor: " . $e->getMessage());
                 $this->safeSleep($interval);
             }
         }
@@ -83,7 +82,7 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
                     return true;
                 }
             } catch (Throwable $e) {
-                $this->logger?->warning("Intento " . ($attempt + 1) . " fallido: " . $e->getMessage());
+                $this->logger?->warning("🍭 Intento " . ($attempt + 1) . " fallido: " . $e->getMessage());
             }
 
             $attempt++;
