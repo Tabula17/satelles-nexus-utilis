@@ -526,7 +526,6 @@ trait HamumTrait
     }
 
     // CLOSE HANDLERS ->
-
     public function handleCloseEvent(TcpUdpServer $server, int $fd, int $reactorId): void
     {
         $this?->logger?->debug("Handling close event for worker {$server->worker_id} with fd: {$fd} and reactorId: {$reactorId}");
