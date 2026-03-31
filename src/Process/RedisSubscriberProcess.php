@@ -26,14 +26,15 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
 
     protected function execute(): void
     {
-        if ($this->redisConfig->retryInterval < 1) {
-            $this->redisConfig->retryInterval = 1; // Establecer un mínimo de 1 segundo para evitar bucles de reconexión demasiado rápidos
+        $interval = $this->redisConfig->retryInterval;
+        if ($interval < 1) {
+            $interval = 1; // Establecer un mínimo de 1 segundo para evitar bucles de reconexión demasiado rápidos
         }
         while ($this->running) {
             try {
                 $redis = new Redis();
                 if (!$this->connectWithRetry($redis)) {
-                    $this->safeSleep($this->redisConfig->retryInterval);
+                    $this->safeSleep($interval);
                     continue;
                 }
                 $this->logger?->debug("Conectado a Redis en {$this->redisConfig->host}:{$this->redisConfig->port}");
@@ -44,7 +45,7 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
 
             } catch (Throwable $e) {
                 $this->logger?->error("Error en suscriptor: " . $e->getMessage());
-                $this->safeSleep($this->redisConfig->retryInterval);
+                $this->safeSleep($interval);
             }
         }
     }
