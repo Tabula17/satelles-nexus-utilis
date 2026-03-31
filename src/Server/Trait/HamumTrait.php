@@ -367,6 +367,11 @@ trait HamumTrait
         if (!isset($this->taskHandlers[$protocolAction]) || !($this->taskHandlers[$protocolAction] instanceof CallableCollection)) {
             $this->taskHandlers[$protocolAction] = new CallableCollection();
         }
+        if($this->taskHandlers[$protocolAction]->contains($callback)) {
+            $this->logger?->debug("Task handler for action '$protocolAction' [{$protocol}] already registered. Skipping.");
+            return;
+        }
+        $this->logger?->debug("Registering task handler for action '$protocolAction' [{$protocol}]");
         $this->taskHandlers[$protocolAction]->offsetSet($protocol, $callback);
         parent::on('Task', $this->handleTaskEvent(...));
     }
