@@ -367,7 +367,7 @@ trait HamumTrait
         if (!isset($this->taskHandlers[$protocolAction]) || !($this->taskHandlers[$protocolAction] instanceof CallableCollection)) {
             $this->taskHandlers[$protocolAction] = new CallableCollection();
         }
-        if($this->taskHandlers[$protocolAction]->contains($callback)) {
+        if ($this->taskHandlers[$protocolAction]->contains($callback)) {
             $this->logger?->warning("⌚️ Task handler for action '$protocolAction' [{$protocol}] already registered. Skipping.");
             return;
         }
@@ -400,10 +400,9 @@ trait HamumTrait
         if ($this instanceof TcpUdpServer && $this->setting['task_enable_coroutine']) {
             $this?->logger?->debug('Task workers will run in coroutine mode');
             /** @var TcpUdpServer $server */
-            /** @var Task $task */
             [$server, $task] = $args;
             try {
-                $data = $task->data;
+                $data = $task instanceof Task ? $task->data : $task;
                 $taskAction = json_validate($data) ? json_decode($data, true)['action'] : '';
                 $results = [];
                 $results['raw'] = $data;
@@ -426,7 +425,7 @@ trait HamumTrait
                 ];
                 $this?->logger?->debug("Task finished with output: " . json_encode($output));
                 $task->finish(json_encode($output));
-            }catch (\Throwable $e) {
+            } catch (\Throwable $e) {
                 $this?->logger?->error("Task failed with exception: " . $e->getMessage());
                 $this?->logger?->error("Stack trace: " . $e->getTraceAsString());
                 $this?->logger?->error("Task data: " . var_export($task, true));
