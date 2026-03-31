@@ -21,6 +21,7 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
         ?LoggerInterface             $logger = null
     )
     {
+        $this->origin = 'task:subscriber:redis';
         parent::__construct($server, $channels, $logger = null);
     }
 
@@ -93,4 +94,10 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
         return false;
     }
 
+    public function init(): void
+    {
+        $this->logger?->info("Configurando eventos de suscriptor de Redis en {$this->redisConfig->host}:{$this->redisConfig->port}");
+        $this->server->on('managerStart', fn() => $this->start());
+        $this->server->on('managerStop', fn() => $this->stop());
+    }
 }

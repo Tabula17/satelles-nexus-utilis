@@ -13,15 +13,13 @@ abstract class AbstractSubscriberProcess
     protected array $channels;
     protected bool $running = false;
     protected ?LoggerInterface $logger = null;
-    protected string $origin = 'task:subscriber';
+    public string $origin = 'task:subscriber';
 
     public function __construct(HamumServerInterface $server, array $channels, ?LoggerInterface $logger = null)
     {
         $this->server = $server;
         $this->channels = $channels;
         $this->logger = $logger;
-        $server->on('managerStart', fn() => $this->start());
-        $server->on('managerStop', fn() => $this->stop());
     }
 
     /**
@@ -49,6 +47,7 @@ abstract class AbstractSubscriberProcess
             $this->logger?->info("Subscriber process stopped");
         }
     }
+    abstract public function init(): void;
 
     /**
      * Lógica principal del suscriptor (debe implementarse)

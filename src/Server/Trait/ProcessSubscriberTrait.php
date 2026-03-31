@@ -11,7 +11,8 @@ trait ProcessSubscriberTrait
 
     public function addProcessSubscriber(AbstractSubscriberProcess $subscriber): void
     {
-        $this->processSubscribers[] = $subscriber;
+        $subscriber->init();
+        $this->processSubscribers[$subscriber->origin] = $subscriber;
     }
 
 }
