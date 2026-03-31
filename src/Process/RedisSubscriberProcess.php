@@ -64,7 +64,8 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
             'data' => $message,
             'timestamp' => microtime(true)
         ];
-        $taskId = $this->server->task(json_encode($task), -1, fn($server, $taskId) => $this->logger?->debug("Task Worker ID: {$taskId} completado"));
+        //$taskId = $this->server->task(json_encode($task), -1, fn($server, $taskId) => $this->logger?->debug("Task Worker ID: {$taskId} completado"));
+        $taskId = $this->server->task(json_encode($task));
         $this->logger?->debug("🍭 Mensaje en {$channel} enviado a Task Worker ID: {$taskId}");
     }
 
