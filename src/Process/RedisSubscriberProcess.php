@@ -15,10 +15,10 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
     use CoroutineHelper;
 
     public function __construct(
-        HamumServerInterface $server,
-        array                $channels,
+        HamumServerInterface         $server,
+        array                        $channels,
         private readonly RedisConfig $redisConfig,
-        ?LoggerInterface $logger = null
+        ?LoggerInterface             $logger = null
     )
     {
         parent::__construct($server, $channels, $logger = null);
@@ -26,6 +26,9 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
 
     protected function execute(): void
     {
+        if ($this->redisConfig->retryInterval < 1) {
+            $this->redisConfig->retryInterval = 1; // Establecer un mínimo de 1 segundo para evitar bucles de reconexión demasiado rápidos
+        }
         while ($this->running) {
             try {
                 $redis = new Redis();
@@ -45,6 +48,7 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
             }
         }
     }
+
     /**
      * Envía el mensaje a un Task Worker para procesar los callbacks
      */
@@ -59,8 +63,9 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
             'timestamp' => microtime(true)
         ];
         $taskId = $this->server->task(json_encode($task), -1, fn($server, $taskId) => $this->logger?->debug("Task Worker ID: {$taskId} completado"));
-        $this->logger?->debug( "Mensaje en {$channel} enviado a Task Worker ID: {$taskId}");
+        $this->logger?->debug("Mensaje en {$channel} enviado a Task Worker ID: {$taskId}");
     }
+
     private function connectWithRetry(Redis $redis): bool
     {
         $maxAttempts = 3;
