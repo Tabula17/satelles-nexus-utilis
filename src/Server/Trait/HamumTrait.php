@@ -402,29 +402,35 @@ trait HamumTrait
             /** @var TcpUdpServer $server */
             /** @var Task $task */
             [$server, $task] = $args;
-            $data = $task->data;
-            $taskAction = json_validate($data) ? json_decode($data, true)['action'] : '';
-            $results = [];
-            $results['raw'] = $data;
-            $taskHandlers = array_merge($this->getEventActionHandlers('task', $taskAction), $this->getEventActionHandlers('task', '*'));
-            $this?->logger?->debug("Found task handlers for action {$taskAction}");
-            foreach ($taskHandlers as $protocol => $handler) {
-                $this?->logger?->debug("Handling task for action {$taskAction} [{$protocol}] with data: {$data}");
-                $results[$protocol] = $handler($server, $data);
+            try {
+                $data = $task->data;
+                $taskAction = json_validate($data) ? json_decode($data, true)['action'] : '';
+                $results = [];
+                $results['raw'] = $data;
+                $taskHandlers = array_merge($this->getEventActionHandlers('task', $taskAction), $this->getEventActionHandlers('task', '*'));
+                $this?->logger?->debug("Found task handlers for action {$taskAction}");
+                foreach ($taskHandlers as $protocol => $handler) {
+                    $this?->logger?->debug("Handling task for action {$taskAction} [{$protocol}] with data: {$data}");
+                    $results[$protocol] = $handler($server, $data);
+                }
+
+                $output = [
+                    'action' => $taskAction,
+                    'results' => $results,
+                    'protocols' => array_keys($results),
+                    'worker_id' => $server->worker_id,
+                    'task_id' => $task->id,
+                    'task_worker_id' => $task->worker_id,
+                    'time' => microtime(true),
+
+                ];
+                $this?->logger?->debug("Task finished with output: " . json_encode($output));
+                $task->finish(json_encode($output));
+            }catch (\Throwable $e) {
+                $this?->logger?->error("Task failed with exception: " . $e->getMessage());
+                $this?->logger?->error("Stack trace: " . $e->getTraceAsString());
+                $this?->logger?->error("Task data: " . var_export($task, true));
             }
-
-            $output = [
-                'action' => $taskAction,
-                'results' => $results,
-                'protocols' => array_keys($results),
-                'worker_id' => $server->worker_id,
-                'task_id' => $task->id,
-                'task_worker_id' => $task->worker_id,
-                'time' => microtime(true),
-
-            ];
-            $this?->logger?->debug("Task finished with output: " . json_encode($output));
-            $task->finish(json_encode($output));
         } else {
             /** @var TcpUdpServer $server */
             /** @var int $taskId */
