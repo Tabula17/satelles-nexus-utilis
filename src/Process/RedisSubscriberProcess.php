@@ -57,7 +57,8 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
                             $pingRedis->ping();
                             $pingRedis->close();
                         } catch (Throwable $e) {
-                            $this->logger?->warning("Heartbeat falló, forzando reconexión");
+                            $this->logger?->warning("Heartbeat falló, forzando reconexión: " . $e->getMessage());
+                            $this->logger?->debug("Stack trace: " . $e->getTraceAsString());
                             throw new RuntimeException("Heartbeat failed");
                         }
                     }
