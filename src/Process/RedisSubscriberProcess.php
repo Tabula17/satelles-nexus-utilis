@@ -111,10 +111,11 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
         $task = new TaskSubscriberDescriptor($task);
         if(!$task->isValid()) {
             $this->logger?->notice("🍭 Mensaje recibido en {$channel} no es un TaskSubscriberDescriptor válido, ignorando. Payload: " . json_encode($message));
+            $this->logger?->debug("🍭 Task: " . $task->getJSON());
             return;
         }
         //$taskId = $this->server->task(json_encode($task), -1, fn($server, $taskId) => $this->logger?->debug("Task Worker ID: {$taskId} completado"));
-        $taskId = $this->server->task($task->jsonSerialize());
+        $taskId = $this->server->task($task->getJSON());
         $this->logger?->debug("🍭 Mensaje en {$channel} enviado a Task Worker ID: {$taskId}");
     }
 
