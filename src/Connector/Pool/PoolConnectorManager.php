@@ -27,6 +27,12 @@ class PoolConnectorManager implements CoetusNexuumInterface
         private readonly ?LoggerInterface $logger = null
     )
     {
+        if (!$this->isInCoroutine()) {
+            $this->logger?->warning("PoolConnectorManager is not running in coroutine. Load connections will be executed in the main process.");
+            $this->logger?->warning("This may cause blocking if the connection attempts take a long time.");
+            $this->logger?->warning("Some connections run only in coroutines and may fail and return an unrecoverable error.");
+            trigger_error("PoolConnectorManager is not running in coroutine. Load connections will be executed in the main process. This may cause blocking if the connection attempts take a long time. Some connections run only in coroutines and may fail and return an unrecoverable error.", E_USER_WARNING);
+        }
     }
 
     public function loadConnection(ConnectionConfig $config, int $poolSize = 3, string $poolClass = ConnectionPool::class): void
@@ -72,8 +78,9 @@ class PoolConnectorManager implements CoetusNexuumInterface
     public function loadConnections(ConnectionCollection $configs, int $poolSize = 3, string $poolClass = ConnectionPool::class): void
     {
         foreach ($configs as $config) {
-            Coroutine::create(fn() =>$this->loadConnection($config, $poolSize, $poolClass));
+            //Coroutine::create(fn() => $this->loadConnection($config, $poolSize, $poolClass));
             //$this->loadConnection($config, $poolSize, $poolClass);
+            $this->runInCoroutineIfPossible($this->loadConnection(...), $config, $poolSize, $poolClass);
         }
     }
 
