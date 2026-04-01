@@ -60,7 +60,7 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
                         }
                     });
                 } catch (Throwable $ignored) {
-                    $this->logger?->warning("❤️‍🩹 Error al iniciar RedisSubscriber heartbeat: " . $ignored->getMessage().". PID: " . getmypid() . " CID: " . Coroutine::getCid());
+                    $this->logger?->warning("❤️‍🩹 Error al iniciar RedisSubscriber heartbeat: " . $ignored->getMessage() . ". PID: " . getmypid() . " CID: " . Coroutine::getCid());
 
                 }
 
@@ -91,25 +91,25 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
     private function dispatchToTaskWorker(string $channel, string $message): void
     {
         $message = json_validate($message) ? json_decode($message, true) : $message;
-        $task =[];
-        if(!isset($message['payload'])) {
+        $task = [];
+        if (!isset($message['payload'])) {
             $task['payload'] = $message;
-        }else{
+        } else {
             $task = $message;
         }
-        if(!isset($task['action'])) {
+        if (!isset($task['action'])) {
             $task['action'] = $message['action'] ?? $channel;
         }
-        if(!str_starts_with($task['action'], 'task:' )) {
+        if (!str_starts_with($task['action'], 'task:')) {
             $task['action'] = 'task:' . $task['action'];
         }
-        $task['channel'] = $channel;
-        $task['origin'] = $this->origin;
+        $task['channel'] = $message['channel'] ?? $channel;
+        $task['origin'] = $this->origin . ':' . $channel;
         $task['timestamp'] = microtime(true);
 
         // Preparar la tare\a
         $task = new TaskSubscriberDescriptor($task);
-        if(!$task->isValid()) {
+        if (!$task->isValid()) {
             $this->logger?->notice("🍭 Mensaje recibido en {$channel} no es un TaskSubscriberDescriptor válido, ignorando. Payload: " . json_encode($message));
             $this->logger?->debug("🍭 Task: " . $task->getJSON());
             return;
