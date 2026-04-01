@@ -22,23 +22,29 @@ abstract class AbstractSubscriberProcess
         $this->logger = $logger;
     }
 
-    public function addChannel(string $channel): void
+    public function addChannel(string $channel, ?callable $handler, bool $own = true): void
     {
         $this->channels[] = $channel;
+        if ($handler) {
+            $this->server->registerTaskHandlers($channel, $handler, $own ? $this->origin : 'task:subscriber');
+        }
         if ($this->running) {
             $this->logger?->info("📰 Channel added: $channel. Restarting subscriber process to apply changes.");
             $this->stop();
             $this->start();
         }
     }
+
     public function removeChannel(string $channel): void
     {
         unset($this->channels[array_search($channel, $this->channels, true)]);
     }
+
     public function getChannels(): array
     {
         return $this->channels;
     }
+
     /**
      * Inicia el proceso suscriptor
      */

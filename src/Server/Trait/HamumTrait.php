@@ -13,7 +13,7 @@ use Tabula17\Satelles\Utilis\Collection\CallableCollection;
 trait HamumTrait
 {
     use MatrixTrait;
-
+    const HAMUM_HOOK_ENABLED = true;
     private array $hookedEvents = [];
     /**
      * @var array With actionable protocols as keys and callables as values. Tasks event occurs in every Swoole server worker and Server type.
@@ -34,7 +34,7 @@ trait HamumTrait
     private array $registeredHandlers = [];
     private array $definedHandlers = [];
 
-    private function traitAllowed(): bool
+    private function isTcpUdpServer(): bool
     {
         return $this instanceof TcpUdpServer;
     }
@@ -164,7 +164,7 @@ trait HamumTrait
 
     public function start(): bool
     {
-        if (!$this->traitAllowed()) {
+        if (!$this->isTcpUdpServer()) {
             $this->logger?->error("Server type is not supported by this trait. Can't override start() method.");
             $this?->logger?->debug(str_repeat('-', 100));
             return false;
@@ -214,7 +214,7 @@ trait HamumTrait
      */
     public function on(string $event_name, callable $callback, bool $cleanQueue = false): bool
     {
-        if (!$this->traitAllowed()) {
+        if (!$this->isTcpUdpServer()) {
             $this->logger?->error("Server type is not supported by this trait. Can't override on() method.");
             return false;
         }
@@ -237,7 +237,7 @@ trait HamumTrait
     {
         $off = $this->offEvent($event_name, $callback);
         if (is_callable($off)) {
-            if ($this->traitAllowed()) {
+            if ($this->isTcpUdpServer()) {
                 parent::on($event_name, $off);
             }
             return true;

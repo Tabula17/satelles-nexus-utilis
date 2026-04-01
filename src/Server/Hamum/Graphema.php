@@ -11,6 +11,7 @@ use Tabula17\Satelles\Utilis\Config\TCPServerConfig;
 abstract class Graphema extends Server implements HamumServerInterface
 {
     use HamumTrait;
+
     private array $requestHandlers = [];
 
     public function __construct(TCPServerConfig $config, public ?LoggerInterface $logger = null)
@@ -24,16 +25,33 @@ abstract class Graphema extends Server implements HamumServerInterface
         $this->set($options);
         $this->init();
     }
+
     abstract protected function init(): void;
+
+    public function isHamumEnabled(): bool
+    {
+        return defined(static::class . '::HAMUM_ENABLED') && static::HAMUM_ENABLED;
+    }
+
+    public function isCronosEnabled(): bool
+    {
+        return defined(static::class . '::CRONOS_ENABLED') && static::CRONOS_ENABLED;
+    }
+
+    public function isProcessSubsciberEnabled(): bool
+    {
+        return defined(static::class . '::PROCESS_SUBSCRIBER_ENABLED') && static::PROCESS_SUBSCRIBER_ENABLED;
+    }
 
     public function handleRequestEvent(string $protocolAction, $request, $response): void
     {
         $this?->logger?->debug("Handling request event with protocolAction: {$protocolAction}");
-        $eventHandlers = array_merge($this->getEventActionHandlers('request', $protocolAction) , $this->getEventActionHandlers('request', '*'));
+        $eventHandlers = array_merge($this->getEventActionHandlers('request', $protocolAction), $this->getEventActionHandlers('request', '*'));
         foreach ($eventHandlers as $callback) {
             $callback($request, $response);
         }
     }
+
     public function registerRequestHandlers(string $protocolAction, callable $callback, $protocol = 'generic'): void
     {
         if (!isset($this->requestHandlers[$protocolAction]) || !($this->requestHandlers[$protocolAction] instanceof CallableCollection)) {

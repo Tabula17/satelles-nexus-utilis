@@ -40,6 +40,18 @@ abstract class Filum extends Server implements HamumServerInterface
         $this->init();
     }
 
+    public function isHamumEnabled(): bool
+    {
+        return defined(static::class . '::HAMUM_ENABLED') && static::HAMUM_ENABLED;
+    }
+    public function isCronosEnabled(): bool
+    {
+        return defined(static::class . '::CRONOS_ENABLED') && static::CRONOS_ENABLED;
+    }
+    public function isProcessSubsciberEnabled(): bool
+    {
+        return defined(static::class . '::PROCESS_SUBSCRIBER_ENABLED') && static::PROCESS_SUBSCRIBER_ENABLED;
+    }
     abstract protected function init(): void;
 
     public function handleRequestEvent(Request $request, Response $response): void
