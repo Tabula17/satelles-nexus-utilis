@@ -4,6 +4,7 @@ namespace Tabula17\Satelles\Nexus\Utilis\Connector\Pool;
 
 use Psr\Log\LoggerInterface;
 use Swoole\ConnectionPool;
+use Swoole\Coroutine;
 use Swoole\Database\PDOProxy;
 use Tabula17\Satelles\Nexus\Utilis\Connector\CoetusNexuumInterface;
 use Tabula17\Satelles\Nexus\Utilis\Exception\ExceptionDefinitions;
@@ -71,7 +72,8 @@ class PoolConnectorManager implements CoetusNexuumInterface
     public function loadConnections(ConnectionCollection $configs, int $poolSize = 3, string $poolClass = ConnectionPool::class): void
     {
         foreach ($configs as $config) {
-            $this->loadConnection($config, $poolSize, $poolClass);
+            Coroutine::create(fn() =>$this->loadConnection($config, $poolSize, $poolClass));
+            //$this->loadConnection($config, $poolSize, $poolClass);
         }
     }
 
