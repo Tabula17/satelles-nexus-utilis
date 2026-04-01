@@ -11,7 +11,7 @@ use Tabula17\Satelles\Utilis\Config\TCPServerConfig;
 abstract class Basis extends Server implements HamumServerInterface
 {
     use HamumTrait;
-    CONST HamumTypes TYPE = HamumTypes::TCP;
+    const HamumTypes TYPE = HamumTypes::TCP;
     private array $connectHandlers = [];
     private array $receiveHandlers = [];
     private array $packetHandlers = [];
@@ -41,6 +41,10 @@ abstract class Basis extends Server implements HamumServerInterface
     public function isProcessSubsciberEnabled(): bool
     {
         return defined(static::class . '::PROCESS_SUBSCRIBER_ENABLED') && static::PROCESS_SUBSCRIBER_ENABLED;
+    }
+    public function isClientInfoEnabled(): bool
+    {
+        return defined(static::class . '::CLIENT_INFO_ENABLED') && static::CLIENT_INFO_ENABLED;
     }
     public function registerReceiveHandlers(string $protocolAction, callable $callback, $protocol = 'generic'): void
     {

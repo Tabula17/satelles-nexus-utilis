@@ -14,7 +14,7 @@ use Tabula17\Satelles\Utilis\Config\TCPServerConfig;
 abstract class Filum extends Server implements HamumServerInterface
 {
     use HamumTrait;
-    final CONST HamumTypes TYPE = HamumTypes::WEBSOCKET;
+    final const HamumTypes TYPE = HamumTypes::WEBSOCKET;
 
     private array $requestHandlers = [];
     private array $connectHandlers = [];
@@ -52,6 +52,10 @@ abstract class Filum extends Server implements HamumServerInterface
     public function isProcessSubsciberEnabled(): bool
     {
         return defined(static::class . '::PROCESS_SUBSCRIBER_ENABLED') && static::PROCESS_SUBSCRIBER_ENABLED;
+    }
+    public function isClientInfoEnabled(): bool
+    {
+        return defined(static::class . '::CLIENT_INFO_ENABLED') && static::CLIENT_INFO_ENABLED;
     }
     abstract protected function init(): void;
 

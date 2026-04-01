@@ -11,7 +11,7 @@ use Tabula17\Satelles\Utilis\Config\TCPServerConfig;
 abstract class Graphema extends Server implements HamumServerInterface
 {
     use HamumTrait;
-    final CONST HamumTypes TYPE = HamumTypes::HTTP;
+    final const HamumTypes TYPE = HamumTypes::HTTP;
 
     private array $requestHandlers = [];
 
@@ -44,6 +44,10 @@ abstract class Graphema extends Server implements HamumServerInterface
         return defined(static::class . '::PROCESS_SUBSCRIBER_ENABLED') && static::PROCESS_SUBSCRIBER_ENABLED;
     }
 
+    public function isClientInfoEnabled(): bool
+    {
+        return defined(static::class . '::CLIENT_INFO_ENABLED') && static::CLIENT_INFO_ENABLED;
+    }
     public function handleRequestEvent(string $protocolAction, $request, $response): void
     {
         $this?->logger?->debug("Handling request event with protocolAction: {$protocolAction}");
