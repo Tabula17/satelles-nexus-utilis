@@ -44,7 +44,7 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
                 $this->logger?->debug("🍭 Conectado a Redis en {$this->redisConfig->host}:{$this->redisConfig->port}");
 
                 try {
-                    $heartbeatTimer = Timer::tick(5000, function () {
+                    $heartbeatTimer = Timer::tick(60000, function () {
                         try {
                             $pingRedis = new Redis();
                             $pingRedis->connect($this->redisConfig->host, $this->redisConfig->port, 1);
