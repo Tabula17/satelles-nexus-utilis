@@ -28,10 +28,10 @@ class PoolConnectorManager implements CoetusNexuumInterface
     )
     {
         if (!$this->isInCoroutine()) {
-            $this->logger?->warning("PoolConnectorManager is not running in coroutine. Load connections will be executed in the main process.");
-            $this->logger?->warning("This may cause blocking if the connection attempts take a long time.");
+            $this->logger?->warning("PoolConnectorManager is not running in coroutine.");
+            $this->logger?->warning("If the connection loading is performed in the main process and connection attempts take a long time, a blocking event may occur.");
             $this->logger?->warning("Some connections run only in coroutines and may fail and return an unrecoverable error.");
-            trigger_error("PoolConnectorManager is not running in coroutine. Load connections will be executed in the main process. This may cause blocking if the connection attempts take a long time. Some connections run only in coroutines and may fail and return an unrecoverable error.", E_USER_WARNING);
+            trigger_error("PoolConnectorManager is not running in coroutine. If the connection loading is performed in the main process and connection attempts take a long time, a blocking event may occur. Some connections run only in coroutines and may fail and return an unrecoverable error.", E_USER_WARNING);
         }
     }
 
