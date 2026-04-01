@@ -14,6 +14,7 @@ use Tabula17\Satelles\Utilis\Config\TCPServerConfig;
 abstract class Filum extends Server implements HamumServerInterface
 {
     use HamumTrait;
+    final CONST HamumTypes TYPE = HamumTypes::WEBSOCKET;
 
     private array $requestHandlers = [];
     private array $connectHandlers = [];

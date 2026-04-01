@@ -11,6 +11,7 @@ use Tabula17\Satelles\Utilis\Config\TCPServerConfig;
 abstract class Graphema extends Server implements HamumServerInterface
 {
     use HamumTrait;
+    final CONST HamumTypes TYPE = HamumTypes::HTTP;
 
     private array $requestHandlers = [];
 

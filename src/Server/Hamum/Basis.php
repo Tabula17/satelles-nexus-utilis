@@ -11,7 +11,7 @@ use Tabula17\Satelles\Utilis\Config\TCPServerConfig;
 abstract class Basis extends Server implements HamumServerInterface
 {
     use HamumTrait;
-
+    CONST HamumTypes TYPE = HamumTypes::TCP;
     private array $connectHandlers = [];
     private array $receiveHandlers = [];
     private array $packetHandlers = [];
