@@ -4,6 +4,7 @@ namespace Tabula17\Satelles\Nexus\Utilis\Process;
 
 use Psr\Log\LoggerInterface;
 use Redis;
+use Swoole\Timer;
 use Tabula17\Satelles\Nexus\Utilis\Exception\RuntimeException;
 use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
 use Tabula17\Satelles\Utilis\Config\RedisConfig;
@@ -39,13 +40,38 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
                     continue;
                 }
                 $this->logger?->debug("🍭 Conectado a Redis en {$this->redisConfig->host}:{$this->redisConfig->port}");
+
+                $heartbeatTimer = Timer::tick(20000, function () use ($redis) {
+                    try {
+                        $pingRedis = new Redis();
+                        $pingRedis->connect($this->redisConfig->host, $this->redisConfig->port, 1);
+                        if ($this->redisConfig->password) {
+                            $pingRedis->auth($this->redisConfig->password);
+                        }
+                        $pingRedis->ping();
+                        $pingRedis->close();
+                    } catch (Throwable $e) {
+                        $this->logger?->warning("Heartbeat falló, forzando reconexión");
+                        throw new RuntimeException("Heartbeat failed");
+                    }
+                });
+
                 // Suscribirse y procesar mensajes
                 $redis->subscribe($this->channels, function ($instance, $channel, $message) {
                     $this->dispatchToTaskWorker($channel, $message);
                 });
 
             } catch (Throwable $e) {
-                $this->logger?->error("🍭 Error en suscriptor: " . $e->getMessage());
+                $this->logger?->error("🍭 Error en suscriptor: " . $e->getMessage());// Limpiar heartbeat
+                if (isset($heartbeatTimer)) {
+                    Timer::clear($heartbeatTimer);
+                }
+                if (isset($redis)) {
+                    try {
+                        $redis->close();
+                    } catch (Throwable $ignored) {
+                    }
+                }
                 $this->safeSleep($interval);
             }
         }
