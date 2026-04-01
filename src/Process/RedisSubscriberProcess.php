@@ -91,15 +91,26 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
     private function dispatchToTaskWorker(string $channel, string $message): void
     {
         $message = json_validate($message) ? json_decode($message, true) : $message;
-        // Preparar la tarea
-        $task = [
-            'from' => $this->origin,
-            'action' => $channel, // HamumTrait taskHandler usará el nombre del canal como acción para enrutar a los callbacks registrados
-            'data' => $message,
-            'timestamp' => microtime(true)
-        ];
+        $task =[];
+        if(!isset($message['payload'])) {
+            $task['payload'] = $message;
+        }else{
+            $task = $message;
+        }
+        if(!isset($task['action'])) {
+            $task['action'] = $message['action'] ?? $channel;
+        }
+        if(!str_starts_with($task['action'], 'task:' )) {
+            $task['action'] = 'task:' . $task['action'];
+        }
+        $task['channel'] = $channel;
+        $task['origin'] = $this->origin;
+        $task['timestamp'] = microtime(true);
+
+        // Preparar la tare\a
+        $task = new TaskSubscriberDescriptor($task);
         //$taskId = $this->server->task(json_encode($task), -1, fn($server, $taskId) => $this->logger?->debug("Task Worker ID: {$taskId} completado"));
-        $taskId = $this->server->task(json_encode($task));
+        $taskId = $this->server->task($task->jsonSerialize());
         $this->logger?->debug("🍭 Mensaje en {$channel} enviado a Task Worker ID: {$taskId}");
     }
 

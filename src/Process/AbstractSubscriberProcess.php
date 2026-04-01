@@ -22,6 +22,23 @@ abstract class AbstractSubscriberProcess
         $this->logger = $logger;
     }
 
+    public function addChannel(string $channel): void
+    {
+        $this->channels[] = $channel;
+        if ($this->running) {
+            $this->logger?->info("📰 Channel added: $channel. Restarting subscriber process to apply changes.");
+            $this->stop();
+            $this->start();
+        }
+    }
+    public function removeChannel(string $channel): void
+    {
+        unset($this->channels[array_search($channel, $this->channels, true)]);
+    }
+    public function getChannels(): array
+    {
+        return $this->channels;
+    }
     /**
      * Inicia el proceso suscriptor
      */
@@ -33,7 +50,7 @@ abstract class AbstractSubscriberProcess
         }, false, 2, true); // redirect stdin/stdout/stderr = true
         $this->process->start();
         // Registrar el PID para limpieza posterior
-        $this->logger?->info("Subscriber process started for channels: " . implode(', ', $this->channels));
+        $this->logger?->info("📰 Subscriber process started for channels: " . implode(', ', $this->channels));
     }
 
     /**
@@ -44,9 +61,20 @@ abstract class AbstractSubscriberProcess
         if ($this->process && $this->running) {
             $this->running = false;
             Process::kill($this->process->pid, SIGTERM);
-            $this->logger?->info("Subscriber process stopped");
+            $this->logger?->info("📰 Subscriber process stopped");
         }
     }
+
+    public function isRunning(): bool
+    {
+        return $this->running;
+    }
+
+    /**
+     * Inicializa si es necesario el suscriptor al agregarse a la instancia de Server si se usa el Trait ProcessSubscriberTrait. (debe implementarse)
+     *
+     * @return void
+     */
     abstract public function init(): void;
 
     /**
