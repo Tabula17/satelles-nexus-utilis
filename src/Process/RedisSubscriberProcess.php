@@ -53,13 +53,14 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
                             }
                             $pingRedis->ping();
                             $pingRedis->close();
+                            $this->logger?->debug("❤️ Heartbeat ejecutado");
                         } catch (Throwable $e) {
-                            $this->logger?->warning("Heartbeat falló, forzando reconexión");
+                            $this->logger?->warning("💔 Heartbeat falló, forzando reconexión");
                             throw new RuntimeException("Heartbeat failed");
                         }
                     });
                 } catch (Throwable $ignored) {
-                    $this->logger?->warning("Error al iniciar heartbeat: " . $ignored->getMessage());
+                    $this->logger?->warning("❤️‍🩹 Error al iniciar heartbeat: " . $ignored->getMessage());
 
                 }
 
