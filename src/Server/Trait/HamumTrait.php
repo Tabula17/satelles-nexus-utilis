@@ -13,6 +13,7 @@ use Tabula17\Satelles\Utilis\Collection\CallableCollection;
 trait HamumTrait
 {
     use MatrixTrait;
+
     const HAMUM_HOOK_ENABLED = true;
     private array $hookedEvents = [];
     /**
@@ -145,6 +146,11 @@ trait HamumTrait
             return $port;
         }
         return null;
+    }
+
+    public function getDefinedHandlers(): array
+    {
+        return $this->definedHandlers;
     }
 
     abstract protected function onBeforeStart(): void;
