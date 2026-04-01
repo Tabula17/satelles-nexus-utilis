@@ -4,6 +4,7 @@ namespace Tabula17\Satelles\Nexus\Utilis\Process;
 
 use Psr\Log\LoggerInterface;
 use Redis;
+use Swoole\Coroutine;
 use Swoole\Timer;
 use Tabula17\Satelles\Nexus\Utilis\Exception\RuntimeException;
 use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
@@ -63,7 +64,7 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
                 });
 
             } catch (Throwable $e) {
-                $this->logger?->error("🍭 Error en suscriptor: " . $e->getMessage());// Limpiar heartbeat
+                $this->logger?->error("🍭 Error en suscriptor: " . $e->getMessage()." CID ".Coroutine::getCid());// Limpiar heartbeat
                 if (isset($heartbeatTimer)) {
                     Timer::clear($heartbeatTimer);
                 }
