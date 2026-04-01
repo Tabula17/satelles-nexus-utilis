@@ -64,7 +64,7 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
                 });
 
             } catch (Throwable $e) {
-                $this->logger?->error("🍭 Error en suscriptor: " . $e->getMessage()." CID ".Coroutine::getCid());// Limpiar heartbeat
+                $this->logger?->error("🍭 Error en suscriptor: " . $e->getMessage() . " CID " . Coroutine::getCid());// Limpiar heartbeat
                 if (isset($heartbeatTimer)) {
                     Timer::clear($heartbeatTimer);
                 }
@@ -104,7 +104,15 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
 
         while ($attempt < $maxAttempts && $this->running) {
             try {
-                if ($redis->connect($this->redisConfig->host, $this->redisConfig->port, 5)) {
+                if (
+                    $redis->connect(
+                        host:$this->redisConfig->host,
+                        port: $this->redisConfig->port,
+                        timeout: $this->redisConfig->connectTimeout,
+                        retry_interval: $this->redisConfig->retryInterval,
+                        read_timeout: $this->redisConfig->readTimeout
+                    )
+                ) {
                     if (isset($this->redisConfig->password) && !$redis->auth($this->redisConfig->password)) {
                         throw new RuntimeException("🍭 Autenticación fallida");
                     }
