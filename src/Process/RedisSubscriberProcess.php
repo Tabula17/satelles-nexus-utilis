@@ -126,7 +126,7 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
     public function init(): void
     {
         $this->logger?->info("🍭 Configurando eventos de suscriptor de Redis en {$this->redisConfig->host}:{$this->redisConfig->port}");
-        $this->server->on('managerStart', fn() => $this->start());
-        $this->server->on('managerStop', fn() => $this->stop());
+        $this->server->on('start', fn() => $this->start());
+        $this->server->on('beforeShutdown', fn() => $this->stop());
     }
 }
