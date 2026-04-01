@@ -53,14 +53,14 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
                             }
                             $pingRedis->ping();
                             $pingRedis->close();
-                            $this->logger?->debug("❤️ Heartbeat ejecutado");
+                            $this->logger?->debug("❤️ RedisSubscriber Heartbeat ejecutado. PID: " . getmypid() . " CID: " . Coroutine::getCid());
                         } catch (Throwable $e) {
-                            $this->logger?->warning("💔 Heartbeat falló, forzando reconexión");
-                            throw new RuntimeException("Heartbeat failed");
+                            $this->logger?->warning("💔 RedisSubscriber Heartbeat falló, forzando reconexión. PID: " . getmypid() . " CID: " . Coroutine::getCid());
+                            throw new RuntimeException("RedisSubscriber Heartbeat failed: " . $e->getMessage());
                         }
                     });
                 } catch (Throwable $ignored) {
-                    $this->logger?->warning("❤️‍🩹 Error al iniciar heartbeat: " . $ignored->getMessage());
+                    $this->logger?->warning("❤️‍🩹 Error al iniciar RedisSubscriber heartbeat: " . $ignored->getMessage().". PID: " . getmypid() . " CID: " . Coroutine::getCid());
 
                 }
 
