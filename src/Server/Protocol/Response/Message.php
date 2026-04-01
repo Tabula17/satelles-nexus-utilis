@@ -8,7 +8,10 @@ class Message extends Base
 {
     protected(set) string $channel;
     protected(set) array|AbstractDescriptor $data = [] {
-        set(array|AbstractDescriptor $data) {
+        set(array|AbstractDescriptor|string $data) {
+            if(is_string($data)){
+                $data = json_validate($data) ? json_decode($data, true) : ['message' => $data, 'type' => 'text'];
+            }
             $this->data = $data instanceof AbstractDescriptor ? $data->toArray() : $data;
         }
     }
