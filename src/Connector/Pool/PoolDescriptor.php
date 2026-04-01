@@ -230,6 +230,7 @@ class PoolDescriptor extends AbstractDescriptor
 
     public function getStats(): PoolStatsDescriptor
     {
+        $lastErrorDate = $this->lastErrorAt ? DateTime::createFromFormat('U.u', sprintf('%f', $this->lastErrorAt)) : null;
         return new PoolStatsDescriptor([
             'name' => $this->name,
             'id' => $this->id,
@@ -242,7 +243,7 @@ class PoolDescriptor extends AbstractDescriptor
             'poolClass' => $this->poolClass,
             'lastError' => $this->status->hasFailure() ? [
                 'message' => $this->lastError,
-                'time' => $this->lastErrorAt ? DateTime::createFromFormat('U.u', sprintf('%f', $this->lastErrorAt))?->format('Y-m-d H:i:s.u') : null,
+                'time' =>$lastErrorDate ? $lastErrorDate->format('Y-m-d H:i:s.u') : null,
                 'attempts' => $this->failedAttempts
             ] : null,
             'checkedOn' => date('Y-m-d H:i:s.u'),
