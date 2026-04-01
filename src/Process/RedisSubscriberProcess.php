@@ -16,6 +16,8 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
 {
     use CoroutineHelper;
 
+    private bool $connected = false;
+
     public function __construct(
         HamumServerInterface         $server,
         array                        $channels,
@@ -37,24 +39,27 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
             try {
                 $redis = new Redis();
                 $redis->setOption(Redis::OPT_READ_TIMEOUT, -1);
-                if (!$this->connectWithRetry($redis)) {
-                    $this->safeSleep($interval);
+                $this->connected = $this->connectWithRetry($redis);
+                if (!$this->connected) {
+                    sleep($interval);
                     continue;
                 }
                 $this->logger?->debug("🍭 Conectado a Redis en {$this->redisConfig->host}:{$this->redisConfig->port}");
 
                 $heartbeatTimer = Timer::tick(5000, function () {
-                    try {
-                        $pingRedis = new Redis();
-                        $pingRedis->connect($this->redisConfig->host, $this->redisConfig->port, 1);
-                        if ($this->redisConfig->password) {
-                            $pingRedis->auth($this->redisConfig->password);
+                    if ($this->connected) {
+                        try {
+                            $pingRedis = new Redis();
+                            $pingRedis->connect($this->redisConfig->host, $this->redisConfig->port, 1);
+                            if ($this->redisConfig->password) {
+                                $pingRedis->auth($this->redisConfig->password);
+                            }
+                            $pingRedis->ping();
+                            $pingRedis->close();
+                        } catch (Throwable $e) {
+                            $this->logger?->warning("Heartbeat falló, forzando reconexión");
+                            throw new RuntimeException("Heartbeat failed");
                         }
-                        $pingRedis->ping();
-                        $pingRedis->close();
-                    } catch (Throwable $e) {
-                        $this->logger?->warning("Heartbeat falló, forzando reconexión");
-                        throw new RuntimeException("Heartbeat failed");
                     }
                 });
 
@@ -74,7 +79,8 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
                     } catch (Throwable $ignored) {
                     }
                 }
-                $this->safeSleep($interval);
+                $this->connected = false;
+                sleep($interval);
             }
         }
     }
@@ -106,7 +112,7 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
             try {
                 if (
                     $redis->connect(
-                        host:$this->redisConfig->host,
+                        host: $this->redisConfig->host,
                         port: $this->redisConfig->port,
                         timeout: $this->redisConfig->connectTimeout,
                         retry_interval: $this->redisConfig->retryInterval,
@@ -124,7 +130,7 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
 
             $attempt++;
             if ($attempt < $maxAttempts) {
-                sleep(2);
+                sleep(1);
             }
         }
 
