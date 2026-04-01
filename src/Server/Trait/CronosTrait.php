@@ -25,6 +25,7 @@ trait CronosTrait
                 $callback(...$args);
             } catch (\Throwable $e) {
                 $this->logger?->error("Error en timer: " . $e->getMessage());
+                $this->logger?->debug("Stack trace: " . $e->getTraceAsString());
             }
         };
         $properties = $properties ?? [];
