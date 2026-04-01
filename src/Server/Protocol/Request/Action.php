@@ -5,6 +5,7 @@ namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request;
 use Tabula17\Satelles\Nexus\Utilis\Exception\UnexpectedValueException;
 use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ProtocolManagerInterface;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ServiceProtocol;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
 
@@ -22,7 +23,7 @@ use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
  */
 class Action extends AbstractDescriptor
 {
-    const string PROTOCOL = 'generic';
+    const ServiceProtocol PROTOCOL = ServiceProtocol::GENERIC;
     private array $resolvers {
         set(array $resolvers) {
             //array_search($resolver, $this->toArray(), true)
@@ -99,7 +100,7 @@ class Action extends AbstractDescriptor
             }
             return new $class($data);
         }
-        trigger_error('No action for protocol ' . static::PROTOCOL . ' -> {' . ($data['action'] ?? 'noType') . '} detected. Must be one of: ' . implode(', ', $this->toArray()), E_USER_WARNING);
+        trigger_error('No action for protocol ' . static::PROTOCOL->shortName() . ' -> {' . ($data['action'] ?? 'noType') . '} detected. Must be one of: ' . implode(', ', $this->toArray()), E_USER_WARNING);
         return Status::undefined;
     }
 
@@ -119,6 +120,6 @@ class Action extends AbstractDescriptor
 
     public static function getProtocolName(): ?string
     {
-        return static::PROTOCOL;
+        return static::PROTOCOL->shortName();
     }
 }

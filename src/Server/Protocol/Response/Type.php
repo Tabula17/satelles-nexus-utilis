@@ -3,12 +3,13 @@
 namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response;
 
 use Tabula17\Satelles\Nexus\Utilis\Exception\UnexpectedValueException;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ServiceProtocol;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
 
 class Type extends AbstractDescriptor
 {
-    const string PROTOCOL = 'generic';
+    const ServiceProtocol PROTOCOL = ServiceProtocol::GENERIC;
 
     protected(set) string $message = 'message';
     protected(set) string $error = 'error';
@@ -102,7 +103,7 @@ class Type extends AbstractDescriptor
 
             return new $class($data);
         }
-        throw new UnexpectedValueException('No response protocol ' . self::PROTOCOL . ' detected. Must be one of: ' . implode(', ', $this->toArray()) . '');
+        throw new UnexpectedValueException('No response protocol ' . self::PROTOCOL->shortName() . ' detected. Must be one of: ' . implode(', ', $this->toArray()) . '');
     }
 
     private function getNamespace(): string
@@ -121,6 +122,6 @@ class Type extends AbstractDescriptor
 
     public static function getProtocolName(): ?string
     {
-        return static::PROTOCOL;
+        return static::PROTOCOL->shortName();
     }
 }
