@@ -14,7 +14,7 @@ abstract class Graphema extends Server implements HamumServerInterface
 
     final const HamumTypes TYPE = HamumTypes::HTTP;
 
-    private array $requestHandlers = [];
+    protected array $requestHandlers = [];
 
     public function __construct(TCPServerConfig $config, public ?LoggerInterface $logger = null)
     {

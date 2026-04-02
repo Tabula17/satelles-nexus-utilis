@@ -19,21 +19,21 @@ trait HamumTrait
     /**
      * @var array With actionable protocols as keys and callables as values. Tasks event occurs in every Swoole server worker and Server type.
      */
-    private array $taskHandlers = [];
+    protected array $taskHandlers = [];
     /**
      * @var array With actionable protocols as keys and callables as values. Finish event occurs in every Swoole server worker and Server type having task workers enabled.
      */
-    private array $finishHandlers = [];
+    protected array $finishHandlers = [];
 
-    private array $pipeMessageHandlers = [];
+    protected array $pipeMessageHandlers = [];
     // private array $receiveHandlers = [];
     // private array $packetHandlers = [];
     // private array $connectHandlers = [];
-    private array $closeHandlers = [];
+    protected array $closeHandlers = [];
     public ?LoggerInterface $logger;
 
-    private array $registeredHandlers = [];
-    private array $definedHandlers = [];
+    protected array $registeredHandlers = [];
+    protected array $definedHandlers = [];
 
     private function isTcpUdpServer(): bool
     {

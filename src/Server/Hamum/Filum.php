@@ -16,18 +16,18 @@ abstract class Filum extends Server implements HamumServerInterface
     use HamumTrait;
     final const HamumTypes TYPE = HamumTypes::WEBSOCKET;
 
-    private array $requestHandlers = [];
-    private array $connectHandlers = [];
-    private array $receiveHandlers = [];
+    protected array $requestHandlers = [];
+    protected array $connectHandlers = [];
+    protected array $receiveHandlers = [];
     /*
      *
             'message',
             'open',
             'disconnect'
      */
-    private array $messageHandlers = [];
-    private array $openHandlers = [];
-    private array $disconnectHandlers = [];
+    protected array $messageHandlers = [];
+    protected array $openHandlers = [];
+    protected array $disconnectHandlers = [];
 
     public function __construct(TCPServerConfig $config, public ?LoggerInterface $logger = null)
     {
