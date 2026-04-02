@@ -11,6 +11,7 @@ use Tabula17\Satelles\Utilis\Config\TCPServerConfig;
 abstract class Graphema extends Server implements HamumServerInterface
 {
     use HamumTrait;
+
     final const HamumTypes TYPE = HamumTypes::HTTP;
 
     private array $requestHandlers = [];
@@ -25,6 +26,13 @@ abstract class Graphema extends Server implements HamumServerInterface
         }
         $this->set($options);
         $this->init();
+        if (empty($this->requestHandlers)) {
+            if (!$this->logger) {
+                trigger_error("⚠️ No request handlers registered. Please register request handlers using registerRequestHandlers() method before starting the server.", E_USER_WARNING);
+            } else {
+                $this->logger->warning("⚠️ No request handlers registered. Please register request handlers using registerRequestHandlers() method before starting the server.");
+            }
+        }
     }
 
     abstract protected function init(): void;
@@ -48,6 +56,7 @@ abstract class Graphema extends Server implements HamumServerInterface
     {
         return defined(static::class . '::CLIENT_INFO_ENABLED') && static::CLIENT_INFO_ENABLED;
     }
+
     public function handleRequestEvent(string $protocolAction, $request, $response): void
     {
         $this?->logger?->debug("Handling request event with protocolAction: {$protocolAction}");

@@ -39,6 +39,13 @@ abstract class Filum extends Server implements HamumServerInterface
         }
         $this->set($options);
         $this->init();
+        if (empty($this->messageHandlers)) {
+            if (!$this->logger) {
+                trigger_error("⚠️ No message handlers registered. Please register message handlers using registerMessageHandlers() method before starting the server.", E_USER_WARNING);
+            } else {
+                $this->logger->warning("⚠️ No message handlers registered. Please register message handlers using registerMessageHandlers() method before starting the server.");
+            }
+        }
     }
 
     public function isHamumEnabled(): bool
