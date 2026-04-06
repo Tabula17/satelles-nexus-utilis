@@ -210,7 +210,7 @@ class PubSubManager implements ProtocolManagerInterface
             }
 
             $output['error'] = "Message cannot be validated/decoded. Unable to process action '{$this->request->subscribe}'";
-            $this->logger?->error($data['error']);
+            $this->logger?->error($output['error']);
         } else {
             $output['error'] = "Action '{$this->request->subscribe}' not found. Unable to process action.";
             $this->logger?->error($output['error']);
