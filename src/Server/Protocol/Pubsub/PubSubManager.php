@@ -240,7 +240,7 @@ class PubSubManager implements ProtocolManagerInterface
         }
         $subscriber['channels']++;
         $this->subscribers->set($fd, $subscriber);
-        $this->subscriptions->incr($channel . ':' . $fd, 'subscriberCount');
+        $this->channels->incr($channel . ':' . $fd, 'subscriberCount');
     }
 
     protected function publish(Filum $server, int $fd, array $data = []): void
