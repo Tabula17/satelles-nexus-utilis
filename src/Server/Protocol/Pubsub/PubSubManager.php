@@ -202,9 +202,8 @@ class PubSubManager implements ProtocolManagerInterface
                 if(!is_array($data['payload'])){
                     $data['payload'] = ['topic' => $data['payload']];
                 }
-                $data['payload']['resolver'] =  $this->doSubscription(...);
-                $data['payload']['protocol'] = $this;
-                $resolver = $this->request->resolve($this->request->subscribe, ...array_values($data['payload']))->handle($fd);
+
+                $resolver = $this->request->resolve($this->request->subscribe, $this->doSubscription(...), $data['payload'], $this)->handle($fd);
                 if (!$resolver->status->isValid()) {
                     $output['error'] = "Subscription for topic '{$data['payload']['topic']}' failed";
                     $this->logger?->error($output['error']);
@@ -260,7 +259,7 @@ class PubSubManager implements ProtocolManagerInterface
             if ($this->request->validateMessage($data)) {
                 $this->addChannel($data['topic'], null);
 
-                $resolver = $this->request->resolve($this->request->publish, $data['payload'], $this->doPublish(...), $this)?->handle($server, $fd);
+                $resolver = $this->request->resolve($this->request->publish, $this->doPublish(...), $data['payload'], $this)?->handle($server, $fd);
                 if (!$resolver->status->isValid()) {
                     $output['error'] = "Publishing to topic '{$data['topic']}' failed";
                     $this->logger?->error($output['error']);
@@ -307,7 +306,7 @@ class PubSubManager implements ProtocolManagerInterface
         ];
         if ($this->request->hasActionResolver($this->request->unsubscribe)) {
             if ($this->request->validateMessage($data)) {
-                $resolver = $this->request->resolve($this->request->unsubscribe, $data['payload'], $this->doUnsubscribe(...), $this)?->handle($fd);
+                $resolver = $this->request->resolve($this->request->unsubscribe, $this->doUnsubscribe(...), $data['payload'], $this)?->handle($fd);
                 if (!$resolver->status->isValid()) {
                     $output['error'] = "Unsubscription from topic '{$data['payload']['name']}' failed";
                     $this->logger?->error($output['error']);

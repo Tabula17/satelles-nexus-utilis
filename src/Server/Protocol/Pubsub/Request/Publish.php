@@ -2,7 +2,9 @@
 
 namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\Request;
 
+use Tabula17\Satelles\Nexus\Utilis\Exception\RuntimeException;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\Definition;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request\Action;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request\Payload;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\PayloadDescriptor\PublishDescriptor;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\Base;
@@ -11,7 +13,12 @@ use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
 class Publish extends Payload
 {
 
-
+    protected(set) Definition $protocol {
+        get {
+            return $this->protocol;
+        }
+        set(array|Definition $protocol) => $this->protocol = $protocol instanceof Definition ? $protocol : new Definition($protocol);
+    }
     protected(set) PublishDescriptor $payload
         {
             get {
@@ -24,7 +31,7 @@ class Publish extends Payload
                 $this->payload = $payload;
             }
         }
-
+/*
     public function __construct(string $topic, array|string $message, callable|string $resolver, Definition $protocol)
     {
         parent::__construct(resolver: $resolver, protocol: $protocol);
@@ -36,6 +43,15 @@ class Publish extends Payload
             ]
         ];
         $this->loadProperties($values);
+    }*/
+    public function initialize(?array &$values): void
+    {
+        if(!isset($values['payload']) || !self::validatePayload($values['payload'])) {
+            throw new RuntimeException('Invalid payload for publish request: ' . json_encode($values['payload'] ?? null) . '. Expected format: {"topic": "string", "message": "string|array"}');
+        }
+        $values['payload']['message'] = $this->formatMessage($values['payload']['message']);
+        $values['action'] = $this->protocol->publish;
+
     }
 
     protected function formatMessage(array|string $message): array

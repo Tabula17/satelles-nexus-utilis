@@ -2,6 +2,7 @@
 
 namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\Request;
 
+use Tabula17\Satelles\Nexus\Utilis\Exception\RuntimeException;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\Definition;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request\Payload;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\PayloadDescriptor\TopicDescriptor;
@@ -11,6 +12,12 @@ use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
 class Subscribe extends Payload
 {
 
+    protected(set) Definition $protocol {
+        get {
+            return $this->protocol;
+        }
+        set(array|Definition $protocol) => $this->protocol = $protocol instanceof Definition ? $protocol : new Definition($protocol);
+    }
     protected(set) TopicDescriptor $payload
         {
             get {
@@ -23,7 +30,7 @@ class Subscribe extends Payload
                 $this->payload = $payload;
             }
         }
-
+/*
     public function __construct(string $topic, callable|string $resolver, Definition $protocol)
     {
         parent::__construct(resolver: $resolver, protocol: $protocol);
@@ -34,8 +41,16 @@ class Subscribe extends Payload
             ]
         ];
         $this->loadProperties($values);
-    }
+    }*/
 
+    public function initialize(?array &$values): void
+    {
+        if(!isset($values['payload']) || !self::validatePayload($values['payload'])) {
+            throw new RuntimeException('Invalid payload for publish request: ' . json_encode($values['payload'] ?? null) . '. Expected format: {"topic": "string", "message": "string|array"}');
+        }
+        $values['action'] = $this->protocol->subscribe;
+
+    }
     public function datasetInResponse(): bool
     {
         // When subscribe to a topic we don't expect a result, only a confirmation of success or failure,

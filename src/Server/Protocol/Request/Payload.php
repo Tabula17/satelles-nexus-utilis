@@ -44,12 +44,9 @@ abstract class Payload extends AbstractDescriptor //implements RequestHandlerInt
      * El protocolo asociado con el payload, que define las acciones y sus restricciones.
      * @var Action
      */
-    private(set) Action $protocol
+    abstract public Action $protocol
         {
-            get {
-                return $this->protocol;
-            }
-            set(array|Action $protocol) => $this->protocol = $protocol instanceof Action ? $protocol : new Action($protocol);
+            get;
         }
     /**
      * El estado del mensaje, que indica si la solicitud ha sido procesada correctamente o no.
@@ -75,7 +72,7 @@ abstract class Payload extends AbstractDescriptor //implements RequestHandlerInt
             }
         }
 
-    public function __construct(
+    final public function __construct(
         callable|string $resolver,
         ?array          $values = [],
         Action          $protocol = new Action()
@@ -83,10 +80,11 @@ abstract class Payload extends AbstractDescriptor //implements RequestHandlerInt
     {
         $this->resolver = $resolver;
         $this->protocol = $protocol;
+        $this->initialize($values);
         parent::__construct($values);
     }
-
-    /**
+    abstract public function initialize(?array &$values): void;
+        /**
      * Indica si el payload debe devolver un dataset en la respuesta
      * @return bool
      */
@@ -151,6 +149,7 @@ abstract class Payload extends AbstractDescriptor //implements RequestHandlerInt
         $data = parent::getModel();
         return array_filter($data, static fn($value) => !in_array($value, ['protocol', 'status', 'resolver']), ARRAY_FILTER_USE_KEY);
     }
+
     public function __invoke(...$args): static
     {
         return $this->handle(...$args);
