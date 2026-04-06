@@ -229,8 +229,8 @@ class PubSubManager implements ProtocolManagerInterface
     private function doSubscription(array $data, int $fd): void
     {
         //format is validated by the resolver, so we can assume it has the correct structure and types
-        $channel = $data['topic'];
-        if (!$this->channels->exist($channel)) {
+        $channel = $data['payload']['topic'];
+        if (!$this->channels->exists($channel)) {
             $this->addChannel($channel, null);
         }
         $subscriber = $this->subscribers->get($fd);
@@ -286,10 +286,10 @@ class PubSubManager implements ProtocolManagerInterface
     {
         //format is validated by the resolver, so we can assume it has the correct structure and types
         //topic,message
-        foreach ($this->getChannelSubscribers($data['topic'], $server) as $subscriber) {
-            $server->push($subscriber, json_encode($data));
+        foreach ($this->getChannelSubscribers($data['payload']['topic'], $server) as $subscriber) {
+            $server->push($subscriber, json_encode($data['payload']));
         }
-        $this->updateChannel($data['topic'], ['lastMessageAt' => time(), 'lastMessageFd' => $fd]);
+        $this->updateChannel($data['payload']['topic'], ['lastMessageAt' => time(), 'lastMessageFd' => $fd]);
     }
 
     protected function unsubscribe(Filum $server, int $fd, array $data = []): void
@@ -332,9 +332,9 @@ class PubSubManager implements ProtocolManagerInterface
     private function doUnsubscribe(array $data, int $fd): void
     {
         //format is validated by the resolver, so we can assume it has the correct structure and types
-        $channel = $data['topic'];
+        $channel = $data['payload']['topic'];
         $idSubscription = $fd . ':' . $channel;
-        if ($this->subscriptions->exist($idSubscription)) {
+        if ($this->subscriptions->exists($idSubscription)) {
             $this->subscriptions->del($idSubscription);
         }
         if ($this->subscribers->exists($fd)) {
