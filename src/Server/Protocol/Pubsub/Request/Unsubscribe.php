@@ -14,7 +14,7 @@ class Unsubscribe extends Subscribe
     }*/
     public function initialize(?array &$values): void
     {
-        if(!isset($values['payload']) || !self::validatePayload($values['payload'])) {
+        if(!isset($values['payload']) || !static::validatePayload($values['payload'])) {
             throw new RuntimeException('Invalid payload for publish request: ' . json_encode($values['payload'] ?? null) . '. Expected format: {"topic": "string", "message": "string|array"}');
         }
         $values['action'] = $this->protocol->unsubscribe;
