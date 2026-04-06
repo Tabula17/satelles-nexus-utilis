@@ -2,15 +2,7 @@
 
 namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request;
 
-use Tabula17\Satelles\Nexus\Utilis\Exception\UnexpectedValueException;
-use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ProtocolManagerInterface;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\Base;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\ResponseCollection;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\ResponseInterface;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ServiceProtocol;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
-use Tabula17\Satelles\Utilis\Collection\ClassCollection;
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
 
 /**
@@ -20,7 +12,6 @@ use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
  */
 class Action extends AbstractDescriptor
 {
-    const ServiceProtocol PROTOCOL = ServiceProtocol::GENERIC;
     private RequestCollection $actionsResolvers;
     private ResponseCollection $responsesTypes;
 

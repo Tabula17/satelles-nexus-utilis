@@ -17,11 +17,13 @@ use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\Subscription\ChannelDe
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\Subscription\SubscriberDescriptor;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\Subscription\SubscriptionDescriptor;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\Status as ResponseStatus;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ServiceProtocol;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
 
 class PubSubManager implements ProtocolManagerInterface
 {
 
+    const ServiceProtocol PROTOCOL = ServiceProtocol::GENERIC;
 
     public Definition $request {
         get {
