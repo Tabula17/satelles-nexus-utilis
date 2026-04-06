@@ -291,7 +291,10 @@ class PubSubManager implements ProtocolManagerInterface
     {
         //format is validated by the resolver, so we can assume it has the correct structure and types
         //topic,message
-        foreach ($this->getChannelSubscribers($data['payload']['topic'], $server) as $subscriber) {
+        $subscribers = $this->getChannelSubscribers($data['payload']['topic'], $server);
+        $this->logger?->debug("Publishing to topic '{$data['payload']['topic']}' from FD {$fd}");
+        $this->logger?->debug("Subscribers: " . count($subscribers));
+        foreach ($subscribers as $subscriber) {
             $server->push($subscriber, json_encode($data['payload']));
         }
         $this->updateChannel($data['payload']['topic'], ['lastMessageAt' => time(), 'lastMessageFd' => $fd]);
