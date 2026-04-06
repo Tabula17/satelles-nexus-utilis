@@ -26,7 +26,7 @@ class Stats extends AbstractDescriptor
         parent::__construct(
             [
                 'worker_id' => $worker_id,
-                'execution_time' => $execution_time,
+                'execution_time' => $execution_time ?? round(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3),
                 'timestamp' => $timestamp ?? time(),
                 'server_time' => $server_time ?? date('Y-m-d H:i:s'),
                 'client_fd' => $client_fd,
