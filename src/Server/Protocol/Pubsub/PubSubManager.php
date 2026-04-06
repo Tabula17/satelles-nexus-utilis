@@ -203,7 +203,7 @@ class PubSubManager implements ProtocolManagerInterface
                     $data['payload'] = ['topic' => $data['payload']];
                 }
 
-                $resolver = $this->request->resolve($this->request->subscribe, $this->doSubscription(...), $data['payload'], $this)->handle($fd);
+                $resolver = $this->request->resolve($this->request->subscribe, $this->doSubscription(...), $data['payload'], $this->request)->handle($fd);
                 if (!$resolver->status->isValid()) {
                     $output['error'] = "Subscription for topic '{$data['payload']['topic']}' failed";
                     $this->logger?->error($output['error']);
@@ -259,7 +259,7 @@ class PubSubManager implements ProtocolManagerInterface
             if ($this->request->validateMessage($data)) {
                 $this->addChannel($data['topic'], null);
 
-                $resolver = $this->request->resolve($this->request->publish, $this->doPublish(...), $data['payload'], $this)?->handle($server, $fd);
+                $resolver = $this->request->resolve($this->request->publish, $this->doPublish(...), $data['payload'], $this->request)?->handle($server, $fd);
                 if (!$resolver->status->isValid()) {
                     $output['error'] = "Publishing to topic '{$data['topic']}' failed";
                     $this->logger?->error($output['error']);
@@ -306,7 +306,7 @@ class PubSubManager implements ProtocolManagerInterface
         ];
         if ($this->request->hasActionResolver($this->request->unsubscribe)) {
             if ($this->request->validateMessage($data)) {
-                $resolver = $this->request->resolve($this->request->unsubscribe, $this->doUnsubscribe(...), $data['payload'], $this)?->handle($fd);
+                $resolver = $this->request->resolve($this->request->unsubscribe, $this->doUnsubscribe(...), $data['payload'], $this->request)?->handle($fd);
                 if (!$resolver->status->isValid()) {
                     $output['error'] = "Unsubscription from topic '{$data['payload']['name']}' failed";
                     $this->logger?->error($output['error']);
