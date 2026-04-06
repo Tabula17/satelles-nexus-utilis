@@ -95,7 +95,7 @@ class Publish extends Payload
     {
         $keys = ['topic' => true, 'message' => true];
         // Check if the payload has the required fields and that they are of the correct type
-        var_dump( !array_diff_key($data, $keys), !array_diff_key($keys, $data), $data);
+       // var_dump( !array_diff_key($data, $keys), !array_diff_key($keys, $data), $data);
         return
             !array_diff_key($data, $keys) &&
             !array_diff_key($keys, $data) &&
