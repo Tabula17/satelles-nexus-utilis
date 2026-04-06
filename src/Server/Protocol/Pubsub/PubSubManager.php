@@ -257,11 +257,11 @@ class PubSubManager implements ProtocolManagerInterface
         ];
         if ($this->request->hasActionResolver($this->request->publish)) {
             if ($this->request->validateMessage($data)) {
-                $this->addChannel($data['topic'], null);
+                $this->addChannel($data['payload']['topic'], null);
 
                 $resolver = $this->request->resolve($this->request->publish, $this->doPublish(...), $data, $this->request)?->handle($server, $fd);
                 if (!$resolver->status->isValid()) {
-                    $output['error'] = "Publishing to topic '{$data['topic']}' failed";
+                    $output['error'] = "Publishing to topic '{$data['payload']['topic']}' failed";
                     $this->logger?->error($output['error']);
                 }
                 $message = $resolver->getResponse($output);
