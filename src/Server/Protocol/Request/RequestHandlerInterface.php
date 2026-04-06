@@ -8,5 +8,6 @@ use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
 
 interface RequestHandlerInterface
 {
-    public function handle(int $fd, array $data, HamumServerInterface $server, ?ProtocolManagerInterface $protocolManager): Status;
+    public function handle(array $data, int $fd, HamumServerInterface $server, ?ProtocolManagerInterface $protocolManager): Status;
+    public function __invoke(...$args): mixed;
 }

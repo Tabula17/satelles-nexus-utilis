@@ -97,6 +97,17 @@ trait HamumTrait
     }
 
     /**
+     * Genera un ID único para este servidor
+     */
+    public function getServerId(): string
+    {
+        static $serverId = null;
+        if ($serverId === null) {
+            $serverId = gethostname() . ':' . (getmypid() ?? uniqid(basename(str_replace('\\', '/', static::class)) . ':', false));
+        }
+        return $serverId;
+    }
+    /**
      * Check if can connect to a port on a specific host.
      * @param string $host
      * @param int $port

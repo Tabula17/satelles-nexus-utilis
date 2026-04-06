@@ -5,25 +5,111 @@ namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request;
 use Tabula17\Satelles\Nexus\Utilis\Exception\UnexpectedValueException;
 use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ProtocolManagerInterface;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\Base;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\ResponseCollection;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\ResponseInterface;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ServiceProtocol;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
+use Tabula17\Satelles\Utilis\Collection\ClassCollection;
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
 
 /**
- * ACTION_LIST_RPC_METHODS = 'list_rpc_methods';
- * ACTION_RPC_CALL = 'rpc';
- * ACTION_SUBSCRIBE = 'subscribe';
- * ACTION_UNSUBSCRIBE = 'unsubscribe';
- * ACTION_PUBLISH = 'publish';
- * ACTION_SEND_FILE = 'send_file';
- * ACTION_START_FILE_TRANSFER = 'start_file_transfer';
- * ACTION_FILE_CHUNK = 'file_chunk';
- * ACTION_REQUEST_FILE = 'request_file';
- * ACTION_AUTHENTICATE = 'authenticate';
+ * Represents an action descriptor class that handles resolution of protocol handlers or statuses
+ * based on provided input data and context. Each action corresponds to a specific handler
+ * or processing logic and can be dynamically resolved or overridden by resolvers.
  */
 class Action extends AbstractDescriptor
 {
     const ServiceProtocol PROTOCOL = ServiceProtocol::GENERIC;
+    private RequestCollection $actionsResolvers;
+    private ResponseCollection $responsesTypes;
+
+    /**
+     * @throws \Tabula17\Satelles\Utilis\Exception\UnexpectedValueException
+     */
+    public function __construct(?array $properties = null, ?RequestCollection $actionsResolvers = null, ?ResponseCollection $responsesTypes = null)
+    {
+        parent::__construct($properties);
+        // Check if all property resolvers are defined in the protocol
+        foreach ($actionsResolvers ?? [] as $property => $resolver) {
+            if (!$this->offsetExists($property)) {
+                $this->actionsResolvers->offsetUnset($property);
+                trigger_error("Resolver for property '{$property}' cannot be set. No such action defined in protocol.", E_USER_WARNING);
+            }
+        }
+        $this->actionsResolvers = $actionsResolvers ?? new RequestCollection();
+
+        foreach ($responsesTypes ?? [] as $property => $response) {
+            if (!$this->offsetExists($property)) {
+                $this->responsesTypes->offsetUnset($property);
+                trigger_error("Response type for property '{$property}' cannot be set. No such action defined in protocol.", E_USER_WARNING);
+            }
+        }
+        $this->responsesTypes = $responsesTypes ?? new ResponseCollection();
+    }
+
+    protected function getProperty(mixed $value): string|int|false
+    {
+        return array_search($value, $this->toArray(), true);
+    }
+
+    public function addActionResolver(string $action, string $resolver): void
+    {
+        $property = $this->getProperty($action);
+        if ($property && is_string($property)) {
+            $this->actionsResolvers->offsetSet($property, $resolver);
+        }
+    }
+    public function hasActionResolver(string $action): bool
+    {
+        $property = $this->getProperty($action);
+        return $property && $this->actionsResolvers->offsetExists($property);
+    }
+
+    public function addResponseType(string $action, string $response): void
+    {
+        $property = $this->getProperty($action);
+        if ($property && is_string($property)) {
+            $this->responsesTypes->offsetSet($property, $response);
+        }
+    }
+    public function hasResponseType(string $action): bool
+    {
+        $property = $this->getProperty($action);
+        return $property && $this->responsesTypes->offsetExists($property);
+    }
+
+    public function validateMessage(string|array|null $message): bool
+    {
+        if (!$message) {
+            return false;
+        }
+        if(is_string($message)) {
+            $message = json_decode($message, true);
+        }
+        if (isset($message['action']) && in_array($message['action'], $this->toArray())) {
+            $property = $this->getProperty($message['action']);
+            $resolverClass = $this->actionsResolvers->offsetGet($property);
+            if ($resolverClass) {
+                return $resolverClass::validatePayload($message['payload'] ?? []);
+            }
+            trigger_error("Action '{$message['action']}' has no resolver defined. Unable to validate payload.", E_USER_WARNING);
+            return false;
+        }
+        trigger_error("Message cannot be validated/decoded. No action found.", E_USER_WARNING);
+        return false;
+    }
+
+    public function resolve(string $action, ...$args): ?Payload
+    {
+        $class = $this->actionsResolvers->offsetGet($this->getProperty($action));
+        // var_dump( $this->actionsResolvers->toArray());
+        if ($class) {
+            return new $class(...$args);
+        }
+        return null;
+    }
+    /*
     private array $resolvers {
         set(array $resolvers) {
             //array_search($resolver, $this->toArray(), true)
@@ -59,16 +145,6 @@ class Action extends AbstractDescriptor
     {
         return array_search($value, $this->toArray(), true);
     }
-
-    /**
-     * Resolves and retrieves the appropriate protocol handler or status for the provided data and context.
-     *
-     * @param array $data The input data containing an 'action' key and other parameters.
-     * @param int|null $fd The file descriptor or connection ID (optional).
-     * @param HamumServerInterface|null $server An optional server instance, if required by the resolver.
-     * @param ProtocolManagerInterface|null $protocolManager An optional protocol manager instance, for advanced resolution.
-     * @return RequestHandlerInterface|Status Returns an instance of the appropriate protocol handler or a status object.
-     */
     public function getProtocolFor(array $data, ?int $fd, ?HamumServerInterface $server = null, ?ProtocolManagerInterface $protocolManager = null): RequestHandlerInterface|Status
     {
         if (isset($data['action']) && in_array($data['action'], $this->toArray())) {
@@ -117,9 +193,14 @@ class Action extends AbstractDescriptor
         // Extract the substring before the last backslash
         return substr($fullClassName, 0, $lastBackslashPos);
     }
-
+*/
     public static function getProtocolName(): ?string
     {
         return static::PROTOCOL->shortName();
+    }
+
+    public function getResponseType(string $action): ?string
+    {
+        return $this->responsesTypes->offsetGet($this->getProperty($action));
     }
 }

@@ -5,15 +5,53 @@ namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol;
 enum ServiceProtocol: string
 {
     case RPC = 'Custom Remote Procedure Call Protocol';
+    /**
+     * Represents the Pub/Sub Pattern Protocol.
+     * 1. Publisher sends a message to a topic.
+     * 2. Subscriber listens for messages on the topic.
+     *
+     * @see https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern
+     *
+     * --> Subribe to topic/channel. Protocol define name convention for topic/channel
+     * { "topic": "topic/channel"}
+     * <-- Publish message to topic/channel. Protocol define message format for publish message
+     * { "topic": "topic/channel", "message": "Hello, world!"} // or maybe a json encoded message
+     */
     case PUBSUB = 'Pub/Sub Pattern Protocol';
     case AUTH = 'Authentication Protocol (e.g., Basic, Digest, Bearer Token)';
     case OAUTH = 'OAuth 2.0 Protocol';
     case JWT = 'JSON Web Token (JWT)';
+    /**
+     * Represents the JSON-RPC 2.0 Protocol.
+     * --> {
+     *      "jsonrpc": "2.0",
+     *      "method": "subtract",
+     *      "params": {
+     *          "minuend": 42,
+     *          "subtrahend": 23
+     *      },
+     *      "id": 3
+     *  }
+     * <--
+     * {
+     *      "jsonrpc": "2.0",
+     *      "result": 19,
+     *      "id": 3
+     * }
+     */
     case JSONRPC = 'JSON-RPC 2.0 Protocol';
     case EXTDIRECT = 'ExtJS Direct Protocol';
     case WAMP = 'Web Application Messaging Protocol';
     case WAMP2 = 'Web Application Messaging Protocol 2.0';
-    case REQRES = 'Request-Response Pattern';
+    /**
+     * Represents the Definition-Response Pattern.
+     * 1. Client sends a request to a server.
+     * 2. Server processes the request and sends a response.
+     * 3. Client receives the response.
+     * @see https://en.wikipedia.org/wiki/Request%E2%80%93response_pattern
+     * @see https://en.wikipedia.org/wiki/Client%E2%80%93server_model
+     */
+    case REQRES = 'Definition-Response Pattern';
     case GENERIC = 'Generic/other Protocol: unspecified or custom';
     case UNKNOWN = 'Unknown Protocol';
 

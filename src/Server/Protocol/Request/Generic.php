@@ -11,10 +11,15 @@ use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
 class Generic extends AbstractDescriptor implements RequestHandlerInterface
 {
 
-    public function handle(int $fd, array $data, HamumServerInterface $server, ?ProtocolManagerInterface $protocolManager): Status
+    public function handle(array $data, int $fd, HamumServerInterface $server, ?ProtocolManagerInterface $protocolManager): Status
     {
         echo 'Generic request handler' . PHP_EOL;
         echo var_export($data, true) . PHP_EOL;
         return Status::unknown;
+    }
+
+    public function __invoke(...$args): Status
+    {
+        return $this->handle(...$args);
     }
 }

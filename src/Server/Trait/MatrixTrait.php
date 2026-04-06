@@ -8,7 +8,6 @@ use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ProtocolManagerCollection;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ProtocolManagerInterface;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request\Action;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\Type;
 
 trait MatrixTrait
 {
@@ -21,7 +20,7 @@ trait MatrixTrait
         $actions = [];
         /** @var ProtocolManagerInterface $protocolManager */
         foreach ($this->getProtocolManagers() as $protocolManager) {
-            $actions[$protocolManager->protocol::getProtocolName()] = $protocolManager->protocol->toArray();
+            $actions[$protocolManager->request::getProtocolName()] = $protocolManager->request->toArray();
         }
         return isset($protocol) ? ($actions[$protocol] ?? []) : $actions;
     }
@@ -31,7 +30,7 @@ trait MatrixTrait
         $types = [];
         /** @var ProtocolManagerInterface $protocolManager */
         foreach ($this->getProtocolManagers() as $protocolManager) {
-            $types[$protocolManager->protocol::getProtocolName()] = $protocolManager->responses->toArray();
+            $types[$protocolManager->request::getProtocolName()] = $protocolManager->responses->toArray();
         }
         return isset($protocol) ? ($types[$protocol] ?? []) : $types;
     }
@@ -41,11 +40,11 @@ trait MatrixTrait
         $protocols = [];
         /** @var ProtocolManagerInterface $protocolManager */
         foreach ($this->getProtocolManagers() as $protocolManager) {
-            foreach ($protocolManager->protocol->toArray() as $protocolAction) {
+            foreach ($protocolManager->request->toArray() as $protocolAction) {
                 if (!isset($protocols[$protocolAction])) {
                     $protocols[$protocolAction] = [];
                 }
-                $protocols[$protocolAction][] = $protocolManager->protocol::getProtocolName();
+                $protocols[$protocolAction][] = $protocolManager->request::getProtocolName();
             }
         }
         return isset($action) ? ($protocols[$action] ?? []) : $protocols;
@@ -82,13 +81,13 @@ trait MatrixTrait
 
     public function getRequestProtocol(string $protocol): ?Action
     {
-        return $this->getProtocolManager($protocol)?->protocol;
+        return $this->getProtocolManager($protocol)?->request;
     }
 
-    public function getResponseTypes(string $protocol): ?Type
+/*    public function getResponseTypes(string $protocol): ?Type
     {
         return $this->getProtocolManager($protocol)?->responses;
-    }
+    }*/
 
     public function removeProtocolManager(string $protocol): void
     {

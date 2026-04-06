@@ -61,8 +61,8 @@ abstract class Graphema extends Server implements HamumServerInterface
 
     public function handleRequestEvent( Request $request, Response $response): void
     {
-        $this->logger?->debug("Request received from {$request->fd}:  " . $request->server['request_uri']);
-        $this->logger?->debug("Request handlers: " . json_encode(array_keys($this->requestHandlers)));
+        $this->logger?->debug("Definition received from {$request->fd}:  " . $request->server['request_uri']);
+        $this->logger?->debug("Definition handlers: " . json_encode(array_keys($this->requestHandlers)));
         //$request->rawContent();
         //$data = var_export($request->get, true);
         $protocolAction = $request->server['request_uri'] ;
@@ -97,12 +97,12 @@ abstract class Graphema extends Server implements HamumServerInterface
             $this->requestHandlers[$protocolAction] = new CallableCollection();
         }
         $this->requestHandlers[$protocolAction]->offsetSet($protocol, $callback);
-        $this->registerEventHandlers('Request');
+        $this->registerEventHandlers('Definition');
     }
 
     public function getRequestHandlers(string $protocolAction): ?array
     {
-        return $this->getEventActionHandlers('Request', $protocolAction);
+        return $this->getEventActionHandlers('Definition', $protocolAction);
     }
 
     public function hasRequestHandlers(string $protocolAction): bool
@@ -114,6 +114,6 @@ abstract class Graphema extends Server implements HamumServerInterface
     {
         $this->requestHandlers[$protocolAction]?->clear();
         unset($this->requestHandlers[$protocolAction]);
-        $this->registerEventHandlers('Request');
+        $this->registerEventHandlers('Definition');
     }
 }
