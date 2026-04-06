@@ -199,7 +199,12 @@ class PubSubManager implements ProtocolManagerInterface
         ];
         if ($this->request->hasActionResolver($this->request->subscribe)) {
             if ($this->request->validateMessage($data)) {
-                $resolver = $this->request->resolve($this->request->subscribe, $data['payload'], $this->doSubscription(...), $this)->handle($fd);
+                if(!is_array($data['payload'])){
+                    $data['payload'] = ['topic' => $data['payload']];
+                }
+                $data['payload']['resolver'] =  $this->doSubscription(...);
+                $data['payload']['protocol'] = $this;
+                $resolver = $this->request->resolve($this->request->subscribe, ...array_values($data['payload']))->handle($fd);
                 if (!$resolver->status->isValid()) {
                     $output['error'] = "Subscription for topic '{$data['payload']['topic']}' failed";
                     $this->logger?->error($output['error']);
