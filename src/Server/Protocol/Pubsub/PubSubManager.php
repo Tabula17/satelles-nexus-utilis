@@ -23,7 +23,7 @@ use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
 class PubSubManager implements ProtocolManagerInterface
 {
 
-    const ServiceProtocol PROTOCOL = ServiceProtocol::GENERIC;
+    const ServiceProtocol protocol = ServiceProtocol::GENERIC;
 
     public Definition $request {
         get {
