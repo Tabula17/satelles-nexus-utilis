@@ -19,6 +19,7 @@ use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\Subscription\Subscript
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\Status as ResponseStatus;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ServiceProtocol;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
+use Tabula17\Satelles\Utilis\Exception\UnexpectedValueException;
 
 class PubSubManager implements ProtocolManagerInterface
 {
@@ -35,7 +36,9 @@ class PubSubManager implements ProtocolManagerInterface
     private Table $subscribers;
 
     /**
-     * @param Definition $request
+     * @param Definition|null $request
+     * @param LoggerInterface|null $logger
+     * @throws UnexpectedValueException
      */
     public function __construct(
         ?Definition                       $request,
@@ -90,6 +93,7 @@ class PubSubManager implements ProtocolManagerInterface
     private function initializeSubscriber(int $fd): void
     {
         if (!$this->subscribers->exists($fd)) {
+            $this->logger?->debug("Initializing subscriber for FD {$fd}");
             $subscriber = new SubscriberDescriptor($fd);
             $this->subscribers->set($fd, $subscriber->toArray());
             $this->autoSubscribeFdToChannels($fd);
@@ -240,6 +244,7 @@ class PubSubManager implements ProtocolManagerInterface
         }
         $subscriber['channels']++;
         $this->subscribers->set($fd, $subscriber);
+        $this->logger?->debug("Subscribing to channel '{$channel}' for FD {$fd}");
         $this->channels->incr($channel . ':' . $fd, 'subscriberCount');
     }
 
