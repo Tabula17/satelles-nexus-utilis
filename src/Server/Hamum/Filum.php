@@ -218,6 +218,7 @@ abstract class Filum extends Server implements HamumServerInterface
                 $callback($server, $frame->fd, $data);
             } catch (\Throwable $e) {
                 $this?->logger?->error("Error handling message event for protocol {$protocol} with action: {$protocolAction}: {$e->getMessage()}");
+                $this?->logger?->debug($e->getTraceAsString());
             }
         }
     }
