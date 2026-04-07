@@ -16,28 +16,39 @@ class Action extends AbstractDescriptor
     private RequestCollection $actionsResolvers;
     private ResponseCollection $responsesTypes;
 
+    private ResponseCollection $deliveryTypes;
+
     /**
      * @throws UnexpectedValueException
      */
-    public function __construct(?array $properties = null, ?RequestCollection $actionsResolvers = null, ?ResponseCollection $responsesTypes = null)
+    public function __construct(?array $properties = null, ?RequestCollection $actionsResolvers = null, ?ResponseCollection $responsesTypes = null, ?ResponseCollection $deliveryTypes = null)
     {
         parent::__construct($properties);
         // Check if all property resolvers are defined in the protocol
-        foreach ($actionsResolvers ?? [] as $property => $resolver) {
+        foreach ($actionsResolvers as $property => $resolver) {
             if (!$this->offsetExists($property)) {
-                $this->actionsResolvers->offsetUnset($property);
+                $actionsResolvers->offsetUnset($property);
                 trigger_error("Resolver for property '{$property}' cannot be set. No such action defined in protocol.", E_USER_WARNING);
             }
         }
         $this->actionsResolvers = $actionsResolvers ?? new RequestCollection();
 
-        foreach ($responsesTypes ?? [] as $property => $response) {
+        foreach ($responsesTypes as $property => $response) {
             if (!$this->offsetExists($property)) {
-                $this->responsesTypes->offsetUnset($property);
+                $responsesTypes->offsetUnset($property);
                 trigger_error("Response type for property '{$property}' cannot be set. No such action defined in protocol.", E_USER_WARNING);
             }
         }
         $this->responsesTypes = $responsesTypes ?? new ResponseCollection();
+
+
+        foreach ($deliveryTypes as $property => $delivery) {
+            if (!$this->offsetExists($property)) {
+                $deliveryTypes->offsetUnset($property);
+                trigger_error("Response type for property '{$property}' cannot be set. No such action defined in protocol.", E_USER_WARNING);
+            }
+        }
+        $this->deliveryTypes = $deliveryTypes ?? new ResponseCollection();
     }
 
     protected function getProperty(mixed $value): string|int|false
@@ -52,11 +63,13 @@ class Action extends AbstractDescriptor
             $this->actionsResolvers->offsetSet($property, $resolver);
         }
     }
+
     public function hasActionResolver(string $action): bool
     {
         $property = $this->getProperty($action);
         return $property && $this->actionsResolvers->offsetExists($property);
     }
+
     public function addResponseType(string $action, string $response): void
     {
         $property = $this->getProperty($action);
@@ -64,6 +77,7 @@ class Action extends AbstractDescriptor
             $this->responsesTypes->offsetSet($property, $response);
         }
     }
+
     public function hasResponseType(string $action): bool
     {
         $property = $this->getProperty($action);
@@ -75,7 +89,7 @@ class Action extends AbstractDescriptor
         if (!$message) {
             return false;
         }
-        if(is_string($message)) {
+        if (is_string($message)) {
             $message = json_decode($message, true);
         }
         if (isset($message['action']) && in_array($message['action'], $this->toArray())) {
@@ -100,6 +114,7 @@ class Action extends AbstractDescriptor
         }
         return null;
     }
+
     /*
     private array $resolvers {
         set(array $resolvers) {
@@ -193,5 +208,35 @@ class Action extends AbstractDescriptor
     public function getResponseType(string $action): ?string
     {
         return $this->responsesTypes->offsetGet($this->getProperty($action));
+    }
+
+    public function getDeliveryType(string $action): ?string
+    {
+        return $this->deliveryTypes->offsetGet($this->getProperty($action));
+    }
+
+    public function hasDeliveryType(string $action): bool
+    {
+        return $this->deliveryTypes->offsetExists($this->getProperty($action));
+    }
+
+    public function addDeliveryType(string $action, string $delivery): void
+    {
+        $property = $this->getProperty($action);
+        if ($property && is_string($property)) {
+            $this->deliveryTypes->offsetSet($property, $delivery);
+        }
+    }
+
+    public function getPayloadModels(): array
+    {
+        $models = [];
+        foreach ($this->toArray() as $key => $action) {
+            $models[$key] = [
+                'request' => $this->actionsResolvers->offsetGet($key)::getModel(),
+                'response' => $this->responsesTypes->offsetGet($key)::getModel()
+            ];
+        }
+        return $models;
     }
 }

@@ -10,6 +10,7 @@ use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\Filum;
 use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Data\Stats;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ProtocolManagerInterface;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\PayloadDescriptor\PublishDelivery;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\Request\Publish;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\Request\Subscribe;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\Request\Unsubscribe;
@@ -80,6 +81,10 @@ class PubSubManager implements ProtocolManagerInterface
         if (!$this->request->hasResponseType('unsubscribe')) {
             $this->request->addResponseType('unsubscribe', ResponseStatus::class);
         }
+        if (!$this->request->hasDeliveryType('publish')) {
+            $this->request->addDeliveryType('publish', PublishDelivery::class);
+        }
+
         $this->autoSubscribeToChannels($server);
     }
 
@@ -314,8 +319,22 @@ class PubSubManager implements ProtocolManagerInterface
         $subscribers = $this->getChannelSubscribers($data['payload']['topic'], $server);
         $this->logger?->debug("Publishing to topic '{$data['payload']['topic']}' from FD {$fd}");
         $this->logger?->debug("Subscribers: " . count($subscribers));
+        $deliveryClass = $this->request->getDeliveryType($this->request->publish);
+
+        $delivery = new $deliveryClass([
+            'topic' => $data['payload']['topic'],
+            'message' => $data['payload']['message'],
+            '_metadata' => new Stats(
+                worker_id: $server->worker_id,
+                timestamp: time(),
+                server_time: date('Y-m-d H:i:s'),
+                client_fd: $fd,
+                origin_server: $server->getServerId()
+            )
+        ]);
+
         foreach ($subscribers as $subscriber) {
-            $server->push($subscriber, json_encode($data['payload']));
+            $server->push($subscriber, json_encode($delivery));
         }
         $this->updateChannel($data['payload']['topic'], ['lastMessageAt' => time(), 'lastMessageFd' => $fd]);
     }
