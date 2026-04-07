@@ -49,6 +49,34 @@ abstract class Payload extends AbstractDescriptor //implements RequestHandlerInt
             get;
         }
     /**
+     * This property indicates where to store the id of the message to send back to the client.
+     * If the client sends a message with an id, it will be stored in this property.
+     * If it is null, the id will not be stored in the payload, but it will be generated and stored in the $id property of the Payload class.
+     * This property must be defined in the Payload class and must be set to the name of an existing property where the ID will be stored.
+     * @var string|null
+     */
+    abstract protected ?string $idProperty
+        {
+            get;
+        }
+    /**
+     *
+     * @var string|mixed
+     */
+    private string $id
+        {
+            get {
+                return $this->id;
+            }
+            set(string $id) {
+                $this->id = $id;
+                if (isset($this->idProperty) && $this->offsetExists($this->idProperty) &&  $this->get($this->idProperty) !== $id) {
+                    $this->set($this->idProperty, $id);
+                }
+                //$this->set($this->idProperty, $id);
+            }
+        }
+    /**
      * El estado del mensaje, que indica si la solicitud ha sido procesada correctamente o no.
      * @var Status
      */
@@ -82,9 +110,12 @@ abstract class Payload extends AbstractDescriptor //implements RequestHandlerInt
         $this->protocol = $protocol;
         $this->initialize($values);
         parent::__construct($values);
+        $this->id = $values[$this->idProperty] ?? uniqid('', true);
     }
+
     abstract public function initialize(?array &$values): void;
-        /**
+
+    /**
      * Indica si el payload debe devolver un dataset en la respuesta
      * @return bool
      */

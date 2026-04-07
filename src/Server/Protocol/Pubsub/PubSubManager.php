@@ -213,7 +213,7 @@ class PubSubManager implements ProtocolManagerInterface
                     $this->logger?->error($output['error']);
                 }
                 $message = $resolver->getResponse($output);
-                $server->push($fd, json_encode($message?->response));
+                $server->push($fd, json_encode($message));
                 return;
             }
 
@@ -291,7 +291,7 @@ class PubSubManager implements ProtocolManagerInterface
                     $this->logger?->error($output['error']);
                 }
                 $message = $resolver->getResponse($output);
-                $server->push($fd, json_encode($message?->response));
+                $server->push($fd, json_encode($message));
                 return;
             }
 
@@ -341,7 +341,7 @@ class PubSubManager implements ProtocolManagerInterface
                     $this->logger?->error($output['error']);
                 }
                 $message = $resolver->getResponse($output);
-                $server->push($fd, json_encode($message?->response));
+                $server->push($fd, json_encode($message));
                 return;
             }
 

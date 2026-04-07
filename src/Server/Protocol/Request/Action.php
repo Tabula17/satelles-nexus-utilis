@@ -4,6 +4,7 @@ namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request;
 
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\ResponseCollection;
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
+use Tabula17\Satelles\Utilis\Exception\UnexpectedValueException;
 
 /**
  * Represents an action descriptor class that handles resolution of protocol handlers or statuses
@@ -16,7 +17,7 @@ class Action extends AbstractDescriptor
     private ResponseCollection $responsesTypes;
 
     /**
-     * @throws \Tabula17\Satelles\Utilis\Exception\UnexpectedValueException
+     * @throws UnexpectedValueException
      */
     public function __construct(?array $properties = null, ?RequestCollection $actionsResolvers = null, ?ResponseCollection $responsesTypes = null)
     {
@@ -56,7 +57,6 @@ class Action extends AbstractDescriptor
         $property = $this->getProperty($action);
         return $property && $this->actionsResolvers->offsetExists($property);
     }
-
     public function addResponseType(string $action, string $response): void
     {
         $property = $this->getProperty($action);

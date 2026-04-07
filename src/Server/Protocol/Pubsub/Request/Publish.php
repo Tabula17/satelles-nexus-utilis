@@ -4,7 +4,6 @@ namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\Request;
 
 use Tabula17\Satelles\Nexus\Utilis\Exception\RuntimeException;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\Definition;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request\Action;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request\Payload;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\PayloadDescriptor\PublishDescriptor;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\Base;
@@ -12,6 +11,14 @@ use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
 
 class Publish extends Payload
 {
+
+    protected null|string $idProperty {
+        get {
+            return
+                'payloadId';
+        }
+    }
+    protected(set) string $payloadId;
 
     protected(set) Definition $protocol {
         get {
@@ -31,22 +38,23 @@ class Publish extends Payload
                 $this->payload = $payload;
             }
         }
-/*
-    public function __construct(string $topic, array|string $message, callable|string $resolver, Definition $protocol)
-    {
-        parent::__construct(resolver: $resolver, protocol: $protocol);
-        $values = [
-            'action' => $protocol->publish,
-            'payload' => [
-                'topic' => $topic,
-                'message' => $this->formatMessage($message)
-            ]
-        ];
-        $this->loadProperties($values);
-    }*/
+
+    /*
+        public function __construct(string $topic, array|string $message, callable|string $resolver, Definition $protocol)
+        {
+            parent::__construct(resolver: $resolver, protocol: $protocol);
+            $values = [
+                'action' => $protocol->publish,
+                'payload' => [
+                    'topic' => $topic,
+                    'message' => $this->formatMessage($message)
+                ]
+            ];
+            $this->loadProperties($values);
+        }*/
     public function initialize(?array &$values): void
     {
-        if(!isset($values['payload']) || !static::validatePayload($values['payload'])) {
+        if (!isset($values['payload']) || !static::validatePayload($values['payload'])) {
             throw new RuntimeException('Invalid payload for publish request: ' . json_encode($values['payload'] ?? null) . '. Expected format: {"topic": "string", "message": "string|array"}');
         }
         $values['payload']['message'] = $this->formatMessage($values['payload']['message']);
@@ -95,7 +103,7 @@ class Publish extends Payload
     {
         $keys = ['topic' => true, 'message' => true];
         // Check if the payload has the required fields and that they are of the correct type
-       // var_dump( !array_diff_key($data, $keys), !array_diff_key($keys, $data), $data);
+        // var_dump( !array_diff_key($data, $keys), !array_diff_key($keys, $data), $data);
         return
             !array_diff_key($data, $keys) &&
             !array_diff_key($keys, $data) &&
@@ -120,4 +128,5 @@ class Publish extends Payload
     {
         return $this->status;
     }
+
 }

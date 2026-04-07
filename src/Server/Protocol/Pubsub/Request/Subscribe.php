@@ -12,6 +12,13 @@ use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
 class Subscribe extends Payload
 {
 
+    protected null|string $idProperty {
+        get {
+            return
+                'payloadId';
+        }
+    }
+    protected(set) string $payloadId;
     protected(set) Definition $protocol {
         get {
             return $this->protocol;
