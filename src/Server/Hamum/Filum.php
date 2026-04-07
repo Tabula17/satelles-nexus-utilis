@@ -212,7 +212,7 @@ abstract class Filum extends Server implements HamumServerInterface
         $data = json_validate($frame->data) ? json_decode($frame->data, true) : ['data' => $frame->data];
         $protocolAction = $data['action'] ?? '';
         $this?->logger?->debug("Looking handler for message event with protocolAction: {$protocolAction}");
-        $eventHandlers = array_merge($this->getEventActionHandlers('message', $protocolAction), []);
+        $eventHandlers = array_merge($this->getEventActionHandlers('message', $protocolAction), $this->getEventActionHandlers('message', '*'));//$this->getEventActionHandlers('message', '*')
         foreach ($eventHandlers as $protocol => $callback) {
             try {
                 $callback($server, $frame->fd, $data);
