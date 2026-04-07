@@ -228,14 +228,25 @@ class Action extends AbstractDescriptor
         }
     }
 
+    /**
+     * Generates and returns an array of payload models, where each key corresponds to
+     * an action and contains details about the request, delivery (if applicable), and response models.
+     *
+     * @return array An associative array where each key maps to a payload model containing 'request',
+     *               'delivery' (if available), and 'response' data.
+     */
     public function getPayloadModels(): array
     {
         $models = [];
         foreach ($this->toArray() as $key => $action) {
             $models[$key] = [
                 'request' => $this->actionsResolvers->offsetGet($key)::getModel(),
+                //'delivery' => null,
                 'response' => $this->responsesTypes->offsetGet($key)::getModel()
             ];
+            if($this->deliveryTypes->offsetGet($key) !== null){
+                $models[$key]['delivery'] = $this->deliveryTypes->offsetGet($key)::getModel();
+            }
         }
         return $models;
     }
