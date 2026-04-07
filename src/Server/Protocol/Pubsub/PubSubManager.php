@@ -322,6 +322,7 @@ class PubSubManager implements ProtocolManagerInterface
 
     protected function unsubscribe(Filum $server, int $fd, array $data = []): void
     {
+        $this->logger?->debug("Unsubscribing from topic: ".json_encode($data));
         $output = [
             'action' => $this->request->unsubscribe,
             '_metadata' => new Stats(
