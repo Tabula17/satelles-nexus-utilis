@@ -105,7 +105,7 @@ class PubSubManager implements ProtocolManagerInterface
     {
         if ($this->subscribers->exists($fd)) {
             foreach ($this->channels as $channel) {
-                $this->doUnsubscribe(['topic' => $channel], $fd);
+                $this->doUnsubscribe(['payload' => ['topic' => $channel]], $fd);
             }
             $this->subscribers->del($fd);
         }
@@ -322,7 +322,6 @@ class PubSubManager implements ProtocolManagerInterface
 
     protected function unsubscribe(Filum $server, int $fd, array $data = []): void
     {
-        $this->logger?->debug("Unsubscribing from topic: ".json_encode($data));
         $output = [
             'action' => $this->request->unsubscribe,
             '_metadata' => new Stats(
