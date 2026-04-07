@@ -101,9 +101,10 @@ class Subscribe extends Payload
         if (!$responseClass) {
             throw new \RuntimeException("No response class found for action {$this->action}");
         }
-        //array_unshift($args, $this->toArray());
+        $extra = $args[0] ?? [];
+        $extra['payloadId'] = $this->payloadId;
         return new $responseClass(
-            $this->status, ...$args
+            $this->status, $extra
         );
     }
 
