@@ -32,8 +32,10 @@ abstract class Base extends AbstractDescriptor implements ResponseInterface
             }
             set(string $id) {
                 $this->id = $id;
-                if (isset($this->idProperty) && $this->offsetExists($this->idProperty) && $this->get($this->idProperty) !== $id) {
-                    $this->set($this->idProperty, $id);
+                if (isset($this->idProperty) && $this->hasProperty($this->idProperty)) {
+                    if(!isset($this->{$this->idProperty}) || $this->{$this->idProperty} !== $id) {
+                        $this->set($this->idProperty, $id);
+                    }
                 }
                 //$this->set($this->idProperty, $id);
             }
