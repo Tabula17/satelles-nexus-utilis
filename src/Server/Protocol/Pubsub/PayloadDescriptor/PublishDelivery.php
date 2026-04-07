@@ -7,7 +7,7 @@ use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
 
 class PublishDelivery extends Base
 {
-    protected(set) TopicDescriptor $response;
+    protected(set) PublishDescriptor $response;
 
     protected null|string $idProperty {
         get {
@@ -20,6 +20,6 @@ class PublishDelivery extends Base
     public function initialize(Status $status, ?array &$values): void
     {
        $values['action'] = 'message';
-       $values['response'] = new TopicDescriptor($values);
+       $values['response'] = new PublishDescriptor($values);
     }
 }
