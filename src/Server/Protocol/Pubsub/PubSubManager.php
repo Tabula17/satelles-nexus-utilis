@@ -393,7 +393,9 @@ class PubSubManager implements ProtocolManagerInterface
     {
         $subscribers = [];
         foreach ($this->subscriptions as $subscription) {
+            $this->logger?->debug("Checking subscription ". json_encode($subscription) ." for channel '{$channel}'");
             if (!$server->isEstablished($subscription['subscriberFd'])) {
+                $this->logger?->debug("Removing subscriber FD {$subscription['subscriberFd']} from channel '{$subscription['channel']}' due to closed connection");
                 $this->unloadSubscriber($subscription['subscriberFd']);
                 continue;
             }
