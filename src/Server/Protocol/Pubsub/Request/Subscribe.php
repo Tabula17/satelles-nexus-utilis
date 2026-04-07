@@ -14,8 +14,7 @@ class Subscribe extends Payload
 
     protected null|string $idProperty {
         get {
-            return
-                'payloadId';
+            return 'payloadId';
         }
     }
     protected(set) string $payloadId;
@@ -37,27 +36,29 @@ class Subscribe extends Payload
                 $this->payload = $payload;
             }
         }
-/*
-    public function __construct(string $topic, callable|string $resolver, Definition $protocol)
-    {
-        parent::__construct(resolver: $resolver, protocol: $protocol);
-        $values = [
-            'action' => $protocol->subscribe,
-            'payload' => [
-                'topic' => $topic
-            ]
-        ];
-        $this->loadProperties($values);
-    }*/
+
+    /*
+        public function __construct(string $topic, callable|string $resolver, Definition $protocol)
+        {
+            parent::__construct(resolver: $resolver, protocol: $protocol);
+            $values = [
+                'action' => $protocol->subscribe,
+                'payload' => [
+                    'topic' => $topic
+                ]
+            ];
+            $this->loadProperties($values);
+        }*/
 
     public function initialize(?array &$values): void
     {
-        if(!isset($values['payload']) || !static::validatePayload($values['payload'])) {
+        if (!isset($values['payload']) || !static::validatePayload($values['payload'])) {
             throw new RuntimeException('Invalid payload for subscribe request: ' . json_encode($values['payload'] ?? null) . '. Expected format: {"topic": "string"}');
         }
         $values['action'] = $this->protocol->subscribe;
 
     }
+
     public function datasetInResponse(): bool
     {
         // When subscribe to a topic we don't expect a result, only a confirmation of success or failure,
@@ -102,6 +103,7 @@ class Subscribe extends Payload
             throw new \RuntimeException("No response class found for action {$this->action}");
         }
         $extra = $args[0] ?? [];
+        var_dump($this->toArray(), $extra);
         $extra['payloadId'] = $this->payloadId;
         return new $responseClass(
             $this->status, $extra
