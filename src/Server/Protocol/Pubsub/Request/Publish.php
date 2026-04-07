@@ -120,7 +120,7 @@ class Publish extends Payload
         }
         //array_unshift($args, $this->toArray());
         $extra = $args[0] ?? [];
-        $extra['payloadId'] = $this->payloadId;
+        $extra['payloadId'] = $this->getResponseID();
         return new $responseClass(
             $this->status, $extra
         );
