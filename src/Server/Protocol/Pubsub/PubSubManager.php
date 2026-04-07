@@ -105,7 +105,7 @@ class PubSubManager implements ProtocolManagerInterface
     {
         if ($this->subscribers->exists($fd)) {
             foreach ($this->channels as $channel) {
-                $this->doUnsubscribe(['payload' => ['topic' => $channel]], $fd);
+                $this->doUnsubscribe(['payload' => ['topic' => $channel['name']]], $fd);
             }
             $this->subscribers->del($fd);
         }
@@ -166,7 +166,7 @@ class PubSubManager implements ProtocolManagerInterface
                 }
             }
             foreach ($this->channels as $channel) {
-                $channel['subscriber_count'] = 0;
+                $channel['subscriberCount'] = 0;
             }
             $this->logger?->info("🛍️ #$workerId -> $closedCount conexiones de clientes cerradas");
         }
