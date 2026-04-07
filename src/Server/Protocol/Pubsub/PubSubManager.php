@@ -203,7 +203,7 @@ class PubSubManager implements ProtocolManagerInterface
         ];
         if ($this->request->hasActionResolver($this->request->subscribe)) {
             if ($this->request->validateMessage($data)) {
-                if(!is_array($data['payload'])){
+                if (!is_array($data['payload'])) {
                     $data['payload'] = ['topic' => $data['payload']];
                 }
 
@@ -235,12 +235,33 @@ class PubSubManager implements ProtocolManagerInterface
         //format is validated by the resolver, so we can assume it has the correct structure and types
         $channel = $data['payload']['topic'];
         if (!$this->channels->exists($channel)) {
-            $this->addChannel($channel, null);
+            $this->logger?->debug("🛍️ El canal #$channel no existe, creando");
+            $channelInfo = $this->addChannel($channel, null);
+        } else {
+            // Agregar suscriptor al canal
+            $channelInfo = $this->channels->get($channel);
         }
+        /*
+         * todo: implement authentication!
+        if ($channelInfo['requires_auth'] === 1) {
+            if (!$this->server->isAuthenticated($fd)) {
+                throw new AuthenticationException('Channel is only for authenticated users');
+            }
+            if (!empty($channelInfo['requires_role']) && !in_array($channelInfo['requires_role'], $this->server->userRoles($fd))) {
+                throw new AuthenticationException('User does not have required role');
+            }
+        }*/
+        $this->logger?->debug("🛍️  El canal #$channel tiene {$channelInfo['subscriberCount']} suscriptores, debemos sumar 1");
+
+
         $subscriber = $this->subscribers->get($fd);
         if (!$subscriber) {
             $this->initializeSubscriber($fd);
             $subscriber = $this->subscribers->get($fd);
+        }
+        $id_subscription = $fd . ':' . $channel;
+        if (!$this->subscriptions->exist($id_subscription)) {
+            $this->subscriptions->set($id_subscription, ['id' => $id_subscription, 'channel' => $channel, 'subscriberFd' => $fd]);
         }
         $subscriber['channels']++;
         $this->subscribers->set($fd, $subscriber);
@@ -393,7 +414,7 @@ class PubSubManager implements ProtocolManagerInterface
     {
         $subscribers = [];
         foreach ($this->subscriptions as $subscription) {
-            $this->logger?->debug("Checking subscription ". json_encode($subscription) ." for channel '{$channel}'");
+            $this->logger?->debug("Checking subscription " . json_encode($subscription) . " for channel '{$channel}'");
             if (!$server->isEstablished($subscription['subscriberFd'])) {
                 $this->logger?->debug("Removing subscriber FD {$subscription['subscriberFd']} from channel '{$subscription['channel']}' due to closed connection");
                 $this->unloadSubscriber($subscription['subscriberFd']);
@@ -405,14 +426,15 @@ class PubSubManager implements ProtocolManagerInterface
         }
         return $subscribers;
     }
-/*
-    public function getChannelInfo(string $channel): array
-    {
-        if ($this->channels->exists($channel)) {
-            return $this->channels->get($channel);
-        }
-        return [];
-    }*/
+
+    /*
+        public function getChannelInfo(string $channel): array
+        {
+            if ($this->channels->exists($channel)) {
+                return $this->channels->get($channel);
+            }
+            return [];
+        }*/
 
     public function autoSubscribeToChannels(HamumServerInterface $server): void
     {
@@ -441,15 +463,15 @@ class PubSubManager implements ProtocolManagerInterface
     {
         $this->channels->del($channel);
     }
-/*
-    public function getChannels(int $fd, array $data, ?HamumServerInterface $server): Status
-    {
-        //js ej: ws.send(JSON.stringify({action: 'channels'})) // "action" must match one of those defined in "$this->protocol (listChannels in this case)"
-        $channels = [];
-        foreach ($this->channels as $channel) {
-            $channels[] = $channel;
-        }
-        //  $this->sendResponseToClient($fd, $this->responses->channels, $server, ['channels' => $channels]);
-        return Status::ok;
-    }*/
+    /*
+        public function getChannels(int $fd, array $data, ?HamumServerInterface $server): Status
+        {
+            //js ej: ws.send(JSON.stringify({action: 'channels'})) // "action" must match one of those defined in "$this->protocol (listChannels in this case)"
+            $channels = [];
+            foreach ($this->channels as $channel) {
+                $channels[] = $channel;
+            }
+            //  $this->sendResponseToClient($fd, $this->responses->channels, $server, ['channels' => $channels]);
+            return Status::ok;
+        }*/
 }
