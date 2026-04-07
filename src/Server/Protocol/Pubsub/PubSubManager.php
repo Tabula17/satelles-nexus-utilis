@@ -321,7 +321,7 @@ class PubSubManager implements ProtocolManagerInterface
         $this->logger?->debug("Subscribers: " . count($subscribers));
         $deliveryClass = $this->request->getDeliveryType($this->request->publish);
 
-        $delivery = new $deliveryClass([
+        $delivery = new $deliveryClass(Status::ok, [
             'topic' => $data['payload']['topic'],
             'message' => $data['payload']['message'],
             '_metadata' => new Stats(
