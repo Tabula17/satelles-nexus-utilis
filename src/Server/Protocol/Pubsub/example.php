@@ -7,7 +7,7 @@ use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\Definition;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\Request\Publish;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\Request\Subscribe;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\Request\Unsubscribe;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\Status;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\StatusResponse;
 
 $pubsub = new Definition(
     [
@@ -28,14 +28,14 @@ $pubsub->addActionResolver($pubsub->unsubscribe, Unsubscribe::class);
 echo "📭 Unsubscribe request format: " . json_encode(Unsubscribe::getModel()) . PHP_EOL;
 echo $sep;
 
-$pubsub->addResponseType($pubsub->publish, Status::class);
-echo "📩 Publish response format: " . json_encode(Status::getModel()) . PHP_EOL;
+$pubsub->addResponseType($pubsub->publish, StatusResponse::class);
+echo "📩 Publish response format: " . json_encode(StatusResponse::getModel()) . PHP_EOL;
 echo $sep;
-$pubsub->addResponseType($pubsub->subscribe, Status::class);
-echo "📩 Subscribe response format: " . json_encode(Status::getModel()) . PHP_EOL;
+$pubsub->addResponseType($pubsub->subscribe, StatusResponse::class);
+echo "📩 Subscribe response format: " . json_encode(StatusResponse::getModel()) . PHP_EOL;
 echo $sep;
-$pubsub->addResponseType($pubsub->unsubscribe, Status::class);
-echo "📩 Unsubscribe response format: " . json_encode(Status::getModel()) . PHP_EOL;
+$pubsub->addResponseType($pubsub->unsubscribe, StatusResponse::class);
+echo "📩 Unsubscribe response format: " . json_encode(StatusResponse::getModel()) . PHP_EOL;
 echo $sep;
 function resolvePublish(...$args): string
 {

@@ -16,7 +16,7 @@ use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\Request\Unsubscribe;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\Subscription\ChannelDescriptor;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\Subscription\SubscriberDescriptor;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\Subscription\SubscriptionDescriptor;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\Status as ResponseStatus;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\StatusResponse as ResponseStatus;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ServiceProtocol;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
 use Tabula17\Satelles\Utilis\Exception\UnexpectedValueException;
@@ -218,11 +218,10 @@ class PubSubManager implements ProtocolManagerInterface
             }
 
             $output['error'] = "Message cannot be validated/decoded. Unable to process action '{$this->request->subscribe}'";
-            $this->logger?->error($output['error']);
         } else {
             $output['error'] = "Action '{$this->request->subscribe}' not found. Unable to process action.";
-            $this->logger?->error($output['error']);
         }
+        $this->logger?->error($output['error']);
         $message = new ResponseStatus(
             status: Status::error,
             values: $output

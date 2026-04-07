@@ -110,7 +110,8 @@ abstract class Payload extends AbstractDescriptor //implements RequestHandlerInt
         $this->protocol = $protocol;
         $this->initialize($values);
         parent::__construct($values);
-        $this->id = $values[$this->idProperty] ?? uniqid('', true);
+        $prefix = strtolower($values['action'] ?? 'unknown') . '::';
+        $this->id = $values[$this->idProperty] ?? uniqid($prefix, true);
     }
 
     abstract public function initialize(?array &$values): void;

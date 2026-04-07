@@ -6,14 +6,42 @@ use Tabula17\Satelles\Nexus\Utilis\Exception\UnexpectedValueException;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Data\Stats;
 use Tabula17\Satelles\Utilis\Collection\CallableCollection;
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
 
 abstract class Base extends AbstractDescriptor implements ResponseInterface
 {
-    protected(set) string $id;
+    /**
+     * This property indicates where to store the id of the message to send back to the client.
+     * If the client sends a message with an id, it will be stored in this property.
+     * If it is null, the id will not be stored in the payload, but it will be generated and stored in the $id property of the Payload class.
+     * This property must be defined in the Payload class and must be set to the name of an existing property where the ID will be stored.
+     * @var string|null
+     */
+    abstract protected ?string $idProperty
+        {
+            get;
+        }
+    /**
+     *
+     * @var string|mixed
+     */
+    private string $id
+        {
+            get {
+                return $this->id;
+            }
+            set(string $id) {
+                $this->id = $id;
+                if (isset($this->idProperty) && $this->offsetExists($this->idProperty) && $this->get($this->idProperty) !== $id) {
+                    $this->set($this->idProperty, $id);
+                }
+                //$this->set($this->idProperty, $id);
+            }
+        }
     protected(set) string $action;
     protected(set) ?Stats $_metadata {
         set(Stats|array|null $stats) {
-            $stats = $stats instanceof Stats? $stats:  new Stats(...$stats??[]);
+            $stats = $stats instanceof Stats ? $stats : new Stats(...$stats ?? []);
             $this->_metadata = $stats;
         }
     }
@@ -24,7 +52,8 @@ abstract class Base extends AbstractDescriptor implements ResponseInterface
     private array $errors = [];
     private bool $validating = false;
 
-    public function __construct(
+    final public function __construct(
+        Status $status,
         ?array $values = []
     )
     {
@@ -32,12 +61,13 @@ abstract class Base extends AbstractDescriptor implements ResponseInterface
         if (empty($values)) {
             $values = [];
         }
-        if (!isset($values['id'])) {
-            $prefix = "nxs::" . strtolower($values['action'] ?? 'unknown') . '::';
-            $values['id'] = uniqid($prefix, false);
-        }
+        $this->initialize($status, $values);
         parent::__construct($values);
+        $prefix = strtolower($values['action'] ?? 'unknown') . '::';
+        $this->id = $values[$this->idProperty] ?? uniqid($prefix, true);
     }
+
+    abstract public function initialize(Status $status, ?array &$values): void;
 
     public function addValidator(callable $validator): void
     {

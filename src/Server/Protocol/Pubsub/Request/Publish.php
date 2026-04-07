@@ -118,6 +118,7 @@ class Publish extends Payload
         if (!$responseClass) {
             throw new \RuntimeException("No response class found for action {$this->action}");
         }
+        var_dump($responseClass, $args);
         //array_unshift($args, $this->toArray());
         return new $responseClass(
             $this->status, ...$args
