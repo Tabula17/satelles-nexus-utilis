@@ -90,7 +90,7 @@ abstract class Payload extends AbstractDescriptor //implements RequestHandlerInt
      *
      * @var Closure
      */
-    private(set) Closure $resolver
+    protected Closure $resolver
         {
             get {
                 return $this->resolver;
@@ -138,6 +138,16 @@ abstract class Payload extends AbstractDescriptor //implements RequestHandlerInt
      * @return bool
      */
     abstract public static function validatePayload(array $data): bool;
+
+    public function getID(): string
+    {
+        return $this->id;
+    }
+
+    public function getResponseID(): ?string
+    {
+        return $this->{$this->idProperty} ?? null;
+    }
 
     /**
      * Wraps the given value as a callable or Closure. If the value is a string representing a class name,
