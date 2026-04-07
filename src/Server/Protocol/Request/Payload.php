@@ -70,7 +70,7 @@ abstract class Payload extends AbstractDescriptor //implements RequestHandlerInt
             }
             set(string $id) {
                 $this->id = $id;
-                if (isset($this->idProperty) && $this->offsetExists($this->idProperty) && $this->get($this->idProperty) !== $id) {
+                if (isset($this->idProperty) && $this->hasProperty($this->idProperty) && $this->get($this->idProperty) !== $id) {
                     $this->set($this->idProperty, $id);
                 }
                 //$this->set($this->idProperty, $id);
