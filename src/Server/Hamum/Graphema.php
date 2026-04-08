@@ -93,6 +93,7 @@ abstract class Graphema extends Server implements HamumServerInterface
     public function registerRequestHandlers(string $protocolAction, callable $callback, $protocol = 'generic'): void
     {
         //todo: necesitamos agregar los protocolos de manera que sea una cascada de ejecuciones y solo el último envíe el response o el end.
+        $this->logger?->debug("📝 Registering request handler for protocolAction: {$protocolAction} and protocol: {$protocol}");
         if (!isset($this->requestHandlers[$protocolAction]) || !($this->requestHandlers[$protocolAction] instanceof CallableCollection)) {
             $this->requestHandlers[$protocolAction] = new CallableCollection();
         }

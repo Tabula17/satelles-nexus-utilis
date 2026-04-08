@@ -107,6 +107,7 @@ trait HamumTrait
         }
         return $serverId;
     }
+
     /**
      * Check if the server can connect to a port on a specific host.
      * @param string $host
@@ -193,6 +194,7 @@ trait HamumTrait
             $this->logger?->debug("Finding handlers on properties -> property: $key");
             if (str_ends_with($key, 'Handlers')) {
                 $event_name = strtolower(str_replace('Handlers', '', $key));
+                $this->logger?->debug("🎯 Found handlers for event $event_name");
                 $this->definedHandlers[$event_name] = [
                     'property' => $key,
                     'handler' => "handle" . ucfirst($event_name) . "Event"
