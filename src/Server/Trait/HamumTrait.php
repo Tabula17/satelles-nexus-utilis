@@ -180,15 +180,8 @@ trait HamumTrait
         return $output;
     }
 
-    public function start(): bool
+    protected function registerDefinedHandlers(): void
     {
-        if (!$this->isTcpUdpServer()) {
-            $this->logger?->error("Server type is not supported by this trait. Can't override start() method.");
-            $this?->logger?->debug(str_repeat('-', 100));
-            return false;
-        }
-
-
         $vars = get_class_vars(get_class($this));
         foreach ($vars as $key => $value) {
             $this->logger?->debug("Finding handlers on properties -> property: $key");
@@ -201,7 +194,24 @@ trait HamumTrait
                 ];
             }
         }
+    }
 
+    protected function hasDefinedHandlers(): bool
+    {
+        return count($this->definedHandlers) > 0;
+    }
+
+    public function start(): bool
+    {
+        if (!$this->isTcpUdpServer()) {
+            $this->logger?->error("Server type is not supported by this trait. Can't override start() method.");
+            $this?->logger?->debug(str_repeat('-', 100));
+            return false;
+        }
+
+        if (!$this->hasDefinedHandlers()) {
+            $this->registerDefinedHandlers();
+        }
 
         $this->onBeforeStart();
         $this->logger?->debug('Server->Template fn->onBeforeStart executed. Now look for callbacks on server->beforestart');
@@ -309,6 +319,9 @@ trait HamumTrait
 
     private function registerEventHandlers(string $event_name): void
     {
+        if (!$this->hasDefinedHandlers()) {
+            $this->registerDefinedHandlers();
+        }
         $this->logger?->debug("🖖🏻 Registering event handlers for event $event_name");
         if (isset($this->definedHandlers[strtolower($event_name)])) {
             $this->logger?->debug("🖖🏻 Event $event_name is defined. Registering event handlers.");
