@@ -328,8 +328,9 @@ class PubSubManager implements ProtocolManagerInterface
                 worker_id: $server->worker_id,
                 timestamp: time(),
                 server_time: date('Y-m-d H:i:s'),
-                client_fd: $fd,
-                origin_server: $server->getServerId()
+                //client_fd: $fd,
+                origin_server: $server->getServerId(),
+                publisher: $fd
             )
         ]);
 

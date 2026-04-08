@@ -25,13 +25,13 @@ abstract class Base extends AbstractDescriptor implements ResponseInterface
      *
      * @var string|mixed
      */
-    private string $id
+    private string $_id
         {
             get {
-                return $this->id;
+                return $this->_id;
             }
             set(string $id) {
-                $this->id = $id;
+                $this->_id = $id;
                 if (isset($this->idProperty) && $this->hasProperty($this->idProperty)) {
                     if(!isset($this->{$this->idProperty}) || $this->{$this->idProperty} !== $id) {
                         $this->set($this->idProperty, $id);
@@ -66,7 +66,7 @@ abstract class Base extends AbstractDescriptor implements ResponseInterface
         $this->initialize($status, $values);
         parent::__construct($values);
         $prefix = strtolower($values['action'] ?? 'unknown') . '::';
-        $this->id = $values[$this->idProperty] ?? uniqid($prefix, true);
+        $this->_id = $values[$this->idProperty] ?? uniqid($prefix, true);
     }
 
     abstract public function initialize(Status $status, ?array &$values): void;

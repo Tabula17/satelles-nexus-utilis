@@ -49,7 +49,7 @@ abstract class Graphema extends Server implements HamumServerInterface
         return defined(static::class . '::CRONOS_ENABLED') && static::CRONOS_ENABLED;
     }
 
-    public function isProcessSubsciberEnabled(): bool
+    public function isProcessSubscriberEnabled(): bool
     {
         return defined(static::class . '::PROCESS_SUBSCRIBER_ENABLED') && static::PROCESS_SUBSCRIBER_ENABLED;
     }
@@ -59,13 +59,13 @@ abstract class Graphema extends Server implements HamumServerInterface
         return defined(static::class . '::CLIENT_INFO_ENABLED') && static::CLIENT_INFO_ENABLED;
     }
 
-    public function handleRequestEvent( Request $request, Response $response): void
+    public function handleRequestEvent(Request $request, Response $response): void
     {
         $this->logger?->debug("Definition received from {$request->fd}:  " . $request->server['request_uri']);
         $this->logger?->debug("Definition handlers: " . json_encode(array_keys($this->requestHandlers)));
         //$request->rawContent();
         //$data = var_export($request->get, true);
-        $protocolAction = $request->server['request_uri'] ;
+        $protocolAction = $request->server['request_uri'];
         //string $protocolAction,
         $this?->logger?->debug("Handling request event with protocolAction: {$protocolAction}");
         $eventHandlers = array_merge($this->getEventActionHandlers('request', $protocolAction), $this->getEventActionHandlers('request', '*'));
@@ -97,12 +97,12 @@ abstract class Graphema extends Server implements HamumServerInterface
             $this->requestHandlers[$protocolAction] = new CallableCollection();
         }
         $this->requestHandlers[$protocolAction]->offsetSet($protocol, $callback);
-        $this->registerEventHandlers('Definition');
+        $this->registerEventHandlers('request');
     }
 
     public function getRequestHandlers(string $protocolAction): ?array
     {
-        return $this->getEventActionHandlers('Definition', $protocolAction);
+        return $this->getEventActionHandlers('request', $protocolAction);
     }
 
     public function hasRequestHandlers(string $protocolAction): bool
@@ -114,6 +114,15 @@ abstract class Graphema extends Server implements HamumServerInterface
     {
         $this->requestHandlers[$protocolAction]?->clear();
         unset($this->requestHandlers[$protocolAction]);
-        $this->registerEventHandlers('Definition');
+        $this->registerEventHandlers('request');
+    }
+
+    /**
+     * Get the registered routes.
+     * @return array<string>
+     */
+    public function getRegisteredRoutes(): array
+    {
+        return array_keys($this->requestHandlers);
     }
 }

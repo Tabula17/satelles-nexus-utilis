@@ -84,7 +84,6 @@ class RedisSubscriberProcess extends AbstractSubscriberProcess
             }
         }
     }
-
     /**
      * Envía el mensaje a un Task Worker para procesar los callbacks
      */

@@ -14,7 +14,7 @@ trait HamumTrait
 {
     use MatrixTrait;
 
-    const HAMUM_HOOK_ENABLED = true;
+    const bool HAMUM_HOOK_ENABLED = true;
     private array $hookedEvents = [];
     /**
      * @var array With actionable protocols as keys and callables as values. Tasks event occurs in every Swoole server worker and Server type.
@@ -108,7 +108,7 @@ trait HamumTrait
         return $serverId;
     }
     /**
-     * Check if can connect to a port on a specific host.
+     * Check if the server can connect to a port on a specific host.
      * @param string $host
      * @param int $port
      * @param $timeout
@@ -144,7 +144,7 @@ trait HamumTrait
     }
 
     /**
-     * Search for an available port on the specified address.
+     * Search for an available port at the specified address.
      * @param string $addr
      * @return int|null
      */

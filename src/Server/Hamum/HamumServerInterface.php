@@ -11,7 +11,7 @@ interface HamumServerInterface
 
     public function isCronosEnabled(): bool;
 
-    public function isProcessSubsciberEnabled(): bool;
+    public function isProcessSubscriberEnabled(): bool;
 
     public function isClientInfoEnabled(): bool;
 }

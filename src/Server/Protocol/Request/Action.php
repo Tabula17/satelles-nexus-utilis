@@ -13,10 +13,10 @@ use Tabula17\Satelles\Utilis\Exception\UnexpectedValueException;
  */
 class Action extends AbstractDescriptor
 {
-    private RequestCollection $actionsResolvers;
-    private ResponseCollection $responsesTypes;
+    protected RequestCollection $actionsResolvers;
+    protected ResponseCollection $responsesTypes;
 
-    private ResponseCollection $deliveryTypes;
+    protected ResponseCollection $deliveryTypes;
 
     /**
      * @throws UnexpectedValueException

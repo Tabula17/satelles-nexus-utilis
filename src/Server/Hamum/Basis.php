@@ -38,7 +38,7 @@ abstract class Basis extends Server implements HamumServerInterface
     {
         return defined(static::class . '::CRONOS_ENABLED') && static::CRONOS_ENABLED;
     }
-    public function isProcessSubsciberEnabled(): bool
+    public function isProcessSubscriberEnabled(): bool
     {
         return defined(static::class . '::PROCESS_SUBSCRIBER_ENABLED') && static::PROCESS_SUBSCRIBER_ENABLED;
     }
