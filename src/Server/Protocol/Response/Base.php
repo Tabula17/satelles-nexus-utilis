@@ -47,7 +47,7 @@ abstract class Base extends AbstractDescriptor implements ResponseInterface
             $this->_metadata = $stats;
         }
     }
-    abstract AbstractDescriptor $response {
+    abstract public AbstractDescriptor $response {
         get;
     }
     private CallableCollection $validators;
