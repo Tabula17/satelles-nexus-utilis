@@ -161,7 +161,7 @@ class JsonRpcManager implements ProtocolManagerInterface
             $server->send($fd, json_encode($error->jsonSerialize()));
         } else {
 
-            $resolver = $this->request->resolve($this->request->call, $this->request->getMethod($data['method']), $data, $this->request);//?->handle($server, $fd);
+            $resolver = $this->request->resolve($this->request->call, $this->request->getMethod($data['method'])->handler, $data, $this->request);//?->handle($server, $fd);
             $this->rpcRequests->set($resolver->getID(), [
                 'requestId' => $resolver->getID(),
                 'fd' => $fd,
@@ -225,7 +225,7 @@ class JsonRpcManager implements ProtocolManagerInterface
             $response->header('Content-Type', 'application/json');
             $response->end(json_encode($error->response->jsonSerialize()));
         } else {
-            $resolver = $this->request->resolve($this->request->call, $this->request->getMethod($data['method']), $data, $this->request);//?->handle($server, $fd);
+            $resolver = $this->request->resolve($this->request->call, $this->request->getMethod($data['method'])->handler, $data, $this->request);//?->handle($server, $fd);
             $this->rpcRequests->set($resolver->getID(), [
                 'requestId' => $resolver->getID(),
                 'fd' => $fd,
