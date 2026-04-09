@@ -32,8 +32,8 @@ class Action extends AbstractDescriptor
                     trigger_error("Resolver for property '{$property}' cannot be set. No such action defined in protocol.", E_USER_WARNING);
                 }
             }
-            $this->actionsResolvers = $actionsResolvers ?? new RequestCollection();
         }
+        $this->actionsResolvers = $actionsResolvers ?? new RequestCollection();
         if ($responsesTypes) {
             foreach ($responsesTypes as $property => $response) {
                 if (!$this->offsetExists($property)) {
@@ -41,8 +41,8 @@ class Action extends AbstractDescriptor
                     trigger_error("Response type for property '{$property}' cannot be set. No such action defined in protocol.", E_USER_WARNING);
                 }
             }
-            $this->responsesTypes = $responsesTypes ?? new ResponseCollection();
         }
+        $this->responsesTypes = $responsesTypes ?? new ResponseCollection();
         if ($deliveryTypes) {
             foreach ($deliveryTypes as $property => $delivery) {
                 if (!$this->offsetExists($property)) {
@@ -50,8 +50,8 @@ class Action extends AbstractDescriptor
                     trigger_error("Response type for property '{$property}' cannot be set. No such action defined in protocol.", E_USER_WARNING);
                 }
             }
-            $this->deliveryTypes = $deliveryTypes ?? new ResponseCollection();
         }
+        $this->deliveryTypes = $deliveryTypes ?? new ResponseCollection();
     }
 
     protected function getProperty(mixed $value): string|int|false
