@@ -146,7 +146,7 @@ class JsonRpcManager implements ProtocolManagerInterface
     public function handleCalls(HamumServerInterface $server, int $fd, array $data = []): void
     {
         //$resolver = $this->request->resolve($this->request->call, null, $data, $this->request)?->handle($server, $fd);
-var_dump($data);
+        $data = $data['payload'] ?? $data;
         if (!$this->request->hasMethod($data['method'])) {
             $error = new ResultResponse(
                 Status::error,
