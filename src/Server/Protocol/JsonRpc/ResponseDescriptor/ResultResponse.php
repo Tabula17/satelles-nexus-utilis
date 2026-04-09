@@ -26,11 +26,7 @@ class ResultResponse extends Base
         }
 
     }
-    public JsonRpcResponse $response {
-        get {
-            return $this->response;
-        }
-    }
+    public JsonRpcResponse $response;
     protected(set) int|string|null $id {
         get {
             return $this->id;
