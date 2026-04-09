@@ -135,7 +135,7 @@ class JsonRpcManager implements ProtocolManagerInterface
      */
     public function registerProtocolHandlers(HamumServerInterface $server): void
     {
-        if ($server::TYPE->isWebsockets()) {
+        if ($server::TYPE->isWebsocket()) {
             $server->registerMessageHandlers($this->request->call, $this->handleCalls(...), static::protocol->shortName());
         }
         if ($server::TYPE->isHttp()) {
