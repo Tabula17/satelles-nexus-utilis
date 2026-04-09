@@ -49,6 +49,7 @@ abstract class Base extends AbstractDescriptor implements ResponseInterface
     }
     abstract protected(set) AbstractDescriptor $response {
         get;
+        set;
     }
     private CallableCollection $validators;
     private array $errors = [];
