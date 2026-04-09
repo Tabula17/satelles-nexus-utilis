@@ -32,7 +32,7 @@ class Definition extends Action
         parent::addDeliveryType($action, $delivery); // for protocol delivery types
     }
 
-    public function addMethod(MethodDescriptor $method, ?string $deliveryType): void
+    public function addMethod(MethodDescriptor $method, ?string $deliveryType = null): void
     {
         if (!isset($this->methods)) {
             $this->methods = new MethodsCollection();

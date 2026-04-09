@@ -21,7 +21,7 @@ class Action extends AbstractDescriptor
     /**
      * @throws UnexpectedValueException
      */
-    public function __construct(?array $properties = null, ?RequestCollection $actionsResolvers = null, ?ResponseCollection $responsesTypes = null, ?ResponseCollection $deliveryTypes = null)
+    public function __construct(array $properties = [], ?RequestCollection $actionsResolvers = null, ?ResponseCollection $responsesTypes = null, ?ResponseCollection $deliveryTypes = null)
     {
         parent::__construct($properties);
         // Check if all property resolvers are defined in the protocol
