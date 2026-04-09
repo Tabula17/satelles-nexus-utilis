@@ -8,6 +8,7 @@ use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request\Payload;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\PayloadDescriptor\PublishDescriptor;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\Base;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
+use Tabula17\Satelles\Utilis\Exception\UnexpectedValueException;
 
 class Publish extends Payload
 {
@@ -24,6 +25,9 @@ class Publish extends Payload
         get {
             return $this->protocol;
         }
+        /**
+         * @throws UnexpectedValueException
+         */
         set(array|Definition $protocol) => $this->protocol = $protocol instanceof Definition ? $protocol : new Definition($protocol);
     }
     protected(set) PublishDescriptor $payload

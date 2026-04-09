@@ -65,7 +65,7 @@ abstract class Graphema extends Server implements HamumServerInterface
         $this->logger?->debug("Definition handlers: " . json_encode(array_keys($this->requestHandlers)));
         //$request->rawContent();
         //$data = var_export($request->get, true);
-        $protocolAction = $request->server['request_uri'];
+        $protocolAction = rtrim($request->server['request_uri'], '/');
         //string $protocolAction,
         $this?->logger?->debug("Handling request event with protocolAction: {$protocolAction}");
         $eventHandlers = array_merge($this->getEventActionHandlers('request', $protocolAction), $this->getEventActionHandlers('request', '*'));
@@ -93,6 +93,10 @@ abstract class Graphema extends Server implements HamumServerInterface
     public function registerRequestHandlers(string $protocolAction, callable $callback, $protocol = 'generic'): void
     {
         //todo: necesitamos agregar los protocolos de manera que sea una cascada de ejecuciones y solo el último envíe el response o el end.
+        $protocolAction = rtrim($protocolAction, '/');
+        if (!str_starts_with($protocolAction, '/')) {
+            $protocolAction = '/' . $protocolAction;
+        }
         $this->logger?->debug("📝 Registering request handler for protocolAction: {$protocolAction} and protocol: {$protocol}");
         if (!isset($this->requestHandlers[$protocolAction]) || !($this->requestHandlers[$protocolAction] instanceof CallableCollection)) {
             $this->requestHandlers[$protocolAction] = new CallableCollection();

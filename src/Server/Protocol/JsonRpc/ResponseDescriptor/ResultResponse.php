@@ -18,7 +18,7 @@ use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
  * −32603               Internal error      Internal JSON-RPC error
  * −32000 to −32099     Server error        Reserved for implementation-defined server errors
  */
-class ErrorResponse extends Base
+class ResultResponse extends Base
 {
     protected null|string $idProperty {
         get {
@@ -26,7 +26,7 @@ class ErrorResponse extends Base
         }
 
     }
-    public JsonRpcErrorDescriptor $response {
+    public JsonRpcResponse $response {
         get {
             return $this->response;
         }
@@ -42,20 +42,30 @@ class ErrorResponse extends Base
             }
         }
     }
-
+    private string|int $_requestId;
     public function initialize(Status $status, ?array &$values): void
     {
-        $response = [];
-        if (isset($values['response']) && $values['response'] instanceof JsonRpcErrorDescriptor) {
-            $response = $values['response']->toArray();
+
+        if($status->isError()) {
+            $response = [];
+            if (isset($values['response']) && $values['response'] instanceof AbstractDescriptor) {
+                $response = $values['response']->toArray();
+            }
+            //find error code
+            $code = $response['error']['code'] ?? $values['code'] ?? 0;
+            //find error message
+            $message = $response['error']['message'] ?? $values['message'] ?? $values['error'] ?? 'Unknow error';
+            //create error response
+            $response = JsonRpcResponse::errorFromCode($code, $message);
+            //set id if exists
+            if (isset($values['id'])) {
+                $response->set('id', $values['id']);
+            }
+            $values['response'] = $response;
+        }else{
+            $result = $values['response'] ?? $values; // if result is not set, use the whole values
+            $values['response'] = new JsonRpcResponse(['result' => $result, 'id' => $values['id'] ?? null]);
         }
-        $code = $response['error']['code'] ?? $values['code'] ?? 0;
-        $message = $response['error']['message'] ?? $values['message'] ?? $values['error'] ?? 'Unknow error';
-        $response = JsonRpcErrorDescriptor::fromCode($code, $message);
-        if (isset($values['id'])) {
-            $response->set('id', $values['id']);
-        }
-        $values['response'] = $response;
 
     }
     public function forceId(int|string $id): static
@@ -64,6 +74,16 @@ class ErrorResponse extends Base
         if(isset($this->response)) {
             $this->response->set('id', $id);
         }
+        return $this;
+    }
+
+    public function getRequestId(): string|int
+    {
+        return $this->_requestId ?? $this->id;
+    }
+    public function setRequestId(string|int $requestId): static
+    {
+        $this->_requestId = $requestId;
         return $this;
     }
 }

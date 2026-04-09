@@ -17,4 +17,13 @@ class ParamDescriptor extends AbstractDescriptor
     protected(set) string|null|Closure $validation = null;
     protected(set) array $enum;
     protected(set) bool $injected = false;
+    public mixed $value {
+        get {
+            return $this->value;
+        }
+        set {
+            settype($value, $this->type);
+            $this->value = $value;
+        }
+    }
 }

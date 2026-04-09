@@ -6,11 +6,11 @@ use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\Type\ErrorDescriptor
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
 
 //<-- {"jsonrpc": "2.0", "error": {"code": -32600, "message": "Invalid Request"}, "id": null}
-class JsonRpcErrorDescriptor extends AbstractDescriptor
+class JsonRpcResponse extends AbstractDescriptor
 {
     protected(set) int|string|null $id;
     protected(set) string $jsonrpc = '2.0';
-
+    protected(set) mixed $result;
     /**
      * Error Code           Message             Description
      * −32700               Parse error         Invalid JSON was received
@@ -20,25 +20,26 @@ class JsonRpcErrorDescriptor extends AbstractDescriptor
      * −32603               Internal error      Internal JSON-RPC error
      * −32000 to −32099     Server error        Reserved for implementation-defined server errors
      */
-    protected(set) ErrorDescriptor $error {
-        set(ErrorDescriptor|array $error) {
-            if (is_array($error)) {
-                $error = new ErrorDescriptor($error);
-            }
-            if ($error->code > 0) {
-                $error->set('code', $error->code * -1);
-            }
+    protected(set) ?ErrorDescriptor $error {
+        set(ErrorDescriptor|array|null $error) {
+            if($error) {
+                if (is_array($error)) {
+                    $error = new ErrorDescriptor($error);
+                }
+                if ($error->code > 0) {
+                    $error->set('code', $error->code * -1);
+                }
 
-            $code = abs($error->code);
-            if (($code < 32000 || $code > 32099) && !static::isPredefinedCode($code)) {
-                $error->set('code', -32000);
-                $error->set('message', 'Unknow error');
-            }
+                $code = abs($error->code);
+                if (($code < 32000 || $code > 32099) && !static::errorCodeExists($code)) {
+                    $error->set('code', -32000);
+                    $error->set('message', 'Unknow error');
+                }
 
-            if ($code >= 32000 && $code <= 32099) {
-                $error->set('message', $this->errors[$code] ?? $error->message);
+                if ($code >= 32000 && $code <= 32099) {
+                    $error->set('message', $this->errors[$code] ?? $error->message);
+                }
             }
-
             $this->error = $error;
         }
     }
@@ -50,12 +51,12 @@ class JsonRpcErrorDescriptor extends AbstractDescriptor
         32700 => 'Parse error',
     ];
 
-    public static function isPredefinedCode(int $code): bool
+    public static function errorCodeExists(int $code): bool
     {
         return isset(static::errors[$code]);
     }
 
-    public static function fromCode(int $code, array|string|null $data = null): self
+    public static function errorFromCode(int $code, array|string|null $data = null): self
     {
         $error = new self();
         $error->error = new ErrorDescriptor();
@@ -63,7 +64,7 @@ class JsonRpcErrorDescriptor extends AbstractDescriptor
             $code *= -1;
         }
         $values = ['code' => $code];
-        if (!static::isPredefinedCode(abs($code))) {
+        if (!static::errorCodeExists(abs($code))) {
             if ($data && is_array($data)) {
                 $data = json_encode($data);
             }
