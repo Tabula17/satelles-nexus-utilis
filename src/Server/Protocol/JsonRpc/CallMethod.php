@@ -108,7 +108,7 @@ class CallMethod extends Payload
         try {
             $handler = $this->payload->handler;
             //var_dump($handler);
-            $this->result = $handler($this->payload->handler, $this->payload->parameters->toArray());
+            $this->result = $handler(...$this->payload->parameters->getValues());
             $eval = $this->result;
             if ($eval instanceof AbstractDescriptor) {
                 $eval = $eval->toArray();
