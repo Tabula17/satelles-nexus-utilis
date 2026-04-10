@@ -38,6 +38,9 @@ class JsonRpcResponse extends AbstractDescriptor
                     $error->set('code', -32000);
                     $error->set('message', 'Unknow error');
                 } else {
+                    if (isset($error->message) && $error->message === null) {
+                        $error->set('data', $error->message);
+                    }
                     $error->set('message', static::errors[$code] ?? 'Unknow error');
                 }
             }

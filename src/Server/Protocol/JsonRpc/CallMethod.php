@@ -107,7 +107,7 @@ class CallMethod extends Payload
         }
         try {
             $handler = $this->payload->handler;
-            var_dump($handler);
+            //var_dump($handler);
             $this->result = $handler($this->payload->handler, $this->payload->parameters->toArray());
             $eval = $this->result;
             if ($eval instanceof AbstractDescriptor) {
@@ -119,7 +119,7 @@ class CallMethod extends Payload
         } catch (Throwable $exception) {
             $this->status = Status::error;
             $this->result = [
-                'code' => $exception->getCode() ?? 32603,
+                'code' => 32603,
                 'message' => $exception->getMessage(),
             ];
         }
