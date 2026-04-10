@@ -26,6 +26,9 @@ class JsonRpcResponse extends AbstractDescriptor
                 if (is_array($error)) {
                     $error = new ErrorDescriptor($error);
                 }
+                if(!isset($error->code)){
+                    $error->set('code', 0);
+                }
                 if ($error->code > 0) {
                     $error->set('code', $error->code * -1);
                 }
