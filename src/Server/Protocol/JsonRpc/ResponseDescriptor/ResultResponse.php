@@ -33,7 +33,7 @@ class ResultResponse extends Base
     }
     protected(set) int|string|null $id {
         get {
-            return $this->id;
+            return $this->id ?? null;
         }
         set(int|string|null $id) {
             $this->id = $id;
@@ -43,10 +43,11 @@ class ResultResponse extends Base
         }
     }
     private string|int $_requestId;
+
     public function initialize(Status $status, ?array &$values): void
     {
 
-        if($status->isError()) {
+        if ($status->isError()) {
             $response = [];
             if (isset($values['response']) && $values['response'] instanceof AbstractDescriptor) {
                 $response = $values['response']->toArray();
@@ -62,16 +63,17 @@ class ResultResponse extends Base
                 $response->set('id', $values['id']);
             }
             $values['response'] = $response;
-        }else{
+        } else {
             $result = $values['response'] ?? $values; // if result is not set, use the whole values
             $values['response'] = new JsonRpcResponse(['result' => $result, 'id' => $values['id'] ?? null]);
         }
 
     }
+
     public function forceId(int|string $id): static
     {
         $this->id = $id;
-        if(isset($this->response)) {
+        if (isset($this->response)) {
             $this->response->set('id', $id);
         }
         return $this;
@@ -81,6 +83,7 @@ class ResultResponse extends Base
     {
         return $this->_requestId ?? $this->id;
     }
+
     public function setRequestId(string|int $requestId): static
     {
         $this->_requestId = $requestId;

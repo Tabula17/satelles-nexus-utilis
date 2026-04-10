@@ -32,10 +32,8 @@ abstract class Base extends AbstractDescriptor implements ResponseInterface
             }
             set(string $id) {
                 $this->_id = $id;
-                if (isset($this->idProperty) && $this->hasProperty($this->idProperty)) {
-                    if(!isset($this->{$this->idProperty}) || $this->{$this->idProperty} !== $id) {
-                        $this->set($this->idProperty, $id);
-                    }
+                if (isset($this->idProperty) && $this->hasProperty($this->idProperty) && !$this->offsetExists($this->idProperty)) {
+                    $this->set($this->idProperty, $id);
                 }
                 //$this->set($this->idProperty, $id);
             }
@@ -56,7 +54,7 @@ abstract class Base extends AbstractDescriptor implements ResponseInterface
 
     final public function __construct(
         public Status $status,
-        ?array $values = []
+        ?array        $values = []
     )
     {
         $this->validators = new CallableCollection();
@@ -80,10 +78,12 @@ abstract class Base extends AbstractDescriptor implements ResponseInterface
     {
         $this->validators->remove($validator);
     }
+
     public function getID(): string
     {
         return $this->_id;
     }
+
     /**
      * Determines if the current response passes all validation rules.
      *
