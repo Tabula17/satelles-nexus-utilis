@@ -78,7 +78,6 @@ class CallMethod extends Payload
             }
         }
         $values['payload'] = $payload->parameters->toArray();
-        var_dump($values);
     }
 
     public function datasetInResponse(): bool
@@ -89,7 +88,9 @@ class CallMethod extends Payload
     public function handle(...$args): static
     {
         // Execute payload->handler and store result in $this->result
-
+        if (isset($this->result) && $this->result instanceof JsonRpcResponse) {
+            return $this;
+        }
         [$server, $fd] = $args;
         foreach ($this->payload->parameters->getInjected() as $parameter) {
             if ($parameter->name === 'server') {

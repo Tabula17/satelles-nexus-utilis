@@ -177,6 +177,7 @@ class JsonRpcManager implements ProtocolManagerInterface
             if ($resolver->datasetInResponse()) {
                 $args[] = true;
             }
+
             $coroutineId = Coroutine::create($this->executeCall(...), $resolver->handle(...), ...$args);
             /*
             if ($resolver->datasetInResponse()) {
