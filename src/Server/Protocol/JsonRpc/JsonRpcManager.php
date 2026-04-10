@@ -94,7 +94,7 @@ class JsonRpcManager implements ProtocolManagerInterface
         // TODO: Implement initializeOnWorkers() method.
 
         /**
-         * @var RpcProcessorInterface $processor
+         * //@var RpcProcessorInterface $processor
          * foreach ($this->rpcProcessors as $processor) {
          * $processor->initializeOnWorkers($server, $workerId);
          * }
@@ -204,8 +204,8 @@ class JsonRpcManager implements ProtocolManagerInterface
         $this->updateRpcRequest($requestId, 'finalizedAt', time());
         $this->updateRpcRequest($requestId, 'status', $response->status->value);
         if ($reply) {
-            $this->logger?->debug("📤 Sending response for request {$requestId} to fd {$fd}");
-            $server->send($fd, json_encode($response->jsonSerialize()));
+            $this->logger?->debug("📤 Sending response for request {$requestId} to fd {$fd}", $response->response->toArray() ?? []);
+            $server->send($fd, json_encode($response));
         }
     }
 
