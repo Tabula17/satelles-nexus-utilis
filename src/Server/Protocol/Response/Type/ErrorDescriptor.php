@@ -8,6 +8,13 @@ class ErrorDescriptor extends AbstractDescriptor
 {
     protected(set) int $code;
     protected(set) string $message;
-    protected(set) ?array $data;
+    protected(set) ?array $data{
+        set(array|string|null $data) {
+            if(is_null($data)) {
+                return;
+            }
+            $this->data = is_array($data) ? $data : [$data];
+        }
+    }
 
 }
