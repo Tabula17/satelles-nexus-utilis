@@ -2,6 +2,7 @@
 
 namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Data;
 
+use JsonSerializable;
 use Tabula17\Satelles\Utilis\Collection\TypedCollection;
 
 class ParamCollection extends TypedCollection
@@ -12,32 +13,33 @@ class ParamCollection extends TypedCollection
         return ParamDescriptor::class;
     }
 
-    public function getRequired(): array
+    public function getRequired(): self
     {
-        return $this->filter(fn(ParamDescriptor $param) => $param->required)->toArray();
+        return $this->filter(fn(ParamDescriptor $param) => $param->required);
     }
 
-    public function getOptional(): array
+    public function getOptional(): self
     {
-        return $this->filter(fn(ParamDescriptor $param) => !$param->required)->toArray();
+        return $this->filter(fn(ParamDescriptor $param) => !$param->required);
     }
-    public function getInjected(): array
+    public function getInjected(): self
     {
-        return $this->filter(fn(ParamDescriptor $param) => $param->injected)->toArray();
+        return $this->filter(fn(ParamDescriptor $param) => $param->injected);
     }
     public function collect(string $property): array
     {
-        return array_map(static fn(ParamDescriptor $param) => $param->$property, $this->values);
+        //return array_map(static fn(ParamDescriptor $param) => $param->$property, $this->values);
+        return array_filter(array_map(static fn(ParamDescriptor $param) => $param->$property, $this->values));
     }
 
     public function collectRequired(string $property): array
     {
-        return array_map(static fn(ParamDescriptor $param) => $param->$property, $this->getRequired());
+        return $this->getRequired()->collect($property);
     }
 
     public function collectOptional(string $property): array
     {
-        return array_map(static fn(ParamDescriptor $param) => $param->$property, $this->getOptional());
+        return $this->getRequired()->collect($property);
     }
     public function setParamValue(string $name, mixed $value): void
     {
