@@ -124,6 +124,10 @@ class CallMethod extends Payload
         /* if ($this->status === Status::error) {
              return $this->result;
          }*/
+
+        if (isset($this->result) && $this->result instanceof JsonRpcResponse) {
+            return new ResultResponse($this->status, ['response' => $this->result, 'id' => $this->_id]);
+        }
         if ($this->datasetInResponse()) {
             $class = $this->protocol->getDeliveryType($this->payload->method) ?? $this->protocol->getResponseType($this->action);
             $response = $class ? new $class($this->status, $this->result) : null;
