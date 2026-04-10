@@ -158,7 +158,8 @@ class JsonRpcManager implements ProtocolManagerInterface
             if (isset($data['id'])) {
                 $error->forceId($data['id']);
             }
-            $server->send($fd, json_encode($error->jsonSerialize()));
+            $this->logger?->error($error->response->error->message ?? 'Error sending response', $error->response->error->toArray() ?? []);
+            $server->send($fd, json_encode($error));
         } else {
 
             $resolver = $this->request->resolve($this->request->call, $this->request->getMethod($data['method'])->handler, $data, $this->request);//?->handle($server, $fd);
@@ -203,6 +204,7 @@ class JsonRpcManager implements ProtocolManagerInterface
         $this->updateRpcRequest($requestId, 'finalizedAt', time());
         $this->updateRpcRequest($requestId, 'status', $response->status->value);
         if ($reply) {
+            $this->logger?->debug("📤 Sending response for request {$requestId} to fd {$fd}");
             $server->send($fd, json_encode($response->jsonSerialize()));
         }
     }
