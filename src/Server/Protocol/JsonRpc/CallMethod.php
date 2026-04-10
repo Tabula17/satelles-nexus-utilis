@@ -102,7 +102,7 @@ class CallMethod extends Payload
                 $parameter->value = $fd;
             }
             if ($parameter->name === 'workerId') {
-                $parameter->value = $server->workerId;
+                $parameter->value = $server->worker_id;
             }
         }
         try {
