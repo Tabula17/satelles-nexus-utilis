@@ -78,6 +78,7 @@ class CallMethod extends Payload
             }
         }
         $values['payload'] = $payload->parameters->toArray();
+        var_dump($values);
     }
 
     public function datasetInResponse(): bool
