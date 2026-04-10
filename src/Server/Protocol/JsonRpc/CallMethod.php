@@ -64,8 +64,10 @@ class CallMethod extends Payload
         }
 
         $payload = $this->protocol->getMethod($values['method']);
-        $requiredParams = $payload->parameters->collectRequired('name');
-        if (count($requiredParams) > 0) {
+        $requiredParams = $payload->parameters->getRequired()->collect('name');
+        $injectedParams = $payload->parameters->getInjected()->collect('name');
+        $neededParams = array_diff($requiredParams, $injectedParams);
+        if (count($neededParams) > 0) {
             if (!isset($values['params']) || count(array_diff($requiredParams, array_keys($values['params'] ?? []))) > 0) {
                 $this->status = Status::error;
                 $this->result = JsonRpcResponse::errorFromCode(32602);

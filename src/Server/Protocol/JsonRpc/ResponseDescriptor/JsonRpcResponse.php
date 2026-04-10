@@ -22,11 +22,11 @@ class JsonRpcResponse extends AbstractDescriptor
      */
     protected(set) ?ErrorDescriptor $error {
         set(ErrorDescriptor|array|null $error) {
-            if($error) {
+            if ($error) {
                 if (is_array($error)) {
                     $error = new ErrorDescriptor($error);
                 }
-                if(!isset($error->code)){
+                if (!isset($error->code)) {
                     $error->set('code', 0);
                 }
                 if ($error->code > 0) {
@@ -34,13 +34,11 @@ class JsonRpcResponse extends AbstractDescriptor
                 }
 
                 $code = abs($error->code);
-                if (($code < 32000 || $code > 32099) && !static::errorCodeExists($code)) {
+                if (!static::errorCodeExists($code)) {
                     $error->set('code', -32000);
                     $error->set('message', 'Unknow error');
-                }
-
-                if ($code >= 32000 && $code <= 32099) {
-                    $error->set('message', $this->errors[$code] ?? $error->message);
+                } else {
+                    $error->set('message', static::errors[$code] ?? 'Unknow error');
                 }
             }
             $this->error = $error;
@@ -62,7 +60,6 @@ class JsonRpcResponse extends AbstractDescriptor
     public static function errorFromCode(int $code, array|string|null $data = null): self
     {
         $error = new self();
-        $error->error = new ErrorDescriptor();
         if ($code > 0) {
             $code *= -1;
         }
@@ -72,11 +69,10 @@ class JsonRpcResponse extends AbstractDescriptor
                 $data = json_encode($data);
             }
             $values['message'] = $data ?? 'Unknow error';
-        } elseif ($data) {
+        } else if ($data) {
             $values['data'] = $data;
         }
-        $error->error->loadProperties($values);
-        //return (new self())->set('error', ['code' => $code, 'message' => static::$errors[$code] ?? 'Unknow error']);
+        $error->error = new ErrorDescriptor($values);
         return $error;
     }
 }

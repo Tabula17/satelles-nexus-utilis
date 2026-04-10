@@ -31,16 +31,6 @@ class ParamCollection extends TypedCollection
         //return array_map(static fn(ParamDescriptor $param) => $param->$property, $this->values);
         return array_filter(array_map(static fn(ParamDescriptor $param) => $param->$property, $this->values));
     }
-
-    public function collectRequired(string $property): array
-    {
-        return $this->getRequired()->collect($property);
-    }
-
-    public function collectOptional(string $property): array
-    {
-        return $this->getRequired()->collect($property);
-    }
     public function setParamValue(string $name, mixed $value): void
     {
         $this->find(static fn(ParamDescriptor $param) => $param->name === $name)->value = $value;
