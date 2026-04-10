@@ -131,6 +131,7 @@ class CallMethod extends Payload
             return new ResultResponse($this->status, ['response' => $this->result, 'id' => $this->_id]);
         }
         if ($this->datasetInResponse()) {
+            var_dump($this->payload);
             $class = $this->protocol->getDeliveryType($this->payload->method) ?? $this->protocol->getResponseType($this->action);
             $response = $class ? new $class($this->status, $this->result) : null;
             if (!$response instanceof ResultResponse) {
