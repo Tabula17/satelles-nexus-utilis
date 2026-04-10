@@ -101,6 +101,9 @@ class CallMethod extends Payload
             if ($parameter->name === 'fd') {
                 $parameter->value = $fd;
             }
+            if ($parameter->name === 'workerId') {
+                $parameter->value = $server->workerId;
+            }
         }
         try {
             $handler = $this->payload->handler;
