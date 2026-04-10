@@ -104,6 +104,7 @@ class CallMethod extends Payload
         }
         try {
             $handler = $this->payload->handler;
+            var_dump($handler);
             $this->result = $handler($this->payload->handler, $this->payload->parameters->toArray());
             $eval = $this->result;
             if ($eval instanceof AbstractDescriptor) {
@@ -133,7 +134,6 @@ class CallMethod extends Payload
             return new ResultResponse($this->status, ['response' => $this->result, 'id' => $this->_id]);
         }
         if ($this->datasetInResponse()) {
-            var_dump($this->payload);
             $class = $this->protocol->getDeliveryType($this->payload->method) ?? $this->protocol->getResponseType($this->action);
             $response = $class ? new $class($this->status, $this->result) : null;
             if (!$response instanceof ResultResponse) {
