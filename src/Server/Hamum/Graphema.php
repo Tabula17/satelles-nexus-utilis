@@ -86,6 +86,8 @@ abstract class Graphema extends Server implements HamumServerInterface
         //$request->rawContent();
         //$data = var_export($request->get, true);
 
+        $request->server['server_id'] = $this->getServerId();
+        $request->server['html_files_path'] = $this->htmlFilesPath;
         $requestPath = explode('/', explode('?', $request->server['request_uri'])[0]);
         $eventHandlers = [];
         while (count($requestPath) > 0) {
@@ -117,8 +119,7 @@ abstract class Graphema extends Server implements HamumServerInterface
             $response->status($err->httpCode());
             $response->end($err->fromPath($this->htmlFilesPath));
         } else {
-            $request->server['server_id'] = $this->getServerId();
-            $request->server['html_files_path'] = $this->htmlFilesPath;
+            $this->logger?->debug("🧩 Executing request handlers for {$request->server['request_uri']}");
             foreach ($eventHandlers as $callback) {
                 $callback($request, $response);
             }
