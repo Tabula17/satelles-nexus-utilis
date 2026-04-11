@@ -254,7 +254,7 @@ class JsonRpcManager implements ProtocolManagerInterface
 
     public function handleRequests(Request $request, Response $response): void
     {
-        if ($request->server['request_uri'] !== $this->definition->call) {
+        if (trim($request->server['request_uri'], '/') !== $this->definition->call) {
             $this->logger?->debug("Requesting RPC API for {$request->server['request_uri']} is different from {$this->definition->call}");
             $err = GraphemaHttpErrors::get(404);
             $response->status($err->httpCode());
@@ -360,7 +360,7 @@ class JsonRpcManager implements ProtocolManagerInterface
 
     public function getHttpRpcJsonInfo(Request $request, Response $response): void
     {
-        if ($request->server['request_uri'] !== $this->definition->call . '/info') {
+        if (trim($request->server['request_uri'], '/') !== $this->definition->call . '/info') {
             $err = GraphemaHttpErrors::get(404);
             $response->status($err->httpCode());
             $response->end($err->fromPath($request->server['html_files_path']));
