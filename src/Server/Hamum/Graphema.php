@@ -18,7 +18,7 @@ abstract class Graphema extends Server implements HamumServerInterface
 
     protected array $requestHandlers = [];
 
-    public function __construct(TCPServerConfig $config, public ?LoggerInterface $logger = null)
+    public function __construct(TCPServerConfig $config, public ?LoggerInterface $logger = null, protected readonly string $htmlFilesPath = './public/')
     {
         parent::__construct($config->host, $config->port, $config->mode ?? SWOOLE_BASE, $config->type ?? SWOOLE_SOCK_TCP);
         $sslEnabled = isset($config->ssl) && $config->ssl->enabled;
@@ -71,10 +71,11 @@ abstract class Graphema extends Server implements HamumServerInterface
         $eventHandlers = array_merge($this->getEventActionHandlers('request', $protocolAction), $this->getEventActionHandlers('request', '*'));
         if (empty($eventHandlers)) {
             $err = GraphemaHttpErrors::get(404);
-            $response->status($err->httpCode());
+            $response->status($err->fromPath($this->htmlFilesPath));
             $response->end($err->html());
         } else {
             $request->server['server_id'] = $this->getServerId();
+            $request->server['html_files_path'] = $this->htmlFilesPath;
             foreach ($eventHandlers as $callback) {
                 $callback($request, $response);
             }
