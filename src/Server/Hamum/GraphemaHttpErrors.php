@@ -57,6 +57,31 @@ enum GraphemaHttpErrors
     }
     public function html(): string
     {
-        return "<h1>{$this->httpCode()} {$this->message()}</h1>";
+        return <<<HTML
+ <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Error {$this->httpCode()}</title>
+    </head>
+    <body>
+        <h1>{$this->httpCode()} {$this->message()}</h1>
+        <footer>
+            <p>&copy; Nexus Graphema Server by Tabula 17</p>
+        </footer>
+       </body>
+    </html>
+ HTML;
+    }
+    public function fromPath(string $path = './'): string
+    {
+        $file = $this->httpCode().'.html';
+        if(file_exists($file))
+        {
+            return file_get_contents($file);
+        }
+
+        return $this->html();
     }
 }
