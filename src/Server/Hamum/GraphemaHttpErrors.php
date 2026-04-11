@@ -19,6 +19,7 @@ enum GraphemaHttpErrors
     case BAD_GATEWAY;
     case SERVICE_UNAVAILABLE;
     case GATEWAY_TIMEOUT;
+
     public static function get(int $code): self
     {
         return match ($code) {
@@ -39,6 +40,7 @@ enum GraphemaHttpErrors
             default => self::INTERNAL_SERVER_ERROR,
         };
     }
+
     public function httpCode(): int
     {
         return match ($this) {
@@ -59,6 +61,7 @@ enum GraphemaHttpErrors
             self::GATEWAY_TIMEOUT => 504,
         };
     }
+
     public function message(): string
     {
         return match ($this) {
@@ -79,6 +82,7 @@ enum GraphemaHttpErrors
             self::GATEWAY_TIMEOUT => 'Gateway Timeout',
         };
     }
+
     public function json(): array
     {
         return [
@@ -86,10 +90,12 @@ enum GraphemaHttpErrors
             'message' => $this->message(),
         ];
     }
+
     public function jsonString(): string
     {
         return json_encode($this->json());
     }
+
     public function html(): string
     {
         return <<<HTML
@@ -109,11 +115,11 @@ enum GraphemaHttpErrors
     </html>
  HTML;
     }
+
     public function fromPath(string $path = './'): string
     {
-        $file = $this->httpCode().'.html';
-        if(file_exists($file))
-        {
+        $file = rtrim($path, '/') . '/' . $this->httpCode() . '.html';
+        if (file_exists($file)) {
             return file_get_contents($file);
         }
 
