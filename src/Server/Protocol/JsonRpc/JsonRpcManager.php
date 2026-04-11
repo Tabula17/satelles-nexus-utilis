@@ -114,7 +114,10 @@ class JsonRpcManager implements ProtocolManagerInterface
      */
     public function runOnOpenConnection(...$args): void
     {
-        //       $server->push($request->fd, json_encode($this->getRpcApi()));
+        /** @var HamumServerInterface $server */
+        /** @var Request $request */
+        [$server, $request] = $args;
+        $server->push($request->fd, json_encode($this->getRpcApi($server)));
     }
 
     /**
@@ -320,7 +323,7 @@ class JsonRpcManager implements ProtocolManagerInterface
         $this->rpcRequests->del($requestId);
     }
 
-    public function getRpcApi(): array
+    public function getRpcApi(HamumServerInterface $server): array
     {
 
         return [
@@ -328,7 +331,9 @@ class JsonRpcManager implements ProtocolManagerInterface
             'type' => $this::protocol->shortName(),
             'description' => $this::protocol->value,
             'payloads' => $this->definition->getPayloadModels(),
-            'methods' => array_values($this->definition->getMethods()->getPublicData())
+            'methods' => array_values($this->definition->getMethods()->getPublicData()),
+            'serverId' => $server->getServerId(),
+            'serverTime' => date('Y-m-d H:i:s'),
         ];
     }
 
