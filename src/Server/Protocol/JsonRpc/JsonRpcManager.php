@@ -264,9 +264,7 @@ class JsonRpcManager implements ProtocolManagerInterface
             $response->status(400);
             $response->header('Content-Type', 'application/json');
             $response->end(json_encode($error->response->jsonSerialize()));
-        }
-
-        if (!$this->definition->hasMethod($data['method'])) {
+        } else if (!$this->definition->hasMethod($data['method'])) {
             $error = new ResultResponse(
                 Status::error,
                 [
