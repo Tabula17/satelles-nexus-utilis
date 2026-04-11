@@ -85,7 +85,7 @@ abstract class Graphema extends Server implements HamumServerInterface
         $requestPath = explode('/', explode('?', $request->server['request_uri'])[0]);
         $eventHandlers = [];
         while (count($requestPath) > 0) {
-            $protocolAction = '/' . implode('/', $requestPath);
+            $protocolAction = '/' . trim(implode('/', $requestPath), '/');
             //string $protocolAction,
             $this?->logger?->debug("Handling request event with protocolAction: {$protocolAction}");
             $eventHandlers = array_merge($this->getEventActionHandlers('request', $protocolAction), $this->getEventActionHandlers('request', '*'));
