@@ -165,7 +165,7 @@ class JsonRpcManager implements ProtocolManagerInterface
         $this->rpcProcessors->offsetSet($processorName, $processor);
         $this->logger?->debug('🥌 -> Registering RPC methods for internal RPC processor ' . $processorName);
         //$this->registerRpcMethods($processor->exposeRpcMethods($server));
-        $this->definition->addMethods(...$processor->exposeRpcMethods($server)?->toArray());
+        $this->definition->addMethods(...$processor->exposeRpcMethods($server)?->extractAll());
     }
 
     /**
