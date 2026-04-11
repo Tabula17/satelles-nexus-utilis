@@ -41,7 +41,8 @@
     "ext-swoole": ">=6.1",
     "ext-posix": "*",
     "ext-pdo": "*",
-    "ext-sockets": "*"
+    "ext-sockets": "*",
+    "ext-fileinfo": "*"
   },
   "require-dev": {
     "swoole/ide-helper": "@dev",

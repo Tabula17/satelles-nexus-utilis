@@ -3,6 +3,7 @@
 namespace Tabula17\Satelles\Nexus\Utilis\Server\Hamum;
 
 use Psr\Log\LoggerInterface;
+use Swoole\Coroutine\System;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\Http\Server;
@@ -59,16 +60,44 @@ abstract class Graphema extends Server implements HamumServerInterface
         return defined(static::class . '::CLIENT_INFO_ENABLED') && static::CLIENT_INFO_ENABLED;
     }
 
+    protected function handleHtmlContent(string $filePath, Response $response): void
+    {
+        $filePath = str_replace(array($this->htmlFilesPath, '\\'), array('', '/'), $filePath);
+        $filePath = ltrim($filePath, '/');
+        $filePath = $this->htmlFilesPath . './' . $filePath;
+        if (file_exists($filePath)) {
+            $response->header('Content-Type', mime_content_type($filePath));
+            $response->end(System::readFile($filePath));
+        } else {
+            $err = GraphemaHttpErrors::get(404);
+            $response->status($err->httpCode());
+            $response->end($err->html());
+        }
+    }
+
     public function handleRequestEvent(Request $request, Response $response): void
     {
         $this->logger?->debug("Definition received from {$request->fd}:  " . $request->server['request_uri']);
         $this->logger?->debug("Definition handlers: " . json_encode(array_keys($this->requestHandlers)));
         //$request->rawContent();
         //$data = var_export($request->get, true);
-        $protocolAction = rtrim($request->server['request_uri'], '/');
-        //string $protocolAction,
-        $this?->logger?->debug("Handling request event with protocolAction: {$protocolAction}");
-        $eventHandlers = array_merge($this->getEventActionHandlers('request', $protocolAction), $this->getEventActionHandlers('request', '*'));
+
+        $requestPath = explode('/', explode('?', $request->server['request_uri'])[0]);
+        $eventHandlers = [];
+        while (count($requestPath) > 0) {
+            $protocolAction = '/' . implode('/', $requestPath);
+            //string $protocolAction,
+            $this?->logger?->debug("Handling request event with protocolAction: {$protocolAction}");
+            $eventHandlers = array_merge($this->getEventActionHandlers('request', $protocolAction), $this->getEventActionHandlers('request', '*'));
+            if (!empty($eventHandlers)) {
+                if (file_exists($this->htmlFilesPath . $protocolAction)) {
+                    $this->handleHtmlContent($protocolAction, $response);
+                    return;
+                }
+                break;
+            }
+            array_pop($requestPath);
+        }
         if (empty($eventHandlers)) {
             $err = GraphemaHttpErrors::get(404);
             $response->status($err->httpCode());
