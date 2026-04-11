@@ -26,7 +26,7 @@ class MethodDescriptor extends AbstractDescriptor
     )
     {
 
-        parent::__construct(func_get_args());
+        parent::__construct(get_defined_vars());
     }
 
     protected(set) string $method;
