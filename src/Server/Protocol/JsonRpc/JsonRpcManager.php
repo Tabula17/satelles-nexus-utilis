@@ -349,6 +349,7 @@ class JsonRpcManager implements ProtocolManagerInterface
     }
     public function getRpcAPiHttp(Request $request, Response $response): void
     {
+        var_dump($request);
         $this->logger?->debug("Requesting RPC API for server {$request->server->getServerId()}");
         $response->header('Content-Type', 'application/json');
         $response->end(json_encode($this->getRpcApi($request->server)));
