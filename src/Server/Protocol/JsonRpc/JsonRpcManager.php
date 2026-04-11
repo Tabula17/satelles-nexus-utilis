@@ -117,7 +117,7 @@ class JsonRpcManager implements ProtocolManagerInterface
         /** @var HamumServerInterface $server */
         /** @var Request $request */
         [$server, $request] = $args;
-        $server->push($request->fd, json_encode($this->getRpcApi($server)));
+        $server->push($request->fd, json_encode($this->getRpcApi($server->getServerId())));
     }
 
     /**
@@ -334,7 +334,7 @@ class JsonRpcManager implements ProtocolManagerInterface
         $this->rpcRequests->del($requestId);
     }
 
-    public function getRpcApi(HamumServerInterface $server): array
+    public function getRpcApi(string $serverId): array
     {
 
         return [
@@ -343,17 +343,17 @@ class JsonRpcManager implements ProtocolManagerInterface
             'description' => $this::protocol->value,
             'payloads' => $this->definition->getPayloadModels(),
             'methods' => array_values($this->definition->getMethods()->getPublicData()),
-            'serverId' => $server->getServerId(),
+            'serverId' => $serverId,
             'serverTime' => date('Y-m-d H:i:s'),
         ];
     }
 
     public function getRpcAPiHttp(Request $request, Response $response): void
     {
-        var_dump($request);
-        $this->logger?->debug("Requesting RPC API for server {$request->server->getServerId()}");
+        $serverId = $request->server['server_id']??'';
+        $this->logger?->debug("Requesting RPC API for server {$serverId}");
         $response->header('Content-Type', 'application/json');
-        $response->end(json_encode($this->getRpcApi($request->server)));
+        $response->end(json_encode($this->getRpcApi($serverId)));
     }
 
     public function getProtocol(): ServiceProtocol

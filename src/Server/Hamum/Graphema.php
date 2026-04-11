@@ -74,6 +74,7 @@ abstract class Graphema extends Server implements HamumServerInterface
             $response->status($err->httpCode());
             $response->end($err->html());
         } else {
+            $request->server['server_id'] = $this->getServerId();
             foreach ($eventHandlers as $callback) {
                 $callback($request, $response);
             }
