@@ -2,10 +2,10 @@
 
 namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\JsonRpc;
 
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Data\MethodDescriptor;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\JsonRpc\ResponseDescriptor\JsonRpcResponse;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\JsonRpc\ResponseDescriptor\ResultResponse;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request\Payload;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Rpc\MethodDescriptor;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
 use Throwable;

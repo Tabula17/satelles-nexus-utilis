@@ -1,8 +1,7 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Data;
+namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Rpc;
 
-use JsonSerializable;
 use Tabula17\Satelles\Utilis\Collection\TypedCollection;
 
 class ParamCollection extends TypedCollection

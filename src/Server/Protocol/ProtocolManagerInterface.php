@@ -9,7 +9,7 @@ use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request\Action;
 interface ProtocolManagerInterface
 {
     const ServiceProtocol protocol = ServiceProtocol::UNKNOWN;
-    public Action $request {
+    public Action $definition {
         get;
     }
 /*    public Type $responses {

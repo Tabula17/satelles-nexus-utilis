@@ -2,11 +2,10 @@
 
 namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\JsonRpc;
 
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Data\MethodDescriptor;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Data\MethodsCollection;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request\Action;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request\Payload;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\Base;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Rpc\MethodDescriptor;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Rpc\MethodsCollection;
 
 class Definition extends Action
 {
@@ -46,6 +45,12 @@ class Definition extends Action
             } else {
                 trigger_error("The specified delivery type $deliveryType is not valid for method " . $method->method, E_USER_WARNING);
             }
+        }
+    }
+    public function addMethods(MethodDescriptor ...$methods): void
+    {
+        foreach ($methods as $method) {
+            $this->addMethod($method);
         }
     }
 

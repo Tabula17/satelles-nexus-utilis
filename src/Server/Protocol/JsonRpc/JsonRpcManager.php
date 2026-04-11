@@ -10,6 +10,8 @@ use Swoole\Table;
 use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\JsonRpc\ResponseDescriptor\ResultResponse;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ProtocolManagerInterface;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Rpc\RpcProcessorCollection;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Rpc\RpcProcessorInterface;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ServiceProtocol;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\Base;
@@ -20,11 +22,12 @@ class JsonRpcManager implements ProtocolManagerInterface
 
     const ServiceProtocol protocol = ServiceProtocol::JSONRPC;
 
-    public Definition $request {
+    public Definition $definition {
         get {
-            return $this->request;
+            return $this->definition;
         }
     }
+    //private RpcProcessorCollection $rpcProcessors;
     private Table $rpcRequests;
     private int $tickId;
 
@@ -32,19 +35,20 @@ class JsonRpcManager implements ProtocolManagerInterface
      * @throws UnexpectedValueException
      */
     public function __construct(
-        ?Definition                       $request,
-        private readonly int              $rpcTimeOut = 600,
-        private readonly ?LoggerInterface $logger = null
+        ?Definition                              $request,
+        private readonly ?RpcProcessorCollection $rpcProcessors = new RpcProcessorCollection(),
+        private readonly int                     $rpcTimeOut = 600,
+        private readonly ?LoggerInterface        $logger = null
     )
     {
-        $this->request = $request ?? new Definition([
+        $this->definition = $request ?? new Definition([
             'call' => 'jsonrpc'
         ]);
-        if (!$this->request->hasActionResolver($this->request->call)) {
-            $this->request->addActionResolver($this->request->call, CallMethod::class);
+        if (!$this->definition->hasActionResolver($this->definition->call)) {
+            $this->definition->addActionResolver($this->definition->call, CallMethod::class);
         }
-        if (!$this->request->hasResponseType($this->request->call)) {
-            $this->request->addResponseType($this->request->call, ResultResponse::class);
+        if (!$this->definition->hasResponseType($this->definition->call)) {
+            $this->definition->addResponseType($this->definition->call, ResultResponse::class);
         }
     }
 
@@ -67,6 +71,12 @@ class JsonRpcManager implements ProtocolManagerInterface
         $this->rpcRequests->create();
         if ($server->isCronosEnabled()) {
             $this->tickId = $server->addTick($this->rpcTimeOut, fn() => $this->cleanUpRpcRequests());
+        }
+        /**
+         * @var RpcProcessorInterface $processor
+         */
+        foreach ($this->rpcProcessors as $processor) {
+            $processor->initializeOnStart($server);
         }
     }
 
@@ -91,14 +101,10 @@ class JsonRpcManager implements ProtocolManagerInterface
      */
     public function initializeOnWorkers(HamumServerInterface $server, int $workerId): void
     {
-        // TODO: Implement initializeOnWorkers() method.
-
-        /**
-         * //@var RpcProcessorInterface $processor
-         * foreach ($this->rpcProcessors as $processor) {
-         * $processor->initializeOnWorkers($server, $workerId);
-         * }
-         */
+        /**@var RpcProcessorInterface $processor */
+        foreach ($this->rpcProcessors as $processor) {
+            $processor->initializeOnWorkers($server, $workerId);
+        }
     }
 
     /**
@@ -106,7 +112,7 @@ class JsonRpcManager implements ProtocolManagerInterface
      */
     public function runOnOpenConnection(...$args): void
     {
-        // TODO: Implement runOnOpenConnection() method.
+        //       $server->push($request->fd, json_encode($this->getRpcApi()));
     }
 
     /**
@@ -122,12 +128,39 @@ class JsonRpcManager implements ProtocolManagerInterface
      */
     public function cleanUpResources(HamumServerInterface $server, int $fd = 0): void
     {
-        if (getmypid() === $server->getMasterPid()) {
+        $isMasterProcess = getmypid() === $server->getMasterPid();
+        if ($isMasterProcess) {
             if ($server->isCronosEnabled()) {
                 $server->removeTick($this->tickId);
             }
             $this->rpcRequests->destroy();
         }
+        /**
+         * @var RpcProcessorInterface $processor
+         */
+        foreach ($this->rpcProcessors as $processor) {
+            $this->logger?->debug("Cleaning up resources for RPC processor " . get_class($processor) . " on worker #{$server->worker_id} for FD {$fd}");
+            if ($isMasterProcess) {
+                // Limpieza global (proceso principal)
+                $processor->cleanUpResources($server);
+            } else {
+                // Limpieza específica del worker
+                $processor->cleanUpOnWorkerStop($server, $server->worker_id);
+            }
+        }
+    }
+
+    public function registerRpcProcessor(string $processorName, RpcProcessorInterface $processor, ?HamumServerInterface $server = null): void
+    {
+        if ($this->rpcProcessors->contains($processor)) {
+            $this->logger?->warning('Processor ' . $processorName . ' already registered as internal RPC processor. Skipping...');
+            return;
+        }
+        $this->logger?->debug('🥌 Registering internal RPC processor ' . $processorName);
+        $this->rpcProcessors->offsetSet($processorName, $processor);
+        $this->logger?->debug('🥌 -> Registering RPC methods for internal RPC processor ' . $processorName);
+        //$this->registerRpcMethods($processor->exposeRpcMethods($server));
+        $this->definition->addMethods(...$processor->exposeRpcMethods($server)?->toArray());
     }
 
     /**
@@ -136,20 +169,20 @@ class JsonRpcManager implements ProtocolManagerInterface
     public function registerProtocolHandlers(HamumServerInterface $server): void
     {
         if ($server::TYPE->isWebsocket()) {
-            $server->registerMessageHandlers($this->request->call, $this->handleCalls(...), static::protocol->shortName());
+            $server->registerMessageHandlers($this->definition->call, $this->handleCalls(...), static::protocol->shortName());
         }
         if ($server::TYPE->isHttp()) {
-            $server->registerRequestHandlers($this->request->call, $this->handleRequests(...), static::protocol->shortName());
+            $server->registerRequestHandlers($this->definition->call, $this->handleRequests(...), static::protocol->shortName());
         }
     }
 
     public function handleCalls(HamumServerInterface $server, int $fd, array $data = []): void
     {
         //$resolver = $this->request->resolve($this->request->call, null, $data, $this->request)?->handle($server, $fd);
-        $action = $data['action'] ?? $this->request->call;
+        $action = $data['action'] ?? $this->definition->call;
         $data = $data['payload'] ?? $data;
         $data['action'] = $action;
-        if (!$this->request->hasMethod($data['method'])) {
+        if (!$this->definition->hasMethod($data['method'])) {
             $error = new ResultResponse(
                 Status::error,
                 [
@@ -164,7 +197,7 @@ class JsonRpcManager implements ProtocolManagerInterface
             $server->push($fd, json_encode($error));
         } else {
 
-            $resolver = $this->request->resolve($this->request->call, $this->request->getMethod($data['method'])->handler, $data, $this->request);//?->handle($server, $fd);
+            $resolver = $this->definition->resolve($this->definition->call, $this->definition->getMethod($data['method'])->handler, $data, $this->definition);//?->handle($server, $fd);
             $this->rpcRequests->set($resolver->getID(), [
                 'requestId' => $resolver->getID(),
                 'fd' => $fd,
@@ -216,7 +249,7 @@ class JsonRpcManager implements ProtocolManagerInterface
         $data = $request->post;
         $fd = $request->fd;
 
-        if (!$this->request->hasMethod($data['method'])) {
+        if (!$this->definition->hasMethod($data['method'])) {
             $error = new ResultResponse(
                 Status::error,
                 [
@@ -230,7 +263,7 @@ class JsonRpcManager implements ProtocolManagerInterface
             $response->header('Content-Type', 'application/json');
             $response->end(json_encode($error->response->jsonSerialize()));
         } else {
-            $resolver = $this->request->resolve($this->request->call, $this->request->getMethod($data['method'])->handler, $data, $this->request);//?->handle($server, $fd);
+            $resolver = $this->definition->resolve($this->definition->call, $this->definition->getMethod($data['method'])->handler, $data, $this->definition);//?->handle($server, $fd);
             $this->rpcRequests->set($resolver->getID(), [
                 'requestId' => $resolver->getID(),
                 'fd' => $fd,

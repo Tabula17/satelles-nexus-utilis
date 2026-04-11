@@ -1,9 +1,8 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Data;
+namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Rpc;
 
 use Closure;
-use Swoole\Table;
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
 
 class MethodDescriptor extends AbstractDescriptor

@@ -20,7 +20,7 @@ trait MatrixTrait
         $actions = [];
         /** @var ProtocolManagerInterface $protocolManager */
         foreach ($this->getProtocolManagers() as $protocolManager) {
-            $actions[$protocolManager->request::getProtocolName()] = $protocolManager->request->toArray();
+            $actions[$protocolManager->definition::getProtocolName()] = $protocolManager->definition->toArray();
         }
         return isset($protocol) ? ($actions[$protocol] ?? []) : $actions;
     }
@@ -30,7 +30,7 @@ trait MatrixTrait
         $types = [];
         /** @var ProtocolManagerInterface $protocolManager */
         foreach ($this->getProtocolManagers() as $protocolManager) {
-            $types[$protocolManager->request::getProtocolName()] = $protocolManager->responses->toArray();
+            $types[$protocolManager->definition::getProtocolName()] = $protocolManager->responses->toArray();
         }
         return isset($protocol) ? ($types[$protocol] ?? []) : $types;
     }
@@ -40,11 +40,11 @@ trait MatrixTrait
         $protocols = [];
         /** @var ProtocolManagerInterface $protocolManager */
         foreach ($this->getProtocolManagers() as $protocolManager) {
-            foreach ($protocolManager->request->toArray() as $protocolAction) {
+            foreach ($protocolManager->definition->toArray() as $protocolAction) {
                 if (!isset($protocols[$protocolAction])) {
                     $protocols[$protocolAction] = [];
                 }
-                $protocols[$protocolAction][] = $protocolManager->request::getProtocolName();
+                $protocols[$protocolAction][] = $protocolManager->definition::getProtocolName();
             }
         }
         return isset($action) ? ($protocols[$action] ?? []) : $protocols;
@@ -81,7 +81,7 @@ trait MatrixTrait
 
     public function getRequestProtocol(string $protocol): ?Action
     {
-        return $this->getProtocolManager($protocol)?->request;
+        return $this->getProtocolManager($protocol)?->definition;
     }
 
 /*    public function getResponseTypes(string $protocol): ?Type

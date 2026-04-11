@@ -27,9 +27,9 @@ class PubSubManager implements ProtocolManagerInterface
 
     const ServiceProtocol protocol = ServiceProtocol::PUBSUB;
 
-    public Definition $request {
+    public Definition $definition {
         get {
-            return $this->request;
+            return $this->definition;
         }
     }
     private Table $channels;
@@ -46,7 +46,7 @@ class PubSubManager implements ProtocolManagerInterface
         private readonly ?LoggerInterface $logger = null
     )
     {
-        $this->request = $request ?? new Definition([
+        $this->definition = $request ?? new Definition([
             'publish' => 'publish',
             'subscribe' => 'subscribe',
             'unsubscribe' => 'unsubscribe'
@@ -63,26 +63,26 @@ class PubSubManager implements ProtocolManagerInterface
         if (!$server::TYPE->isWebsocket()) {
             throw new RuntimeException("PubSubManager only works with websockets");
         }
-        if (!$this->request->hasActionResolver('publish')) {
-            $this->request->addActionResolver('publish', Publish::class);
+        if (!$this->definition->hasActionResolver('publish')) {
+            $this->definition->addActionResolver('publish', Publish::class);
         }
-        if (!$this->request->hasActionResolver('subscribe')) {
-            $this->request->addActionResolver('subscribe', Subscribe::class);
+        if (!$this->definition->hasActionResolver('subscribe')) {
+            $this->definition->addActionResolver('subscribe', Subscribe::class);
         }
-        if (!$this->request->hasActionResolver('unsubscribe')) {
-            $this->request->addActionResolver('unsubscribe', Unsubscribe::class);
+        if (!$this->definition->hasActionResolver('unsubscribe')) {
+            $this->definition->addActionResolver('unsubscribe', Unsubscribe::class);
         }
-        if (!$this->request->hasResponseType('publish')) {
-            $this->request->addResponseType('publish', ResponseStatus::class);
+        if (!$this->definition->hasResponseType('publish')) {
+            $this->definition->addResponseType('publish', ResponseStatus::class);
         }
-        if (!$this->request->hasResponseType('subscribe')) {
-            $this->request->addResponseType('subscribe', ResponseStatus::class);
+        if (!$this->definition->hasResponseType('subscribe')) {
+            $this->definition->addResponseType('subscribe', ResponseStatus::class);
         }
-        if (!$this->request->hasResponseType('unsubscribe')) {
-            $this->request->addResponseType('unsubscribe', ResponseStatus::class);
+        if (!$this->definition->hasResponseType('unsubscribe')) {
+            $this->definition->addResponseType('unsubscribe', ResponseStatus::class);
         }
-        if (!$this->request->hasDeliveryType('publish')) {
-            $this->request->addDeliveryType('publish', PublishDelivery::class);
+        if (!$this->definition->hasDeliveryType('publish')) {
+            $this->definition->addDeliveryType('publish', PublishDelivery::class);
         }
 
         $this->autoSubscribeToChannels($server);
@@ -188,16 +188,16 @@ class PubSubManager implements ProtocolManagerInterface
     public function registerProtocolHandlers(HamumServerInterface $server): void
     {
         if ($server::TYPE->isWebsocket()) {
-            $server->registerMessageHandlers($this->request->subscribe, $this->subscribe(...));
-            $server->registerMessageHandlers($this->request->publish, $this->publish(...));
-            $server->registerMessageHandlers($this->request->unsubscribe, $this->unsubscribe(...));
+            $server->registerMessageHandlers($this->definition->subscribe, $this->subscribe(...));
+            $server->registerMessageHandlers($this->definition->publish, $this->publish(...));
+            $server->registerMessageHandlers($this->definition->unsubscribe, $this->unsubscribe(...));
         }
     }
 
     protected function subscribe(Filum $server, int $fd, array $data = []): void
     {
         $output = [
-            'action' => $this->request->subscribe,
+            'action' => $this->definition->subscribe,
             '_metadata' => new Stats(
                 worker_id: $server->worker_id,
                 timestamp: time(),
@@ -206,13 +206,13 @@ class PubSubManager implements ProtocolManagerInterface
                 origin_server: $server->getServerId()
             )
         ];
-        if ($this->request->hasActionResolver($this->request->subscribe)) {
-            if ($this->request->validateMessage($data)) {
+        if ($this->definition->hasActionResolver($this->definition->subscribe)) {
+            if ($this->definition->validateMessage($data)) {
                 if (!is_array($data['payload'])) {
                     $data['payload'] = ['topic' => $data['payload']];
                 }
 
-                $resolver = $this->request->resolve($this->request->subscribe, $this->doSubscription(...), $data, $this->request)->handle($fd);
+                $resolver = $this->definition->resolve($this->definition->subscribe, $this->doSubscription(...), $data, $this->definition)->handle($fd);
                 if (!$resolver->status->isValid()) {
                     $output['error'] = "Subscription for topic '{$data['payload']['topic']}' failed";
                     $this->logger?->error($output['error']);
@@ -222,9 +222,9 @@ class PubSubManager implements ProtocolManagerInterface
                 return;
             }
 
-            $output['error'] = "Message cannot be validated/decoded. Unable to process action '{$this->request->subscribe}'";
+            $output['error'] = "Message cannot be validated/decoded. Unable to process action '{$this->definition->subscribe}'";
         } else {
-            $output['error'] = "Action '{$this->request->subscribe}' not found. Unable to process action.";
+            $output['error'] = "Action '{$this->definition->subscribe}' not found. Unable to process action.";
         }
         $this->logger?->error($output['error']);
         $message = new ResponseStatus(
@@ -276,7 +276,7 @@ class PubSubManager implements ProtocolManagerInterface
     protected function publish(Filum $server, int $fd, array $data = []): void
     {
         $output = [
-            'action' => $this->request->publish,
+            'action' => $this->definition->publish,
             '_metadata' => new Stats(
                 worker_id: $server->worker_id,
                 timestamp: time(),
@@ -285,11 +285,11 @@ class PubSubManager implements ProtocolManagerInterface
                 origin_server: $server->getServerId()
             )
         ];
-        if ($this->request->hasActionResolver($this->request->publish)) {
-            if ($this->request->validateMessage($data)) {
+        if ($this->definition->hasActionResolver($this->definition->publish)) {
+            if ($this->definition->validateMessage($data)) {
                 $this->addChannel($data['payload']['topic'], null);
 
-                $resolver = $this->request->resolve($this->request->publish, $this->doPublish(...), $data, $this->request)?->handle($server, $fd);
+                $resolver = $this->definition->resolve($this->definition->publish, $this->doPublish(...), $data, $this->definition)?->handle($server, $fd);
                 if (!$resolver->status->isValid()) {
                     $output['error'] = "Publishing to topic '{$data['payload']['topic']}' failed";
                     $this->logger?->error($output['error']);
@@ -299,10 +299,10 @@ class PubSubManager implements ProtocolManagerInterface
                 return;
             }
 
-            $output['error'] = "Message cannot be validated/decoded. Unable to process action '{$this->request->publish}'";
+            $output['error'] = "Message cannot be validated/decoded. Unable to process action '{$this->definition->publish}'";
             $this->logger?->error($data['error']);
         } else {
-            $output['error'] = "Action '{$this->request->publish}' not found. Unable to process action.";
+            $output['error'] = "Action '{$this->definition->publish}' not found. Unable to process action.";
             $this->logger?->error($output['error']);
         }
         $message = new ResponseStatus(
@@ -319,7 +319,7 @@ class PubSubManager implements ProtocolManagerInterface
         $subscribers = $this->getChannelSubscribers($data['payload']['topic'], $server);
         $this->logger?->debug("Publishing to topic '{$data['payload']['topic']}' from FD {$fd}: ".json_encode($data));
         $this->logger?->debug("Subscribers: " . count($subscribers));
-        $deliveryClass = $this->request->getDeliveryType($this->request->publish);
+        $deliveryClass = $this->definition->getDeliveryType($this->definition->publish);
 
         $delivery = new $deliveryClass(Status::ok, [
             'topic' => $data['payload']['topic'],
@@ -343,7 +343,7 @@ class PubSubManager implements ProtocolManagerInterface
     protected function unsubscribe(Filum $server, int $fd, array $data = []): void
     {
         $output = [
-            'action' => $this->request->unsubscribe,
+            'action' => $this->definition->unsubscribe,
             '_metadata' => new Stats(
                 worker_id: $server->worker_id,
                 timestamp: time(),
@@ -352,9 +352,9 @@ class PubSubManager implements ProtocolManagerInterface
                 origin_server: $server->getServerId()
             )
         ];
-        if ($this->request->hasActionResolver($this->request->unsubscribe)) {
-            if ($this->request->validateMessage($data)) {
-                $resolver = $this->request->resolve($this->request->unsubscribe, $this->doUnsubscribe(...), $data, $this->request)?->handle($fd);
+        if ($this->definition->hasActionResolver($this->definition->unsubscribe)) {
+            if ($this->definition->validateMessage($data)) {
+                $resolver = $this->definition->resolve($this->definition->unsubscribe, $this->doUnsubscribe(...), $data, $this->definition)?->handle($fd);
                 if (!$resolver->status->isValid()) {
                     $output['error'] = "Unsubscription from topic '{$data['payload']['name']}' failed";
                     $this->logger?->error($output['error']);
@@ -364,10 +364,10 @@ class PubSubManager implements ProtocolManagerInterface
                 return;
             }
 
-            $output['error'] = "Message cannot be validated/decoded. Unable to process action '{$this->request->unsubscribe}'";
+            $output['error'] = "Message cannot be validated/decoded. Unable to process action '{$this->definition->unsubscribe}'";
             $this->logger?->error($data['error']);
         } else {
-            $output['error'] = "Action '{$this->request->unsubscribe}' not found. Unable to process action.";
+            $output['error'] = "Action '{$this->definition->unsubscribe}' not found. Unable to process action.";
             $this->logger?->error($output['error']);
         }
         $message = new ResponseStatus(
