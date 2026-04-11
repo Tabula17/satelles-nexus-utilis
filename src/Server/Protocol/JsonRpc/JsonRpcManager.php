@@ -253,6 +253,18 @@ class JsonRpcManager implements ProtocolManagerInterface
     {
         $data = $request->post;
         $fd = $request->fd;
+        if (!$data) {
+            $error = new ResultResponse(
+                Status::rejected,
+                [
+                    'code' => -32600,
+                    'message' => 'Invalid request'
+                ]
+            );
+            $response->status(400);
+            $response->header('Content-Type', 'application/json');
+            $response->end(json_encode($error->response->jsonSerialize()));
+        }
 
         if (!$this->definition->hasMethod($data['method'])) {
             $error = new ResultResponse(
