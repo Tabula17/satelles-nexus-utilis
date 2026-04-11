@@ -26,4 +26,18 @@ class ParamDescriptor extends AbstractDescriptor
             $this->value = $value;
         }
     }
+
+    public function getPublicData(): array
+    {
+
+        $values = $this->toArray();
+        unset($values['injected']);
+        if (isset($values['value'])) {
+            unset($values['value']);
+        }
+        if (isset($values['validation'])) {
+            unset($values['validation']);
+        }
+        return $values;
+    }
 }

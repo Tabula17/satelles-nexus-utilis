@@ -7,6 +7,27 @@ use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
 
 class MethodDescriptor extends AbstractDescriptor
 {
+    public function __construct(
+        string                $method,
+        array|Closure         $handler,
+        string                $description = 'RPC Method',
+        ParamCollection|array $parameters = [],
+        bool                  $requiresAuth = false,
+        array                 $allowedRoles = ['ws:general'],
+        int                   $timeout = 10,
+        array                 $returns = [],
+        array                 $examples = [],
+        bool                  $deprecated = false,
+        string                $since = '0.0.1',
+        string                $version = '1.0.0',
+        ?string               $responseClass = null,
+        bool                  $onlyInternal = false,
+        bool                  $coroutine = true,
+    )
+    {
+
+        parent::__construct(func_get_args());
+    }
 
     protected(set) string $method;
     protected(set) Closure $handler {
@@ -50,19 +71,22 @@ class MethodDescriptor extends AbstractDescriptor
                 }
             }
         }
+    protected(set) string $version = '1.0.0';
+    protected(set) ?string $responseClass;
 
     public function getRequiredParams(): array
     {
         return $this->parameters->filter(fn($param) => $param->required)->toArray();
     }
+
     public function getPublicData(): array
     {
         if ($this->onlyInternal) {
             return [];
         }
         $values = $this->toArray();
-        unset($values['handler']);
-        $values['parameters'] = $this->parameters?->filter(fn($val) => !$val->injected)?->toArray() ?? [];
+        unset($values['handler'], $values['responseClass'], $values['onlyInternal'], $values['coroutine']);
+        $values['parameters'] = $this->parameters?->getPublics()?->getPublicData() ?? [];
 
         return $values;
     }

@@ -19,7 +19,7 @@ class CallMethod extends Payload
         }
         set(array|MethodDescriptor $payload) {
             if (is_array($payload)) {
-                $payload = new MethodDescriptor($payload);
+                $payload = new MethodDescriptor(...$payload);
             }
             $this->payload = $payload;
 

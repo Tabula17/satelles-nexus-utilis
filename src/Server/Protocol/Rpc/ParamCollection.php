@@ -25,6 +25,10 @@ class ParamCollection extends TypedCollection
     {
         return $this->filter(fn(ParamDescriptor $param) => $param->injected);
     }
+    public function getPublics(): self
+    {
+        return $this->filter(fn(ParamDescriptor $param) => !$param->injected);
+    }
     public function collect(string $property): array
     {
         //return array_map(static fn(ParamDescriptor $param) => $param->$property, $this->values);
@@ -42,5 +46,13 @@ class ParamCollection extends TypedCollection
             $params[$param->name] = $param->value;
         }
         return $params;
+    }
+    public function getPublicData(): array
+    {
+        $data =[];
+        foreach ($this->values as $param) {
+            $data[$param->name] = $param->getPublicData();
+        }
+        return $data;
     }
 }
