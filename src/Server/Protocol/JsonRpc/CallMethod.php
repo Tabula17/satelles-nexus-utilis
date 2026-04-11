@@ -156,4 +156,14 @@ class CallMethod extends Payload
     {
         return isset($data['method'], $data['jsonrpc']) && $data['jsonrpc'] === '2.0';
     }
+
+    /**
+     * Retrieves the model data from the parent, filtering out unwanted keys.
+     * @return array The filtered model data.
+     */
+    public static function getModel(): array
+    {
+        $data = parent::getModel();
+        return array_filter($data, static fn($value) => !in_array($value, ['protocol', 'status', 'resolver']), ARRAY_FILTER_USE_KEY);
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\JsonRpc;
 
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\JsonRpc\ResponseDescriptor\JsonRpcResponse;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request\Action;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\Base;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Rpc\MethodDescriptor;
@@ -47,6 +48,7 @@ class Definition extends Action
             }
         }
     }
+
     public function addMethods(MethodDescriptor ...$methods): void
     {
         foreach ($methods as $method) {
@@ -63,8 +65,31 @@ class Definition extends Action
     {
         return $this->methods->offsetGet($method);
     }
+
     public function getMethods(): MethodsCollection
     {
         return $this->methods;
+    }
+
+    public function getPayloadModels(): array
+    {
+        $models = [
+            'request' => [
+                'id' => 'string|int|null',
+                'method' => 'string',
+                'params' => 'array',
+                'jsonrpc' => 'string[2.0]'
+            ],
+            'response' => JsonRpcResponse::getModel()
+        ];
+        foreach ($this->toArray() as $key => $action) {
+            if (!isset($models['results'])) {
+                $models['results'] = [];
+            }
+            if ($this->deliveryTypes->offsetGet($key) !== null) {
+                $models['results'] = $this->deliveryTypes->offsetGet($key)::getModel();
+            }
+        }
+        return $models;
     }
 }
