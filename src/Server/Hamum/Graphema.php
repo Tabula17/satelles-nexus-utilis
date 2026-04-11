@@ -106,6 +106,10 @@ abstract class Graphema extends Server implements HamumServerInterface
             array_pop($requestPath);
         }
         if (empty($eventHandlers)) {
+            if (file_exists($this->makePathFile($request->server['request_uri']))) {
+                $this->handleHtmlContent($request->server['request_uri'], $response);
+                return;
+            }
             $err = GraphemaHttpErrors::get(404);
             $response->status($err->httpCode());
             $response->end($err->fromPath($this->htmlFilesPath));
