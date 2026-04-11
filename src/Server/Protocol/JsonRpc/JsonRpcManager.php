@@ -263,7 +263,7 @@ class JsonRpcManager implements ProtocolManagerInterface
         $this->updateRpcRequest($requestId, 'status', $response->status->value);
         if ($reply) {
             $httpResponse->header('Content-Type', 'application/json');
-            $httpResponse->end(json_encode($response->response->jsonSerialize()));
+            $httpResponse->end(json_encode($response->response));
         }
 
     }

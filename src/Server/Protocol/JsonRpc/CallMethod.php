@@ -113,7 +113,6 @@ class CallMethod extends Payload
             if ($eval instanceof AbstractDescriptor) {
                 $eval = $eval->toArray();
             }
-            var_dump($eval);
             $this->status = Status::fromString($eval['status'] ?? $eval['success'] ?? (!empty($eval) ? 'ok' : 'error'));
 
         } catch (Throwable $exception) {
