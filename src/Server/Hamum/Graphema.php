@@ -36,6 +36,7 @@ abstract class Graphema extends Server implements HamumServerInterface
                 $this->logger->warning("⚠️ No request handlers registered. Please register request handlers using registerRequestHandlers() method before starting the server.");
             }
         }
+
     }
 
     abstract protected function init(): void;
@@ -62,9 +63,7 @@ abstract class Graphema extends Server implements HamumServerInterface
 
     protected function handleHtmlContent(string $filePath, Response $response): void
     {
-        $filePath = str_replace(array($this->htmlFilesPath, '\\'), array('', '/'), $filePath);
-        $filePath = ltrim($filePath, '/');
-        $filePath = $this->htmlFilesPath . './' . $filePath;
+        $filePath = $this->makePathFile($filePath);
         if (file_exists($filePath)) {
             $response->header('Content-Type', mime_content_type($filePath));
             $response->end(System::readFile($filePath));
@@ -73,6 +72,11 @@ abstract class Graphema extends Server implements HamumServerInterface
             $response->status($err->httpCode());
             $response->end($err->html());
         }
+    }
+
+    private function makePathFile(string $file): string
+    {
+        return $this->htmlFilesPath . '/' . ltrim(str_replace(array($this->htmlFilesPath, '\\'), array('', '/'), $file), '/');
     }
 
     public function handleRequestEvent(Request $request, Response $response): void
@@ -90,7 +94,7 @@ abstract class Graphema extends Server implements HamumServerInterface
             $this?->logger?->debug("Handling request event with protocolAction: {$protocolAction}");
             $eventHandlers = array_merge($this->getEventActionHandlers('request', $protocolAction), $this->getEventActionHandlers('request', '*'));
             if (!empty($eventHandlers)) {
-                if (file_exists($this->htmlFilesPath . $protocolAction)) {
+                if (file_exists($this->makePathFile($protocolAction))) {
                     $this->handleHtmlContent($protocolAction, $response);
                     return;
                 }

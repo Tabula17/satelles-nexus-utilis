@@ -4,9 +4,11 @@ namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\JsonRpc;
 
 use Psr\Log\LoggerInterface;
 use Swoole\Coroutine;
+use Swoole\Coroutine\System;
 use Swoole\Http\Response;
 use Swoole\Http\Request;
 use Swoole\Table;
+use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\GraphemaHttpErrors;
 use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\JsonRpc\ResponseDescriptor\ResultResponse;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ProtocolManagerInterface;
@@ -252,6 +254,13 @@ class JsonRpcManager implements ProtocolManagerInterface
 
     public function handleRequests(Request $request, Response $response): void
     {
+        if ($request->server['request_uri'] !== $this->definition->call) {
+            $err = GraphemaHttpErrors::get(404);
+            $response->status($err->httpCode());
+            $response->end($err->fromPath($request->server['html_files_path']));
+            return;
+        }
+
         $data = $request->post;
         $fd = $request->fd;
         if (!$data) {
@@ -347,10 +356,15 @@ class JsonRpcManager implements ProtocolManagerInterface
             'serverTime' => date('Y-m-d H:i:s'),
         ];
     }
-
     public function getHttpRpcJsonInfo(Request $request, Response $response): void
     {
-        $serverId = $request->server['server_id']??'';
+        if ($request->server['request_uri'] !== $this->definition->call) {
+            $err = GraphemaHttpErrors::get(404);
+            $response->status($err->httpCode());
+            $response->end($err->fromPath($request->server['html_files_path']));
+            return;
+        }
+        $serverId = $request->server['server_id'] ?? '';
         $this->logger?->debug("Requesting RPC API for server {$serverId}");
         $response->header('Content-Type', 'application/json');
         $response->end(json_encode($this->getRpcInfo($serverId)));
