@@ -81,8 +81,8 @@ abstract class Graphema extends Server implements HamumServerInterface
 
     public function handleRequestEvent(Request $request, Response $response): void
     {
-        $this->logger?->debug("Definition received from {$request->fd}:  " . $request->server['request_uri']);
-        $this->logger?->debug("Definition handlers: " . json_encode(array_keys($this->requestHandlers)));
+        $this->logger?->debug("🧩 Definition received from {$request->fd}:  " . $request->server['request_uri']);
+        $this->logger?->debug("🧩 Definition handlers: " . json_encode(array_keys($this->requestHandlers)));
         //$request->rawContent();
         //$data = var_export($request->get, true);
 
@@ -91,15 +91,14 @@ abstract class Graphema extends Server implements HamumServerInterface
         while (count($requestPath) > 0) {
             $protocolAction = '/' . trim(implode('/', $requestPath), '/');
             //string $protocolAction,
-            $this?->logger?->debug("Handling request event with protocolAction: {$protocolAction}");
+            $this?->logger?->debug("🧩 Handling request event with protocolAction: {$protocolAction}");
             $eventHandlers = array_merge($this->getEventActionHandlers('request', $protocolAction), $this->getEventActionHandlers('request', '*'));
             if (!empty($eventHandlers)) {
-
                 if ($protocolAction === $request->server['request_uri']) {
+                    $this->logger?->debug("🧩 Request {$request->server['request_uri']} is same as {$protocolAction}. Ending request handling and sending to handler.");
                     break;
                 }
-
-                $this->logger?->debug("Found request handlers for file {$protocolAction} under {$request->server['request_uri']}. Checking if file exists: {$this->makePathFile($protocolAction)}");
+                $this->logger?->debug("🧩 Found request handlers for file {$protocolAction} under {$request->server['request_uri']}. Checking if file exists: {$this->makePathFile($protocolAction)}");
                 if (file_exists($this->makePathFile($protocolAction))) {
                     $this->handleHtmlContent($protocolAction, $response);
                     return;
