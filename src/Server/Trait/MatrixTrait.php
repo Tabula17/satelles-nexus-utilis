@@ -20,7 +20,7 @@ trait MatrixTrait
         $actions = [];
         /** @var ProtocolManagerInterface $protocolManager */
         foreach ($this->getProtocolManagers() as $protocolManager) {
-            $actions[$protocolManager->definition::getProtocolName()] = $protocolManager->definition->toArray();
+            $actions[$protocolManager->getProtocolName()] = $protocolManager->definition->toArray();
         }
         return isset($protocol) ? ($actions[$protocol] ?? []) : $actions;
     }
@@ -30,7 +30,7 @@ trait MatrixTrait
         $types = [];
         /** @var ProtocolManagerInterface $protocolManager */
         foreach ($this->getProtocolManagers() as $protocolManager) {
-            $types[$protocolManager->definition::getProtocolName()] = $protocolManager->responses->toArray();
+            $types[$protocolManager->getProtocolName()] = $protocolManager->responses->toArray();
         }
         return isset($protocol) ? ($types[$protocol] ?? []) : $types;
     }
@@ -44,7 +44,7 @@ trait MatrixTrait
                 if (!isset($protocols[$protocolAction])) {
                     $protocols[$protocolAction] = [];
                 }
-                $protocols[$protocolAction][] = $protocolManager->definition::getProtocolName();
+                $protocols[$protocolAction][] = $protocolManager->getProtocolName();
             }
         }
         return isset($action) ? ($protocols[$action] ?? []) : $protocols;

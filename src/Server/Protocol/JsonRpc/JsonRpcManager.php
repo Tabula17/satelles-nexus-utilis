@@ -30,6 +30,7 @@ class JsonRpcManager implements ProtocolManagerInterface
     //private RpcProcessorCollection $rpcProcessors;
     private Table $rpcRequests;
     private int $tickId;
+    private string $protocolId;
 
     /**
      * @throws UnexpectedValueException
@@ -57,6 +58,7 @@ class JsonRpcManager implements ProtocolManagerInterface
      */
     public function initializeOnStart(HamumServerInterface $server): void
     {
+        $this->protocolId = $this::protocol->shortName() . '::' . $server->getServerId();
         $this->rpcRequests = new Table(2048);
         //Request Table
         $this->rpcRequests->column('requestId', Table::TYPE_STRING, 32);
@@ -316,5 +318,27 @@ class JsonRpcManager implements ProtocolManagerInterface
             Coroutine::cancel($request['coroutineId']);
         }
         $this->rpcRequests->del($requestId);
+    }
+
+    public function getRpcApi(): array
+    {
+
+        return [
+            'protocolId' => $this->protocolId,
+            'type' => $this::protocol->shortName(),
+            'description' => $this::protocol->value,
+            'payloads' => $this->definition->getPayloadModels(),
+            'methods' => array_values($this->definition->getMethods()->getPublicData())
+        ];
+    }
+
+    public function getProtocol(): ServiceProtocol
+    {
+        return $this::protocol;
+    }
+
+    public function getProtocolName(): string
+    {
+        return $this::protocol->shortName();
     }
 }

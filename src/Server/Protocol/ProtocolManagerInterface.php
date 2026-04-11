@@ -71,5 +71,7 @@ interface ProtocolManagerInterface
      * @return void
      */
     public function registerProtocolHandlers(HamumServerInterface $server): void;
+    public function getProtocol(): ServiceProtocol;
+    public function getProtocolName(): string;
 
 }

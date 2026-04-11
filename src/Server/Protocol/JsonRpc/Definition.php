@@ -63,4 +63,8 @@ class Definition extends Action
     {
         return $this->methods->offsetGet($method);
     }
+    public function getMethods(): MethodsCollection
+    {
+        return $this->methods;
+    }
 }

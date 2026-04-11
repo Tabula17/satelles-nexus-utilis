@@ -482,6 +482,15 @@ class PubSubManager implements ProtocolManagerInterface
     {
         $this->channels->del($channel);
     }
+    public function getProtocol(): ServiceProtocol
+    {
+        return $this::protocol;
+    }
+
+    public function getProtocolName(): string
+    {
+        return $this::protocol->shortName();
+    }
     /*
         public function getChannels(int $fd, array $data, ?HamumServerInterface $server): Status
         {
