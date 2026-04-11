@@ -66,7 +66,7 @@ abstract class Graphema extends Server implements HamumServerInterface
         $filePath = $this->makePathFile($filePath);
         if (file_exists($filePath)) {
             $response->header('Content-Type', mime_content_type($filePath));
-            $response->end(System::readFile($filePath));
+            $response->end(file_get_contents($filePath));
         } else {
             $err = GraphemaHttpErrors::get(404);
             $response->status($err->httpCode());
