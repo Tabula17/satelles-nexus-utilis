@@ -69,8 +69,14 @@ abstract class Graphema extends Server implements HamumServerInterface
         //string $protocolAction,
         $this?->logger?->debug("Handling request event with protocolAction: {$protocolAction}");
         $eventHandlers = array_merge($this->getEventActionHandlers('request', $protocolAction), $this->getEventActionHandlers('request', '*'));
-        foreach ($eventHandlers as $callback) {
-            $callback($request, $response);
+        if (empty($eventHandlers)) {
+            $err = GraphemaHttpErrors::get(404);
+            $response->status($err->httpCode());
+            $response->end($err->html());
+        } else {
+            foreach ($eventHandlers as $callback) {
+                $callback($request, $response);
+            }
         }
         /**
          *  //todo: evaluar posibilidades de generar una respuesta final.

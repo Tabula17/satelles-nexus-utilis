@@ -178,7 +178,7 @@ class JsonRpcManager implements ProtocolManagerInterface
         }
         if ($server::TYPE->isHttp()) {
             $server->registerRequestHandlers($this->definition->call, $this->handleRequests(...), static::protocol->shortName());
-            $server->registerRequestHandlers($this->definition->call.'/info', $this->getRpcAPiHttp(...), static::protocol->shortName());
+            $server->registerRequestHandlers($this->definition->call . '/info', $this->getRpcAPiHttp(...), static::protocol->shortName());
         }
     }
 
@@ -262,7 +262,7 @@ class JsonRpcManager implements ProtocolManagerInterface
                     'message' => 'Invalid request'
                 ]
             );
-            $response->status(400);
+            $response->status(Status::rejected->httpCode());
             $response->header('Content-Type', 'application/json');
             $response->end(json_encode($error->response->jsonSerialize()));
         } else if (!$this->definition->hasMethod($data['method'])) {
@@ -347,6 +347,7 @@ class JsonRpcManager implements ProtocolManagerInterface
             'serverTime' => date('Y-m-d H:i:s'),
         ];
     }
+
     public function getRpcAPiHttp(Request $request, Response $response): void
     {
         var_dump($request);
