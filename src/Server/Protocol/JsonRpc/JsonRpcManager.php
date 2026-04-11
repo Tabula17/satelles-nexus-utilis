@@ -178,6 +178,7 @@ class JsonRpcManager implements ProtocolManagerInterface
         }
         if ($server::TYPE->isHttp()) {
             $server->registerRequestHandlers($this->definition->call, $this->handleRequests(...), static::protocol->shortName());
+            $server->registerRequestHandlers($this->definition->call.'/info', $this->getRpcAPiHttp(...), static::protocol->shortName());
         }
     }
 
@@ -345,6 +346,11 @@ class JsonRpcManager implements ProtocolManagerInterface
             'serverId' => $server->getServerId(),
             'serverTime' => date('Y-m-d H:i:s'),
         ];
+    }
+    public function getRpcAPiHttp(Request $request, Response $response): void
+    {
+        $response->header('Content-Type', 'application/json');
+        $response->end(json_encode($this->getRpcApi($request->server)));
     }
 
     public function getProtocol(): ServiceProtocol
