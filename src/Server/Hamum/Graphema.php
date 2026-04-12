@@ -64,10 +64,13 @@ abstract class Graphema extends Server implements HamumServerInterface
     protected function handleHtmlContent(string $filePath, Response $response): void
     {
         $filePath = $this->makePathFile($filePath);
+        $this->logger?->debug("🔖 Getting file: {$filePath}");
         if (file_exists($filePath)) {
+            $this->logger?->debug("🎯 Encontrada! Sending file: {$filePath}");
             $response->header('Content-Type', mime_content_type($filePath));
             $response->end(file_get_contents($filePath));
         } else {
+            $this->logger?->debug("🙅🏼‍♂️ 404 Not Found: {$filePath}");
             $err = GraphemaHttpErrors::get(404);
             $response->status($err->httpCode());
             $response->end($err->html());
