@@ -75,14 +75,15 @@ abstract class Graphema extends Server implements HamumServerInterface
         }
         return false;
     }
+
     protected function handleHtmlContent(string $filePath, Response $response): void
     {
         $filePath = $this->makePathFile($filePath);
         $this->logger?->debug("🔖 Getting file: {$filePath}");
 
-        if(is_dir($filePath)){
+        if (is_dir($filePath)) {
             $indexes = ['index.html', 'index.htm', 'index.php'];
-            while(count($indexes) > 0 && !file_exists($filePath .= '/' . $indexes[0])){
+            while (count($indexes) > 0 && !file_exists($filePath .= '/' . $indexes[0])) {
                 array_shift($indexes);
             }
         }
@@ -95,6 +96,7 @@ abstract class Graphema extends Server implements HamumServerInterface
             $this->sendHttpError($response, GraphemaHttpErrors::NOT_FOUND);
         }
     }
+
     private function makePathFile(string $file): string
     {
         $file = $this->htmlFilesPath . '/' . ltrim(str_replace(array($this->htmlFilesPath, '\\'), array('', '/'), $file), '/');
@@ -128,7 +130,11 @@ abstract class Graphema extends Server implements HamumServerInterface
 
         $request->server['server_id'] = $this->getServerId();
         $request->server['html_files_path'] = $this->htmlFilesPath;
-        $requestPath = explode('/', explode('?', $request->server['request_uri'])[0]);
+        if (strlen($request->server['request_uri']) === 1) {
+            $requestPath = [$request->server['request_uri']];
+        } else {
+            $requestPath = explode('/', explode('?', trim($request->server['request_uri'], '/'))[0]);
+        }
 
         $protocols = [];
         $file = '';
@@ -141,7 +147,7 @@ abstract class Graphema extends Server implements HamumServerInterface
 
         foreach ($protocols as $protocolAction => $file) {
             $this?->logger?->debug("🧩 Handling request event with protocolAction: {$protocolAction}");
-            $eventHandlers = array_merge($this->getRequestHandlers($protocolAction), $this->getRequestHandlers( '*'));
+            $eventHandlers = array_merge($this->getRequestHandlers($protocolAction), $this->getRequestHandlers('*'));
             if (!empty($eventHandlers)) {
                 if ($protocolAction === $request->server['request_uri']) {
                     $this->logger?->debug("🧩 Request {$request->server['request_uri']} is same as {$protocolAction}. Ending request handling and sending to handler.");
