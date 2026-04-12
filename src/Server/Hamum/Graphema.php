@@ -109,11 +109,14 @@ abstract class Graphema extends Server implements HamumServerInterface
                     $this->logger?->debug("🧩 Request {$request->server['request_uri']} is same as {$protocolAction}. Ending request handling and sending to handler.");
                     break;
                 }
-                $this->logger?->debug("🧩 Found request handlers for file {$protocolAction} under {$request->server['request_uri']}. Checking if file exists: {$file}");
+                $path = file_exists($this->makePathFile($file));
+                $this->logger?->debug("🧩 Found request handlers for file {$protocolAction} under {$request->server['request_uri']}. Checking if file exists: {$path}");
+
                 if (file_exists($this->makePathFile($file))) {
                     $this->handleHtmlContent($protocolAction, $response);
                     return;
                 }
+                $this->logger?->debug("🙅🏼‍♂️ Not luck, file not found: {$file}");
             }
         }
         /*
