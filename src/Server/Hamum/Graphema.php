@@ -62,6 +62,19 @@ abstract class Graphema extends Server implements HamumServerInterface
         return defined(static::class . '::CLIENT_INFO_ENABLED') && static::CLIENT_INFO_ENABLED;
     }
 
+    private function searchFileFromRequestUri(string $requestUri): string|false
+    {
+        $requestUri = ltrim($requestUri, '/');
+        $requestPath = explode('/', explode('?', $requestUri)[0]);
+        $file = '';
+        while (count($requestPath) > 0) {
+            $file = rtrim('/' . array_pop($requestPath) . '/' . ltrim($file, '/'), '/');
+            if (file_exists($this->makePathFile($file))) {
+                return $file;
+            }
+        }
+        return false;
+    }
     protected function handleHtmlContent(string $filePath, Response $response): void
     {
         $filePath = $this->makePathFile($filePath);
@@ -99,8 +112,6 @@ abstract class Graphema extends Server implements HamumServerInterface
     {
         $this->logger?->debug("🧩 Definition received from {$request->fd}:  " . $request->server['request_uri']);
         $this->logger?->debug("🧩 Definition handlers: " . json_encode(array_keys($this->requestHandlers)));
-        //$request->rawContent();
-        //$data = var_export($request->get, true);
 
         $request->server['server_id'] = $this->getServerId();
         $request->server['html_files_path'] = $this->htmlFilesPath;
@@ -133,31 +144,11 @@ abstract class Graphema extends Server implements HamumServerInterface
                 $this->logger?->debug("🙅🏼‍♂️ Not luck, file not found: {$file}");
             }
         }
-        /*
-        while (count($requestPath) > 0) {
-            $protocolAction = '/' . trim(implode('/', $requestPath), '/');
-            //string $protocolAction,
-            $this?->logger?->debug("🧩 Handling request event with protocolAction: {$protocolAction}");
-            $eventHandlers = array_merge($this->getEventActionHandlers('request', $protocolAction), $this->getEventActionHandlers('request', '*'));
-            if (!empty($eventHandlers)) {
-                if ($protocolAction === $request->server['request_uri']) {
-                    $this->logger?->debug("🧩 Request {$request->server['request_uri']} is same as {$protocolAction}. Ending request handling and sending to handler.");
-                    break;
-                }
-                $maybeFile = $this->makePathFile(str_replace($protocolAction, '', $request->server['request_uri']));
-                $this->logger?->debug("🧩 Found request handlers for file {$protocolAction} under {$request->server['request_uri']}. Checking if file exists: {$maybeFile}");
-                if (file_exists($maybeFile)) {
-                    $this->handleHtmlContent($protocolAction, $response);
-                    return;
-                }
-                break;
-            }
-            array_pop($requestPath);
-        }*/
         if (empty($eventHandlers)) {
-            $this->logger?->debug("🗃️ Checking if file exists: {$this->makePathFile($request->server['request_uri'])}");
-            if (file_exists($this->makePathFile($request->server['request_uri']))) {
-                $this->handleHtmlContent($request->server['request_uri'], $response);
+            $ifFile = $this->searchFileFromRequestUri($request->server['request_uri']);
+            $this->logger?->debug("🗃️ Checking if file exists: {$this->makePathFile($ifFile)}");
+            if ($ifFile) {
+                $this->handleHtmlContent($ifFile, $response);
                 return;
             }
             $this->sendHttpError($response, GraphemaHttpErrors::NOT_FOUND);
