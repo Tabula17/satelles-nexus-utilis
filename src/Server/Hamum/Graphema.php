@@ -81,7 +81,7 @@ abstract class Graphema extends Server implements HamumServerInterface
             $this->logger?->debug("🙅🏼‍♂️ 404 Not Found: {$filePath}");
             $err = GraphemaHttpErrors::get(404);
             $response->status($err->httpCode());
-            $response->end($err->html());
+            $response->end($err->fromPath($this->htmlFilesPath));
         }
     }
     private function makePathFile(string $file): string
