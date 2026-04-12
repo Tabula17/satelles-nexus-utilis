@@ -108,6 +108,19 @@ abstract class Graphema extends Server implements HamumServerInterface
         $response->end($err->fromPath($this->htmlFilesPath));
     }
 
+    public function staticRequest(string $route, Request $request, Response $response): bool
+    {
+        $path = $request->server['request_uri'] ?? '/';
+        $path = trim($path, '/');
+        $route = trim($route, '/');
+        $routeMatches = $path === $route;
+        if (!$routeMatches) {
+            $this->logger?->debug("Static route fails: $path !== $route");
+            $this->sendHttpError($response);
+        }
+        return $routeMatches;
+    }
+
     public function handleRequestEvent(Request $request, Response $response): void
     {
         $this->logger?->debug("🧩 Definition received from {$request->fd}:  " . $request->server['request_uri']);
