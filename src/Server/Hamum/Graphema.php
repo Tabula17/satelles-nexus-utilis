@@ -66,6 +66,13 @@ abstract class Graphema extends Server implements HamumServerInterface
     {
         $filePath = $this->makePathFile($filePath);
         $this->logger?->debug("🔖 Getting file: {$filePath}");
+
+        if(is_dir($filePath)){
+            $indexes = ['index.html', 'index.htm', 'index.php'];
+            while(!file_exists($filePath .= '/' . $indexes[0]) && count($indexes) > 0){
+                array_shift($indexes);
+            }
+        }
         if (file_exists($filePath)) {
             $this->logger?->debug("🎯 Encontrada! Sending file: {$filePath}");
             $response->header('Content-Type', MimeTypes::fromFile($filePath)->contentType('UTF-8'));
