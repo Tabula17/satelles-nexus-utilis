@@ -130,9 +130,12 @@ abstract class Graphema extends Server implements HamumServerInterface
 
         $request->server['server_id'] = $this->getServerId();
         $request->server['html_files_path'] = $this->htmlFilesPath;
+
         if (strlen($request->server['request_uri']) === 1) {
-            $requestPath = [$request->server['request_uri']];
+            $cleanRequestUri = $request->server['request_uri'];
+            $requestPath = [$cleanRequestUri];
         } else {
+            $cleanRequestUri = rtrim($request->server['request_uri'], '/');
             $requestPath = explode('/', explode('?', trim($request->server['request_uri'], '/'))[0]);
         }
 
@@ -149,12 +152,12 @@ abstract class Graphema extends Server implements HamumServerInterface
             $this?->logger?->debug("🧩 Handling request event with protocolAction: {$protocolAction}");
             $eventHandlers = array_merge($this->getRequestHandlers($protocolAction), $this->getRequestHandlers('*'));
             if (!empty($eventHandlers)) {
-                if ($protocolAction === rtrim($request->server['request_uri'], '/')) {
-                    $this->logger?->debug("🧩 Request {$request->server['request_uri']} is same as {$protocolAction}. Ending request handling and sending to handler.");
+                if ($protocolAction === $cleanRequestUri) {
+                    $this->logger?->debug("🧩 Request {$cleanRequestUri} is same as {$protocolAction}. Ending request handling and sending to handler.");
                     break;
                 }
                 $path = $this->makePathFile($file);
-                $this->logger?->debug("🧩 Checking {$protocolAction} => {$request->server['request_uri']}. Checking if file exists: {$path}");
+                $this->logger?->debug("🧩 Checking {$protocolAction} => {$cleanRequestUri}. Checking if file exists: {$path}");
 
                 if (file_exists($path)) {
                     $this->handleHtmlContent($file, $response);
@@ -164,7 +167,7 @@ abstract class Graphema extends Server implements HamumServerInterface
             }
         }
         if (empty($eventHandlers)) {
-            $ifFile = $this->searchFileFromRequestUri($request->server['request_uri']);
+            $ifFile = $this->searchFileFromRequestUri($cleanRequestUri);
             $this->logger?->debug("🗃️ Checking if file exists: {$this->makePathFile($ifFile)}");
             if ($ifFile) {
                 $this->handleHtmlContent($ifFile, $response);
@@ -172,7 +175,7 @@ abstract class Graphema extends Server implements HamumServerInterface
             }
             $this->sendHttpError($response, GraphemaHttpErrors::NOT_FOUND);
         } else {
-            $this->logger?->debug("🧩 Executing request handlers for {$request->server['request_uri']}");
+            $this->logger?->debug("🧩 Executing request handlers for {$cleanRequestUri}");
             foreach ($eventHandlers as $callback) {
                 $callback($request, $response);
             }
