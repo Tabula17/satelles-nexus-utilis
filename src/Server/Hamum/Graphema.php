@@ -149,7 +149,7 @@ abstract class Graphema extends Server implements HamumServerInterface
             $this?->logger?->debug("🧩 Handling request event with protocolAction: {$protocolAction}");
             $eventHandlers = array_merge($this->getRequestHandlers($protocolAction), $this->getRequestHandlers('*'));
             if (!empty($eventHandlers)) {
-                if ($protocolAction === $request->server['request_uri']) {
+                if ($protocolAction === rtrim($request->server['request_uri'], '/')) {
                     $this->logger?->debug("🧩 Request {$request->server['request_uri']} is same as {$protocolAction}. Ending request handling and sending to handler.");
                     break;
                 }
