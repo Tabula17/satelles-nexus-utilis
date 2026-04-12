@@ -116,7 +116,7 @@ abstract class Graphema extends Server implements HamumServerInterface
                 $this->logger?->debug("🧩 Checking {$protocolAction} => {$request->server['request_uri']}. Checking if file exists: {$path}");
 
                 if (file_exists($path)) {
-                    $this->handleHtmlContent($protocolAction, $response);
+                    $this->handleHtmlContent($file, $response);
                     return;
                 }
                 $this->logger?->debug("🙅🏼‍♂️ Not luck, file not found: {$file}");
