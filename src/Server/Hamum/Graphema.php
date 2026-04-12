@@ -79,9 +79,7 @@ abstract class Graphema extends Server implements HamumServerInterface
             $response->end(file_get_contents($filePath));
         } else {
             $this->logger?->debug("🙅🏼‍♂️ 404 Not Found: {$filePath}");
-            $err = GraphemaHttpErrors::get(404);
-            $response->status($err->httpCode());
-            $response->end($err->fromPath($this->htmlFilesPath));
+            $this->sendHttpError($response, GraphemaHttpErrors::NOT_FOUND);
         }
     }
     private function makePathFile(string $file): string
@@ -89,6 +87,12 @@ abstract class Graphema extends Server implements HamumServerInterface
         $file = $this->htmlFilesPath . '/' . ltrim(str_replace(array($this->htmlFilesPath, '\\'), array('', '/'), $file), '/');
         $this->logger?->debug("looking for file: {$file}");
         return $file;
+    }
+
+    private function sendHttpError(Response $response, GraphemaHttpErrors $err = GraphemaHttpErrors::NOT_FOUND): void
+    {
+        $response->status($err->httpCode());
+        $response->end($err->fromPath($this->htmlFilesPath));
     }
 
     public function handleRequestEvent(Request $request, Response $response): void
@@ -156,9 +160,7 @@ abstract class Graphema extends Server implements HamumServerInterface
                 $this->handleHtmlContent($request->server['request_uri'], $response);
                 return;
             }
-            $err = GraphemaHttpErrors::get(404);
-            $response->status($err->httpCode());
-            $response->end($err->fromPath($this->htmlFilesPath));
+            $this->sendHttpError($response, GraphemaHttpErrors::NOT_FOUND);
         } else {
             $this->logger?->debug("🧩 Executing request handlers for {$request->server['request_uri']}");
             foreach ($eventHandlers as $callback) {
