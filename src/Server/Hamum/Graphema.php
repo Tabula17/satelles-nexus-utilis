@@ -7,6 +7,7 @@ use Swoole\Coroutine\System;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\Http\Server;
+use Tabula17\Satelles\Nexus\Utilis\Server\MimeTypes;
 use Tabula17\Satelles\Nexus\Utilis\Server\Trait\HamumTrait;
 use Tabula17\Satelles\Utilis\Collection\CallableCollection;
 use Tabula17\Satelles\Utilis\Config\TCPServerConfig;
@@ -67,7 +68,7 @@ abstract class Graphema extends Server implements HamumServerInterface
         $this->logger?->debug("🔖 Getting file: {$filePath}");
         if (file_exists($filePath)) {
             $this->logger?->debug("🎯 Encontrada! Sending file: {$filePath}");
-            $response->header('Content-Type', mime_content_type($filePath));
+            $response->header('Content-Type', MimeTypes::fromFile($filePath)->contentType('UTF-8'));
             $response->end(file_get_contents($filePath));
         } else {
             $this->logger?->debug("🙅🏼‍♂️ 404 Not Found: {$filePath}");
@@ -76,7 +77,6 @@ abstract class Graphema extends Server implements HamumServerInterface
             $response->end($err->html());
         }
     }
-
     private function makePathFile(string $file): string
     {
         $file = $this->htmlFilesPath . '/' . ltrim(str_replace(array($this->htmlFilesPath, '\\'), array('', '/'), $file), '/');
