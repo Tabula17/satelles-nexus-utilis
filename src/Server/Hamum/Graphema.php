@@ -91,11 +91,11 @@ abstract class Graphema extends Server implements HamumServerInterface
         $requestPath = explode('/', explode('?', $request->server['request_uri'])[0]);
 
         $protocols=[];
-        $file = '/';
+        $file = '';
         while (count($requestPath) > 0) {
             $action = '/' . trim(implode('/', $requestPath), '/');
             $protocols[$action] = $file;
-            $file.=  array_pop($requestPath);
+            $file.=  '/'.array_pop($requestPath);
         }
         $eventHandlers = [];
 
