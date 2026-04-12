@@ -76,7 +76,9 @@ abstract class Graphema extends Server implements HamumServerInterface
 
     private function makePathFile(string $file): string
     {
-        return $this->htmlFilesPath . '/' . ltrim(str_replace(array($this->htmlFilesPath, '\\'), array('', '/'), $file), '/');
+        $file = $this->htmlFilesPath . '/' . ltrim(str_replace(array($this->htmlFilesPath, '\\'), array('', '/'), $file), '/');
+        $this->logger?->debug("looking for file: {$file}");
+        return $file;
     }
 
     public function handleRequestEvent(Request $request, Response $response): void
