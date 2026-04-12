@@ -10,7 +10,17 @@
     "sockets",
     "networking",
     "async",
-    "event-driven"
+    "event-driven",
+    "swoole",
+    "server",
+    "client",
+    "pooling",
+    "connection",
+    "database",
+    "caching",
+    "logging",
+    "monitoring",
+    "async-io"
   ],
   "authors": [
     {
@@ -52,6 +62,7 @@
   "suggest": {
     "ext-redis": "Redis extension for caching",
     "ext-memcached": "Memcached extension for caching",
-    "monolog/monolog": "Logging"
+    "monolog/monolog": "Logging",
+    "bramus/monolog-colored-line-formatter": "dev-master"
   }
 }

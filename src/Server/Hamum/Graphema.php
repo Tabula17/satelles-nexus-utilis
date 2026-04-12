@@ -117,7 +117,7 @@ abstract class Graphema extends Server implements HamumServerInterface
 
         foreach ($protocols as $protocolAction => $file) {
             $this?->logger?->debug("🧩 Handling request event with protocolAction: {$protocolAction}");
-            $eventHandlers = array_merge($this->getEventActionHandlers('request', $protocolAction), $this->getEventActionHandlers('request', '*'));
+            $eventHandlers = array_merge($this->getRequestHandlers($protocolAction), $this->getRequestHandlers( '*'));
             if (!empty($eventHandlers)) {
                 if ($protocolAction === $request->server['request_uri']) {
                     $this->logger?->debug("🧩 Request {$request->server['request_uri']} is same as {$protocolAction}. Ending request handling and sending to handler.");

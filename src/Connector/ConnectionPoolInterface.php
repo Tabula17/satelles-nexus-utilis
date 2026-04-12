@@ -10,7 +10,7 @@ use Tabula17\Satelles\Nexus\Utilis\Connector\Pool\PoolDescriptor;
 use Tabula17\Satelles\Utilis\Collection\ConnectionCollection;
 use Tabula17\Satelles\Utilis\Config\ConnectionConfig;
 
-interface CoetusNexuumInterface
+interface ConnectionPoolInterface
 {
     public function loadConnection(ConnectionConfig $config, int $poolSize = 3, string $poolClass = ConnectionPool::class): void;
 

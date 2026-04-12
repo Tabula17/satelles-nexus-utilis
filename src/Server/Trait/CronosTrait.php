@@ -35,12 +35,12 @@ trait CronosTrait
         }
         $properties['interval'] = $interval;
         $properties['added'] = microtime(true);
-        $id = Timer::tick($interval, $wrappedCallback, $properties);
-        $this->managedTasks->offsetSet($id, $properties);
+        $properties['id'] = Timer::tick($interval, $wrappedCallback, $properties);
+        $this->managedTasks->offsetSet($properties['id'], $properties);
 
-        $this->logger?->debug("⏱️ Timer agregado: " . $properties['owner'] . " - Intervalo: " . $interval / 1000 . " segundos | ID: " . $id . " | Total timers: " . count($this->managedTasks) . " | Params: " . json_encode($properties) . "");
+        $this->logger?->debug("⏱️ Timer agregado: " . $properties['owner'] . " - Intervalo: " . $interval / 1000 . " segundos | ID: " . $properties['id'] . " | Total timers: " . count($this->managedTasks) . " | Params: " . json_encode($properties) . "");
 
-        return $id;
+        return $properties['id'];
     }
 
     public function removeTick(int $id): bool

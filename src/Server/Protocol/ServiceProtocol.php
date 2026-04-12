@@ -4,6 +4,10 @@ namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol;
 
 enum ServiceProtocol: string
 {
+    /**
+     * Represents the Custom Remote Procedure Call Protocol.
+     * @see https://en.wikipedia.org/wiki/Remote_procedure_call
+     */
     case RPC = 'Custom Remote Procedure Call Protocol';
     /**
      * Represents the Pub/Sub Pattern Protocol.
@@ -18,8 +22,22 @@ enum ServiceProtocol: string
      * { "topic": "topic/channel", "message": "Hello, world!"} // or maybe a json encoded message
      */
     case PUBSUB = 'Pub/Sub Pattern Protocol';
+    /**
+     * Represents the Authentication Protocol (e.g., Basic, Digest, Bearer Token).
+     * @see https://en.wikipedia.org/wiki/Basic_access_authentication
+     * @see https://en.wikipedia.org/wiki/Digest_access_authentication
+     * @see https://en.wikipedia.org/wiki/Bearer_token
+     */
     case AUTH = 'Authentication Protocol (e.g., Basic, Digest, Bearer Token)';
+    /**
+     * Represents the OAuth 2.0 Protocol.
+     * @see https://oauth.net/2/
+     */
     case OAUTH = 'OAuth 2.0 Protocol';
+    /**
+     * Represents the JSON Web Token (JWT) Protocol.
+     * @see https://jwt.io/introduction/
+     */
     case JWT = 'JSON Web Token (JWT)';
     /**
      * Represents the JSON-RPC 2.0 Protocol.
@@ -40,8 +58,27 @@ enum ServiceProtocol: string
      * }
      */
     case JSONRPC = 'JSON-RPC 2.0 Protocol';
+    /**
+     * Represents the ExtJS Direct Protocol.
+     * @see https://docs.sencha.com/extjs/7.0.0/extjs/Ext.direct.RemotingProvider.html
+     * @see https://docs.sencha.com/extjs/7.0.0/extjs/Ext.direct.RemotingEvent.html
+     * @see https://docs.sencha.com/extjs/7.0.0/extjs/Ext.direct.RemotingMethod.html
+     * @see https://docs.sencha.com/extjs/7.0.0/extjs/Ext.direct.Transaction.html
+     * @see https://docs.sencha.com/extjs/7.0.0/extjs/Ext.direct.Event.html
+     * @see https://docs.sencha.com/extjs/7.0.0/extjs/Ext.direct.Provider.html
+     * @see https://docs.sencha.com/extjs/7.0.0/extjs/Ext.direct.Manager.html
+     *
+     */
     case EXTDIRECT = 'ExtJS Direct Protocol';
+    /**
+     * Represents the Web Application Messaging Protocol.
+     * @see https://wamp-proto.org/
+     */
     case WAMP = 'Web Application Messaging Protocol';
+    /**
+     * Represents the Web Application Messaging Protocol 2.0.
+     * @see https://wamp-proto.org/
+     */
     case WAMP2 = 'Web Application Messaging Protocol 2.0';
     /**
      * Represents the Definition-Response Pattern.
@@ -52,19 +89,40 @@ enum ServiceProtocol: string
      * @see https://en.wikipedia.org/wiki/Client%E2%80%93server_model
      */
     case REQRES = 'Definition-Response Pattern';
+    /**
+     * Represents a generic or custom protocol.
+     */
     case GENERIC = 'Generic/other Protocol: unspecified or custom';
+    /**
+     * Represents an unknown or unsupported protocol.
+     */
     case UNKNOWN = 'Unknown Protocol';
 
+    /**
+     * Determines if the current instance is recognized by checking that it is neither UNKNOWN nor GENERIC.
+     *
+     * @return bool True if the instance is recognized, false otherwise.
+     */
     public function isRecognized(): bool
     {
         return $this !== self::UNKNOWN && $this !== self::GENERIC;
     }
 
+    /**
+     * Determines if the current instance is an Auth protocol.
+     *
+     * @return bool True if the instance represents an Auth protocol, false otherwise.
+     */
     public function isAuth(): bool
     {
         return $this === self::AUTH || $this === self::OAUTH || $this === self::JWT;
     }
 
+    /**
+     * Determines if the current instance is of the PUBSUB type.
+     *
+     * @return bool True if the current instance is PUBSUB; otherwise, false.
+     */
     public function isPubSub(): bool
     {
         return $this === self::PUBSUB;
@@ -93,6 +151,12 @@ enum ServiceProtocol: string
         return match ($this) {
             self::RPC, self::JSONRPC, self::EXTDIRECT, self::AUTH, self::OAUTH, self::JWT => true,
             default => false,
+        };
+    }
+    public function hasHttpResponse(): bool
+    {
+        return match ($this) {
+            self::RPC, self::JSONRPC, self::EXTDIRECT, self::AUTH, self::OAUTH, self::JWT, self::WAMP, self::WAMP2 => true
         };
     }
 
