@@ -89,7 +89,31 @@ abstract class Graphema extends Server implements HamumServerInterface
         $request->server['server_id'] = $this->getServerId();
         $request->server['html_files_path'] = $this->htmlFilesPath;
         $requestPath = explode('/', explode('?', $request->server['request_uri'])[0]);
+
+        $protocols=[];
+        $file = '/';
+        while (count($requestPath) > 0) {
+            $action = '/' . trim(implode('/', $requestPath), '/');
+            $protocols[$action] = $this->makePathFile(str_replace($protocols, '', $file));
+            $file.=  array_pop($requestPath);
+        }
         $eventHandlers = [];
+
+        foreach ($protocols as $protocolAction => $file) {
+            $this?->logger?->debug("🧩 Handling request event with protocolAction: {$protocolAction}");
+            $eventHandlers = array_merge($this->getEventActionHandlers('request', $protocolAction), $this->getEventActionHandlers('request', '*'));
+            if(!empty($eventHandlers)){
+                if ($protocolAction === $request->server['request_uri']) {
+                    $this->logger?->debug("🧩 Request {$request->server['request_uri']} is same as {$protocolAction}. Ending request handling and sending to handler.");
+                    break;
+                }
+                if (file_exists($file)) {
+                    $this->handleHtmlContent($protocolAction, $response);
+                    return;
+                }
+            }
+        }
+        /*
         while (count($requestPath) > 0) {
             $protocolAction = '/' . trim(implode('/', $requestPath), '/');
             //string $protocolAction,
@@ -109,7 +133,7 @@ abstract class Graphema extends Server implements HamumServerInterface
                 break;
             }
             array_pop($requestPath);
-        }
+        }*/
         if (empty($eventHandlers)) {
             $this->logger?->debug("🗃️ Checking if file exists: {$this->makePathFile($request->server['request_uri'])}");
             if (file_exists($this->makePathFile($request->server['request_uri']))) {
