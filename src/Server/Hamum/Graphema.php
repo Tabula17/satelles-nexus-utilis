@@ -89,7 +89,7 @@ abstract class Graphema extends Server implements HamumServerInterface
         return $file;
     }
 
-    private function sendHttpError(Response $response, GraphemaHttpErrors $err = GraphemaHttpErrors::NOT_FOUND): void
+    protected function sendHttpError(Response $response, GraphemaHttpErrors $err = GraphemaHttpErrors::NOT_FOUND): void
     {
         $response->status($err->httpCode());
         $response->end($err->fromPath($this->htmlFilesPath));
