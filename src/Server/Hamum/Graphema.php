@@ -69,7 +69,7 @@ abstract class Graphema extends Server implements HamumServerInterface
 
         if(is_dir($filePath)){
             $indexes = ['index.html', 'index.htm', 'index.php'];
-            while(!file_exists($filePath .= '/' . $indexes[0]) && count($indexes) > 0){
+            while(count($indexes) > 0 && !file_exists($filePath .= '/' . $indexes[0])){
                 array_shift($indexes);
             }
         }
