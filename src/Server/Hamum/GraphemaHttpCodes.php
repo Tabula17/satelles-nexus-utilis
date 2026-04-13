@@ -463,7 +463,7 @@ enum GraphemaHttpCodes
     <h1>{$this->httpCode()}</h1>
     <p>{$this->message()}</p>
     <footer>
-        <p>&copy; Nexus Grapheme Server by Tabula 17</p>
+        <p>&copy; Nexus Graphema Server by Tabula 17</p>
     </footer>
 </body>
 </html>
