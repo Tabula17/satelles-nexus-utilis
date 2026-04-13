@@ -90,6 +90,7 @@ abstract class Graphema extends Server implements HamumServerInterface
         if (file_exists($filePath)) {
             $this->logger?->debug("🎯 Encontrada! Sending file: {$filePath}");
             $response->header('Content-Type', MimeTypes::fromFile($filePath)->contentType('UTF-8'));
+            $response->header('Content-Length', filesize($filePath));
             $response->end(file_get_contents($filePath));
         } else {
             $this->logger?->debug("🙅🏼‍♂️ 404 Not Found: {$filePath}");
@@ -106,8 +107,11 @@ abstract class Graphema extends Server implements HamumServerInterface
 
     protected function sendHttpError(Response $response, GraphemaHttpCodes $err = GraphemaHttpCodes::NOT_FOUND): void
     {
+        $response->header('Content-Type', 'text/html; charset=utf-8');
+        $content = $err->fromPath($this->htmlFilesPath);
+        $response->header('Content-Length', strlen($content));
         $response->status($err->httpCode());
-        $response->end($err->fromPath($this->htmlFilesPath));
+        $response->end($content);
     }
 
     public function staticRequest(string $route, Request $request, Response $response): bool
