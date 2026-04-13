@@ -93,7 +93,7 @@ abstract class Graphema extends Server implements HamumServerInterface
             $response->end(file_get_contents($filePath));
         } else {
             $this->logger?->debug("🙅🏼‍♂️ 404 Not Found: {$filePath}");
-            $this->sendHttpError($response, GraphemaHttpErrors::NOT_FOUND);
+            $this->sendHttpError($response, GraphemaHttpCodes::NOT_FOUND);
         }
     }
 
@@ -104,7 +104,7 @@ abstract class Graphema extends Server implements HamumServerInterface
         return $file;
     }
 
-    protected function sendHttpError(Response $response, GraphemaHttpErrors $err = GraphemaHttpErrors::NOT_FOUND): void
+    protected function sendHttpError(Response $response, GraphemaHttpCodes $err = GraphemaHttpCodes::NOT_FOUND): void
     {
         $response->status($err->httpCode());
         $response->end($err->fromPath($this->htmlFilesPath));
@@ -173,7 +173,7 @@ abstract class Graphema extends Server implements HamumServerInterface
                 $this->handleHtmlContent($ifFile, $response);
                 return;
             }
-            $this->sendHttpError($response, GraphemaHttpErrors::NOT_FOUND);
+            $this->sendHttpError($response, GraphemaHttpCodes::NOT_FOUND);
         } else {
             $this->logger?->debug("🧩 Executing request handlers for {$cleanRequestUri}");
             foreach ($eventHandlers as $callback) {

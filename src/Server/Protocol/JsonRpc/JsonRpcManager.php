@@ -8,7 +8,7 @@ use Swoole\Coroutine\System;
 use Swoole\Http\Response;
 use Swoole\Http\Request;
 use Swoole\Table;
-use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\GraphemaHttpErrors;
+use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\GraphemaHttpCodes;
 use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\JsonRpc\ResponseDescriptor\ResultResponse;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ProtocolManagerInterface;
@@ -256,7 +256,7 @@ class JsonRpcManager implements ProtocolManagerInterface
     {
         if (trim($request->server['request_uri'], '/') !== $this->definition->call) {
             $this->logger?->debug("Requesting RPC API for {$request->server['request_uri']} is different from {$this->definition->call}");
-            $err = GraphemaHttpErrors::NOT_FOUND;
+            $err = GraphemaHttpCodes::NOT_FOUND;
             $response->status($err->httpCode());
             $response->end($err->fromPath($request->server['html_files_path']));
             return;
@@ -264,7 +264,7 @@ class JsonRpcManager implements ProtocolManagerInterface
 
         if($request->getMethod()!=='POST') {
             $this->logger?->debug("Bad request method {$request->getMethod()} for {$request->server['request_uri']}");
-            $err = GraphemaHttpErrors::BAD_REQUEST;
+            $err = GraphemaHttpCodes::BAD_REQUEST;
             $response->status($err->httpCode());
             $response->end($err->fromPath($request->server['html_files_path']));
             return;
@@ -368,7 +368,7 @@ class JsonRpcManager implements ProtocolManagerInterface
     public function getHttpRpcJsonInfo(Request $request, Response $response): void
     {
         if (trim($request->server['request_uri'], '/') !== $this->definition->call . '/info') {
-            $err = GraphemaHttpErrors::NOT_FOUND;
+            $err = GraphemaHttpCodes::NOT_FOUND;
             $response->status($err->httpCode());
             $response->end($err->fromPath($request->server['html_files_path']));
             return;
