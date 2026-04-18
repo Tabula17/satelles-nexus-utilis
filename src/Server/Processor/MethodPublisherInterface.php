@@ -1,6 +1,6 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Rpc;
+namespace Tabula17\Satelles\Nexus\Utilis\Server\Processor;
 
 use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
 

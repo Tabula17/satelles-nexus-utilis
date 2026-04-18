@@ -1,6 +1,6 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\JsonRpc\ResponseDescriptor;
+namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\JsonRpc\ResponseDescriptor;
 
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\Base;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;

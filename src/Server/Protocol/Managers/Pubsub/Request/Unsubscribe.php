@@ -1,9 +1,8 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\Request;
+namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\Pubsub\Request;
 
 use Tabula17\Satelles\Nexus\Utilis\Exception\RuntimeException;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\Definition;
 
 class Unsubscribe extends Subscribe
 {/*

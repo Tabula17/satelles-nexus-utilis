@@ -1,6 +1,6 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub;
+namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\Pubsub;
 
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request\Action;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ServiceProtocol;

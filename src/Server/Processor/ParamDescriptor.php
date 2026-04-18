@@ -1,6 +1,6 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Rpc;
+namespace Tabula17\Satelles\Nexus\Utilis\Server\Processor;
 
 use Closure;
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;

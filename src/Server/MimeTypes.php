@@ -2,7 +2,10 @@
 
 namespace Tabula17\Satelles\Nexus\Utilis\Server;
 
-enum MimeTypes
+use JsonSerializable;
+use Tabula17\Satelles\Utilis\Interface\EnumMethodsInterface;
+
+enum MimeTypes implements EnumMethodsInterface, JsonSerializable
 {
     case HTML;
     case CSS;
@@ -97,5 +100,20 @@ enum MimeTypes
     public static function fromFile(string $file): self
     {
         return MimeTypeDefinitions::fromFile($file);
+    }
+
+    public static function fromValue(mixed $value): ?static
+    {
+        return MimeTypeDefinitions::fromExtension($value);
+    }
+
+    public static function isValid(mixed $value): bool
+    {
+        return MimeTypeDefinitions::extensionExists($value);
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return [$this->extension() => $this->mime()];
     }
 }

@@ -15,7 +15,10 @@ final class MimeTypeDefinitions
     {
         return self::definitions()[$type->name]['extension'] ?? 'bin';
     }
-
+    public static function extensionExists(string $extension): bool
+    {
+        return isset(self::extensionLookup()[$extension]);
+    }
     public static function fromExtension(string $extension): MimeTypes
     {
         $extension = strtolower(ltrim($extension, '.'));

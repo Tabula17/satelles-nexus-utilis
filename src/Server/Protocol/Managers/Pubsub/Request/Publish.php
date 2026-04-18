@@ -1,67 +1,82 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\Request;
+namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\Pubsub\Request;
 
 use Tabula17\Satelles\Nexus\Utilis\Exception\RuntimeException;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\Definition;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\Pubsub\Definition;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\Pubsub\PayloadDescriptor\PublishDescriptor;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request\Payload;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Pubsub\PayloadDescriptor\TopicDescriptor;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\Base;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
+use Tabula17\Satelles\Utilis\Exception\UnexpectedValueException;
 
-class Subscribe extends Payload
+class Publish extends Payload
 {
 
     protected null|string $idProperty {
         get {
-            return 'payloadId';
+            return
+                'payloadId';
         }
     }
     protected(set) string $payloadId;
+
     protected(set) Definition $protocol {
         get {
             return $this->protocol;
         }
+        /**
+         * @throws UnexpectedValueException
+         */
         set(array|Definition $protocol) => $this->protocol = $protocol instanceof Definition ? $protocol : new Definition($protocol);
     }
-    protected(set) TopicDescriptor $payload
+    protected(set) PublishDescriptor $payload
         {
             get {
                 return $this->payload;
             }
-            set(array|TopicDescriptor $payload) {
+            set(array|PublishDescriptor $payload) {
                 if (is_array($payload)) {
-                    $payload = new TopicDescriptor($payload);
+                    $payload = new PublishDescriptor($payload);
                 }
                 $this->payload = $payload;
             }
         }
 
     /*
-        public function __construct(string $topic, callable|string $resolver, Definition $protocol)
+        public function __construct(string $topic, array|string $message, callable|string $resolver, Definition $protocol)
         {
             parent::__construct(resolver: $resolver, protocol: $protocol);
             $values = [
-                'action' => $protocol->subscribe,
+                'action' => $protocol->publish,
                 'payload' => [
-                    'topic' => $topic
+                    'topic' => $topic,
+                    'message' => $this->formatMessage($message)
                 ]
             ];
             $this->loadProperties($values);
         }*/
-
     public function initialize(?array &$values): void
     {
         if (!isset($values['payload']) || !static::validatePayload($values['payload'])) {
-            throw new RuntimeException('Invalid payload for subscribe request: ' . json_encode($values['payload'] ?? null) . '. Expected format: {"topic": "string"}');
+            throw new RuntimeException('Invalid payload for publish request: ' . json_encode($values['payload'] ?? null) . '. Expected format: {"topic": "string", "message": "string|array"}');
         }
-        $values['action'] = $this->protocol->subscribe;
+        $values['payload']['message'] = $this->formatMessage($values['payload']['message']);
+        $values['action'] = $this->protocol->publish;
 
+    }
+
+    protected function formatMessage(array|string $message): array
+    {
+        if (is_string($message)) {
+            $message = json_validate($message) ? json_decode($message, true) : ['message' => $message];
+        }
+        return $message;
     }
 
     public function datasetInResponse(): bool
     {
-        // When subscribe to a topic we don't expect a result, only a confirmation of success or failure,
+        // When publish a request we don't expect a result, only a confirmation of success or failure,
         // so we return false to indicate that we don't expect a resultset
         return false;
     }
@@ -90,9 +105,14 @@ class Subscribe extends Payload
 
     public static function validatePayload(array $data): bool
     {
-        $keys = ['topic' => true];
+        $keys = ['topic' => true, 'message' => true];
         // Check if the payload has the required fields and that they are of the correct type
-        return !array_diff_key($data, $keys) && !array_diff_key($keys, $data) && is_string($data['topic']) && !empty($data['topic']);
+        // var_dump( !array_diff_key($data, $keys), !array_diff_key($keys, $data), $data);
+        return
+            !array_diff_key($data, $keys) &&
+            !array_diff_key($keys, $data) &&
+            is_string($data['topic']) && !empty($data['topic']) &&
+            (is_array($data['message']) || is_string($data['message']));
 
     }
 
@@ -102,16 +122,17 @@ class Subscribe extends Payload
         if (!$responseClass) {
             throw new \RuntimeException("No response class found for action {$this->action}");
         }
+        //array_unshift($args, $this->toArray());
         $extra = $args[0] ?? [];
-        //var_dump($this->toArray(), $this->getID());
         $extra['payloadId'] = $this->getResponseID();
         return new $responseClass(
             $this->status, $extra
         );
     }
 
-    public function getResult(...$args): Status
+    public function getResult(...$args): mixed
     {
         return $this->status;
     }
+
 }

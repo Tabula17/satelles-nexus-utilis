@@ -1,12 +1,12 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\JsonRpc;
+namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\JsonRpc;
 
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\JsonRpc\ResponseDescriptor\JsonRpcResponse;
+use Tabula17\Satelles\Nexus\Utilis\Server\Processor\MethodDescriptor;
+use Tabula17\Satelles\Nexus\Utilis\Server\Processor\MethodsCollection;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\JsonRpc\ResponseDescriptor\JsonRpcResponse;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request\Action;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\Base;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Rpc\MethodDescriptor;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Rpc\MethodsCollection;
 
 class Definition extends Action
 {

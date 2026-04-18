@@ -1,6 +1,6 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Rpc;
+namespace Tabula17\Satelles\Nexus\Utilis\Server\Processor;
 
 use Closure;
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
@@ -29,7 +29,7 @@ class MethodDescriptor extends AbstractDescriptor
         parent::__construct(get_defined_vars());
     }
 
-    protected(set) string $method;
+    protected(set) readonly string $method;
     protected(set) Closure $handler {
         set(callable|Closure $handler) {
             $this->handler = $handler instanceof Closure ? $handler : $handler(...);
