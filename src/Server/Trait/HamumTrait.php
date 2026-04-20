@@ -524,7 +524,9 @@ trait HamumTrait
         $handlers = array_merge($this->getEventActionHandlers('finish', $protocolAction), $this->getEventActionHandlers('finish', '*'));
         foreach ($handlers as $protocol => $handler) {
             $this?->logger?->debug("Handling finish for action '$protocolAction' [{$protocol}] with data: {$data}");
-            $handler($server, $taskId, $data);
+            if ($handler($server, $taskId, $data) === false) {
+                break;
+            }
         }
     }
 
@@ -563,7 +565,9 @@ trait HamumTrait
 
         foreach ($handlers as $protocol => $handler) {
             $this?->logger?->debug("Handling pipe message for action '$protocolAction' [{$protocol}] with data: {$data}");
-            $handler($server, $srcWorkerId, $data);
+            if ($handler($server, $srcWorkerId, $data) === false) {
+                break;
+            }
         }
     }
 
@@ -580,7 +584,9 @@ trait HamumTrait
         $handlers = $this->getEventActionHandlers('close', null);
         foreach ($handlers as $protocol => $handler) {
             $this?->logger?->debug("Handling close for action[{$protocol}] with fd: {$fd} and reactorId: {$reactorId}");
-            $handler($server, $fd, $reactorId);
+            if ($handler($server, $fd, $reactorId) === false) {
+                break;
+            }
         }
     }
 

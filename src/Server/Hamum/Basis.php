@@ -11,6 +11,7 @@ use Tabula17\Satelles\Utilis\Config\TCPServerConfig;
 abstract class Basis extends Server implements HamumServerInterface
 {
     use HamumTrait;
+
     const HamumTypes TYPE = HamumTypes::TCP;
     private array $connectHandlers = [];
     private array $receiveHandlers = [];
@@ -34,18 +35,22 @@ abstract class Basis extends Server implements HamumServerInterface
     {
         return defined(static::class . '::HAMUM_ENABLED') && static::HAMUM_ENABLED;
     }
+
     public function isCronosEnabled(): bool
     {
         return defined(static::class . '::CRONOS_ENABLED') && static::CRONOS_ENABLED;
     }
+
     public function isProcessSubscriberEnabled(): bool
     {
         return defined(static::class . '::PROCESS_SUBSCRIBER_ENABLED') && static::PROCESS_SUBSCRIBER_ENABLED;
     }
+
     public function isClientInfoEnabled(): bool
     {
         return defined(static::class . '::CLIENT_INFO_ENABLED') && static::CLIENT_INFO_ENABLED;
     }
+
     public function registerReceiveHandlers(string $protocolAction, callable $callback, $protocol = 'generic'): void
     {
         if (!isset($this->receiveHandlers[$protocolAction]) || !($this->receiveHandlers[$protocolAction] instanceof CallableCollection)) {
@@ -79,7 +84,9 @@ abstract class Basis extends Server implements HamumServerInterface
         if ($this->hasReceiveHandlers($protocolAction)) {
             $eventHandlers = array_merge($this->getEventActionHandlers('receive', $protocolAction), $this->getEventActionHandlers('receive', '*'));
             foreach ($eventHandlers as $callback) {
-                $callback($server, $fd, $reactorId, $data);
+                if ($callback($server, $fd, $reactorId, $data) === false) {
+                    break;
+                }
             }
         }
     }
@@ -117,7 +124,9 @@ abstract class Basis extends Server implements HamumServerInterface
         if ($this->hasPacketHandlers($protocolAction)) {
             $eventHandlers = array_merge($this->getEventActionHandlers('packet', $protocolAction), $this->getEventActionHandlers('packet', '*'));
             foreach ($eventHandlers as $callback) {
-                $callback($server, $data, $clientInfo);
+                if ($callback($server, $data, $clientInfo) === false) {
+                    break;
+                }
             }
         }
     }
@@ -153,7 +162,9 @@ abstract class Basis extends Server implements HamumServerInterface
         $this?->logger?->debug("Handling connect event for fd {$fd}");
         $eventHandlers = $this->getEventActionHandlers('connect', null);
         foreach ($eventHandlers as $callback) {
-            $callback($server, $fd, $reactorId);
+            if ($callback($server, $fd, $reactorId) === false) {
+                break;
+            }
         }
     }
 

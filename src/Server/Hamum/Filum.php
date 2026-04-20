@@ -14,6 +14,7 @@ use Tabula17\Satelles\Utilis\Config\TCPServerConfig;
 abstract class Filum extends Server implements HamumServerInterface
 {
     use HamumTrait;
+
     final const HamumTypes TYPE = HamumTypes::WEBSOCKET;
 
     protected array $requestHandlers = [];
@@ -52,18 +53,22 @@ abstract class Filum extends Server implements HamumServerInterface
     {
         return defined(static::class . '::HAMUM_ENABLED') && static::HAMUM_ENABLED;
     }
+
     public function isCronosEnabled(): bool
     {
         return defined(static::class . '::CRONOS_ENABLED') && static::CRONOS_ENABLED;
     }
+
     public function isProcessSubscriberEnabled(): bool
     {
         return defined(static::class . '::PROCESS_SUBSCRIBER_ENABLED') && static::PROCESS_SUBSCRIBER_ENABLED;
     }
+
     public function isClientInfoEnabled(): bool
     {
         return defined(static::class . '::CLIENT_INFO_ENABLED') && static::CLIENT_INFO_ENABLED;
     }
+
     abstract protected function init(): void;
 
     public function handleRequestEvent(Request $request, Response $response): void
@@ -71,7 +76,9 @@ abstract class Filum extends Server implements HamumServerInterface
         $this?->logger?->debug("Handling request event with protocolAction: {$request->server['request_uri']}");
         $eventHandlers = array_merge($this->getEventActionHandlers('request', $request->server['request_uri']), $this->getEventActionHandlers('request', '*'));
         foreach ($eventHandlers as $callback) {
-            $callback($request, $response);
+            if ($callback($request, $response) === false) {
+                break;
+            }
         }
     }
 
@@ -134,7 +141,9 @@ abstract class Filum extends Server implements HamumServerInterface
         if ($this->hasReceiveHandlers($protocolAction)) {
             $eventHandlers = array_merge($this->getEventActionHandlers('receive', $protocolAction), $this->getEventActionHandlers('receive', '*'));
             foreach ($eventHandlers as $callback) {
-                $callback($server, $fd, $reactorId, $data);
+                if ($callback($server, $fd, $reactorId, $data) === false) {
+                    break;
+                }
             }
         }
     }
@@ -170,7 +179,9 @@ abstract class Filum extends Server implements HamumServerInterface
         $this?->logger?->debug("Handling connect event for fd {$fd}");
         $eventHandlers = $this->getEventActionHandlers('connect', null);
         foreach ($eventHandlers as $callback) {
-            $callback($server, $fd, $reactorId);
+            if ($callback($server, $fd, $reactorId) === false) {
+                break;
+            }
         }
     }
 
@@ -215,7 +226,9 @@ abstract class Filum extends Server implements HamumServerInterface
         $eventHandlers = array_merge($this->getEventActionHandlers('message', $protocolAction), $this->getEventActionHandlers('message', '*'));//$this->getEventActionHandlers('message', '*')
         foreach ($eventHandlers as $protocol => $callback) {
             try {
-                $callback($server, $frame->fd, $data);
+                if ($callback($server, $frame->fd, $data) === false) {
+                    break;
+                }
             } catch (\Throwable $e) {
                 $this?->logger?->error("Error handling message event for protocol {$protocol} with action: {$protocolAction}: {$e->getMessage()}");
                 $this?->logger?->debug($e->getTraceAsString());
@@ -254,7 +267,9 @@ abstract class Filum extends Server implements HamumServerInterface
         $this?->logger?->debug("Handling open event for fd {$fd}");
         $eventHandlers = $this->getEventActionHandlers('open', null);
         foreach ($eventHandlers as $callback) {
-            $callback($server, $fd, $reactorId);
+            if ($callback($server, $fd, $reactorId) === false) {
+                break;
+            }
         }
     }
 
@@ -289,7 +304,9 @@ abstract class Filum extends Server implements HamumServerInterface
         $this?->logger?->debug("Handling disconnect event for fd {$fd}");
         $eventHandlers = $this->getEventActionHandlers('disconnect', null);
         foreach ($eventHandlers as $callback) {
-            $callback($server, $fd, $reactorId);
+            if($callback($server, $fd, $reactorId) === false) {
+                break;
+            }
         }
     }
 

@@ -181,7 +181,9 @@ abstract class Graphema extends Server implements HamumServerInterface
         } else {
             $this->logger?->debug("🧩 Executing request handlers for {$cleanRequestUri}");
             foreach ($eventHandlers as $callback) {
-                $callback($request, $response);
+                if ($callback($request, $response) === false) {
+                    break;
+                }
             }
         }
         /**
