@@ -19,11 +19,11 @@ final class MimeTypeDefinitions
     {
         return isset(self::extensionLookup()[$extension]);
     }
-    public static function fromExtension(string $extension): MimeTypes
+    public static function fromExtension(string $extension): ?MimeTypes
     {
         $extension = strtolower(ltrim($extension, '.'));
 
-        return self::extensionLookup()[$extension] ?? MimeTypes::BIN;
+        return self::extensionLookup()[$extension] /*?? MimeTypes::BIN*/;
     }
 
     public static function fromFile(string $file): MimeTypes
@@ -35,6 +35,16 @@ final class MimeTypeDefinitions
         }
 
         return self::fromExtension($extension);
+    }
+
+    public static function fromMime(string $value): ?MimeTypes
+    {
+        foreach (self::definitions() as $name => $definition) {
+            if ($definition['mime'] === $value) {
+                return constant(MimeTypes::class . '::' . $name);
+            }
+        }
+        return null;
     }
 
     public static function isTextBased(MimeTypes $type): bool

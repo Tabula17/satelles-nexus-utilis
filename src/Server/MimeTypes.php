@@ -94,7 +94,7 @@ enum MimeTypes implements EnumMethodsInterface, JsonSerializable
 
     public static function fromExtension(string $extension): self
     {
-        return MimeTypeDefinitions::fromExtension($extension);
+        return MimeTypeDefinitions::fromExtension($extension) ?? self::BIN;
     }
 
     public static function fromFile(string $file): self
@@ -102,9 +102,19 @@ enum MimeTypes implements EnumMethodsInterface, JsonSerializable
         return MimeTypeDefinitions::fromFile($file);
     }
 
-    public static function fromValue(mixed $value): ?static
+    public static function fromValue(mixed $value): self
     {
-        return MimeTypeDefinitions::fromExtension($value);
+        return MimeTypeDefinitions::fromExtension($value) ?? self::BIN;
+    }
+
+    public static function fromMime(mixed $value): self
+    {
+        return MimeTypeDefinitions::fromMime($value) ?? self::BIN;
+    }
+
+    public static function tryFrom(mixed $value): self
+    {
+        return MimeTypeDefinitions::fromExtension($value) ?? MimeTypeDefinitions::fromMime($value) ?? MimeTypeDefinitions::fromFile($value) ?? self::BIN;
     }
 
     public static function isValid(mixed $value): bool
