@@ -12,14 +12,14 @@ use Tabula17\Satelles\Utilis\Config\TCPServerConfig;
 
 class BasisFileClientTcp extends Client
 {
-    private const int CHUNK_SIZE = 1048576; // 1MB
+    protected const int CHUNK_SIZE = 1048576; // 1MB
 
     // Constantes para el protocolo de framing
-    private const int FRAME_TYPE_DATA = 0x01;
-    private const int FRAME_TYPE_PROGRESS = 0x02;
-    private const int FRAME_TYPE_ERROR = 0x03;
-    private const int FRAME_TYPE_HEADER = 0x04;
-    private const int FRAME_TYPE_END = 0x05;
+    protected const int FRAME_TYPE_DATA = 0x01;
+    protected const int FRAME_TYPE_PROGRESS = 0x02;
+    protected const int FRAME_TYPE_ERROR = 0x03;
+    protected const int FRAME_TYPE_HEADER = 0x04;
+    protected const int FRAME_TYPE_END = 0x05;
 
     public function __construct(
         protected TCPServerConfig $serverCfg,
@@ -37,7 +37,7 @@ class BasisFileClientTcp extends Client
      * @return bool True si se envió correctamente
      * @throws RuntimeException
      */
-    private function sendFileWithMetadata(string $filePath, array $metadata): bool
+    protected function sendFileWithMetadata(string $filePath, array $metadata): bool
     {
         if (!file_exists($filePath)) {
             throw new RuntimeException("Archivo no encontrado: {$filePath}");
@@ -99,7 +99,7 @@ class BasisFileClientTcp extends Client
     /**
      * Recibe respuesta y la guarda en memoria
      */
-    private function receiveResponseToMemory(): string
+    protected function receiveResponseToMemory(): string
     {
         $peek = $this->recv(1, MSG_PEEK);
 
@@ -129,7 +129,7 @@ class BasisFileClientTcp extends Client
     /**
      * Recibe un archivo por streaming y lo devuelve como string
      */
-    private function receiveStreamToMemory(): string
+    protected function receiveStreamToMemory(): string
     {
         $header = $this->recvAll(4);
 
@@ -170,7 +170,7 @@ class BasisFileClientTcp extends Client
     /**
      * Recibe la respuesta del servidor (detecta si es JSON o streaming)
      */
-    private function receiveResponse(string $outputPath): bool
+    protected function receiveResponse(string $outputPath): bool
     {
         $peek = $this->recv(1, MSG_PEEK);
 
@@ -200,7 +200,7 @@ class BasisFileClientTcp extends Client
     /**
      * Recibe un archivo por streaming y lo guarda en disco
      */
-    private function receiveStreamToFile(string $outputPath): bool
+    protected function receiveStreamToFile(string $outputPath): bool
     {
         $header = $this->recvAll(4);
 
@@ -256,7 +256,7 @@ class BasisFileClientTcp extends Client
      * @return bool
      * @throws RuntimeException
      */
-    private function receiveResponseWithFraming(string $outputPath, ?callable $onProgress = null): bool
+    protected function receiveResponseWithFraming(string $outputPath, ?callable $onProgress = null): bool
     {
         $handle = fopen($outputPath, 'wb');
 
@@ -344,7 +344,7 @@ class BasisFileClientTcp extends Client
     /**
      * Recibe exactamente N bytes
      */
-    private function recvAll(int $length): string|false
+    protected function recvAll(int $length): string|false
     {
         $data = '';
         $remaining = $length;
@@ -366,7 +366,7 @@ class BasisFileClientTcp extends Client
     /**
      * Recibe una respuesta JSON completa
      */
-    private function receiveJson(): array
+    protected function receiveJson(): array
     {
         $data = <<<'EOF'
 EOF;
@@ -411,7 +411,7 @@ EOF;
     /**
      * Asegura que la conexión está establecida
      */
-    private function ensureConnected(): void
+    protected function ensureConnected(): void
     {
         if (!$this->isConnected()) {
             $connected = $this->connect($this->serverCfg->host, $this->serverCfg->port);
