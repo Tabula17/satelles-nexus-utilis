@@ -55,16 +55,14 @@ class BasisFileClientTcp extends Client
             $metadata['fileName'] = basename($filePath);
             $metadata['fileSize'] = $fileSize;
 
-            $jsonMetadata = json_encode($metadata, JSON_THROW_ON_ERROR);
-            $jsonLength = strlen($jsonMetadata);
 
-            // 1. Enviar longitud del JSON (4 bytes)
-            if (!$this->send(pack('N', $jsonLength))) {
-                throw new RuntimeException('Error al enviar longitud de metadatos');
+            // ✅ NUEVO: Enviar byte marcador de tipo archivo (0x01)
+            if (!$this->send(chr(0x01))) {
+                throw new RuntimeException('Error al enviar marcador de tipo');
             }
 
             // 2. Enviar JSON de metadatos
-            if (!$this->send($jsonMetadata)) {
+            if (!$this->sendJsonMessage($metadata)) {
                 throw new RuntimeException('Error al enviar metadatos');
             }
 
@@ -94,6 +92,21 @@ class BasisFileClientTcp extends Client
         } finally {
             fclose($handle);
         }
+    }
+
+    protected function sendJsonMessage(array $data): bool|int
+    {
+        $this->ensureConnected();
+
+        $jsonMetadata = json_encode($data, JSON_THROW_ON_ERROR);
+        $jsonLength = strlen($jsonMetadata);
+        // 1. Enviar longitud del JSON (4 bytes)
+        if (!$this->send(pack('N', $jsonLength))) {
+            throw new RuntimeException('Error al enviar longitud de metadatos');
+        }
+
+        // Enviar byte marcador de tipo JSON (0x00)
+       return $this->send(chr(0x00) . json_encode($data));
     }
 
     /**
@@ -341,6 +354,7 @@ class BasisFileClientTcp extends Client
             }
         }
     }
+
     /**
      * Recibe exactamente N bytes
      */
