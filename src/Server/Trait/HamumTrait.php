@@ -224,7 +224,7 @@ trait HamumTrait
                 unset($this->hookedEvents['beforestart'][$k]);
             }
         }
-        if ($this->setting['task_worker_num'] > 0 && empty($this->taskHandlers)) {
+        if (($this->setting['task_worker_num'] ?? 0) > 0 && empty($this->taskHandlers)) {
             $this?->logger?->debug('No task handlers found. Registering task event handler.');
             parent::on('task', $this->handleTaskEvent(...));
         }
@@ -307,9 +307,9 @@ trait HamumTrait
         $this->hookedEvents[$event_name][] = $callback;
         $hookedCallback = function (...$args) use ($event_name) {
             $beforeEventName = 'onBefore' . ucfirst($event_name);
-            if(!$this->eventsSupported($beforeEventName) && method_exists($this, $beforeEventName)) {
+            if (!$this->eventsSupported($beforeEventName) && method_exists($this, $beforeEventName)) {
                 $this->logger?->debug("Calling before event handler for event $event_name");
-                if($this->$beforeEventName(...$args) === false) {
+                if ($this->$beforeEventName(...$args) === false) {
                     $this->logger?->debug("Before event handler for event $event_name returned false. Stopping execution.");
                     return;
                 }
