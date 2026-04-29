@@ -67,7 +67,7 @@ abstract class Basis extends Server implements HamumServerInterface
 
     public function hasReceiveHandlers(string $protocolAction): bool
     {
-        return $this->receiveHandlers[$protocolAction]->offsetExists($protocolAction) && $this->receiveHandlers[$protocolAction]->count() > 0;
+        return $this->receiveHandlers[$protocolAction]?->offsetExists($protocolAction) && $this->receiveHandlers[$protocolAction]?->count() > 0;
     }
 
     public function removeReceiveHandlers(string $protocolAction): void
