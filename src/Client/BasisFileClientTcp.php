@@ -57,40 +57,20 @@ class BasisFileClientTcp extends Client
             $jsonMetadata = json_encode($metadata, JSON_THROW_ON_ERROR);
             $jsonLength = strlen($jsonMetadata);
 
-            // ========== DIAGNÓSTICO ==========
-            echo "[CLIENTE DEBUG] JSON length: {$jsonLength}\n";
-            echo "[CLIENTE DEBUG] JSON content: {$jsonMetadata}\n";
-            echo "[CLIENTE DEBUG] File size: {$fileSize}\n";
-            echo "[CLIENTE DEBUG] First 20 bytes of file: " . bin2hex(fread($handle, 20)) . "\n";
-            rewind($handle); // Volver al inicio del archivo
-            // =================================
+            // ========== SOLUCIÓN: Todo el header en UN SOLO send() ==========
+            $header = chr(0x01)                     // Marcador de tipo archivo
+                . pack('N', $jsonLength)        // Longitud del JSON (4 bytes, big-endian)
+                . $jsonMetadata                 // JSON de metadatos
+                . pack('J', $fileSize);         // Tamaño del archivo (8 bytes, big-endian)
 
-            // 1. Enviar byte marcador
-            $marker = chr(0x01);
-            echo "[CLIENTE DEBUG] Enviando marcador: 0x" . bin2hex($marker) . "\n";
-            if (!$this->send($marker)) {
-                throw new RuntimeException('Error al enviar marcador de tipo');
-            }
+            echo "[CLIENTE DEBUG] Header completo: " . strlen($header) . " bytes\n";
+            echo "[CLIENTE DEBUG] Primeros 30 bytes del header: " . bin2hex(substr($header, 0, 30)) . "\n";
 
-            // 2. Enviar longitud del JSON
-            $jsonLenBin = pack('N', $jsonLength);
-            echo "[CLIENTE DEBUG] Enviando JSON length: {$jsonLength} -> 0x" . bin2hex($jsonLenBin) . "\n";
-            if (!$this->send($jsonLenBin)) {
-                throw new RuntimeException('Error al enviar longitud de metadatos');
+            // Enviar TODO el header de UNA SOLA VEZ
+            if (!$this->send($header)) {
+                throw new RuntimeException('Error al enviar header');
             }
-
-            // 3. Enviar JSON
-            echo "[CLIENTE DEBUG] Enviando JSON ({$jsonLength} bytes)\n";
-            if (!$this->send($jsonMetadata)) {
-                throw new RuntimeException('Error al enviar metadatos');
-            }
-
-            // 4. Enviar longitud del archivo
-            $fileSizeBin = pack('J', $fileSize);
-            echo "[CLIENTE DEBUG] Enviando file size: {$fileSize} -> 0x" . bin2hex($fileSizeBin) . "\n";
-            if (!$this->send($fileSizeBin)) {
-                throw new RuntimeException('Error al enviar longitud de archivo');
-            }
+            // ================================================================
 
             // 5. Enviar archivo en chunks
             echo "[CLIENTE DEBUG] Enviando archivo...\n";
