@@ -101,7 +101,7 @@ class BasisFileClientTcp extends Client
      */
     protected function receiveResponseToMemory(): string
     {
-        $peek = $this->recv(1, MSG_PEEK);
+        $peek = $this->recv(1);//, MSG_PEEK);
 
         if ($peek === false || $peek === '') {
             throw new RuntimeException('Conexión cerrada inesperadamente');
@@ -172,7 +172,7 @@ class BasisFileClientTcp extends Client
      */
     protected function receiveResponse(string $outputPath): bool
     {
-        $peek = $this->recv(1, MSG_PEEK);
+        $peek = $this->recv(1);//, MSG_PEEK);
 
         if ($peek === false || $peek === '') {
             throw new RuntimeException('Conexión cerrada inesperadamente');
