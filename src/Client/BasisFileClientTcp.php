@@ -105,15 +105,8 @@ class BasisFileClientTcp extends Client
     {
         $this->ensureConnected();
 
-        $jsonMetadata = json_encode($data, JSON_THROW_ON_ERROR);
-        $jsonLength = strlen($jsonMetadata);
-        // 1. Enviar longitud del JSON (4 bytes)
-        if (!$this->send(pack('N', $jsonLength))) {
-            throw new RuntimeException('Error al enviar longitud de metadatos');
-        }
-
-        // Enviar byte marcador de tipo JSON (0x00)
-       return $this->send(chr(0x00) . json_encode($data));
+        // ✅ Enviar byte marcador de JSON (0x00) + JSON
+        return $this->send(chr(0x00) . json_encode($data));
     }
 
     /**
