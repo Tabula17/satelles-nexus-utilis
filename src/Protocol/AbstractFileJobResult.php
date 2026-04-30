@@ -257,18 +257,7 @@ abstract class AbstractFileJobResult extends AbstractJobResult implements FileJo
 
     public function streamToTcp(Server $server, int $fd, int $chunkSize = 1048576): bool
     {
-        if ($this->isFile()) {
-            return $this->streamFileToTcp($server, $fd, $this->outputPath, $chunkSize);
-        }
-
-        if ($this->isStream()) {
-            return $this->streamBase64ToTcp($server, $fd, $this->base64Content, $chunkSize);
-        }
-
-        // ✅ Enviar error con marcador JSON
-        $errorJson = json_encode(['error' => 'No content available']);
-        $server->send($fd, chr(self::RESPONSE_TYPE_JSON) . $errorJson);
-        return false;
+        return $this->streamToTcpWithProgress($server, $fd, false, $chunkSize);
     }
     public function streamToTcpWithProgress(Server $server, int $fd, bool $sendProgress = true, int $chunkSize = 1048576): bool
     {

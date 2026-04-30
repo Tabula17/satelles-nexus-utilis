@@ -212,7 +212,7 @@ class BasisFileClientTcp extends Client
         }
 
         // Si no es JSON, es streaming de archivo
-        return $this->receiveStreamToFile($outputPath);
+        return $this->receiveResponseWithFraming($outputPath, null);
     }
 
     /**
