@@ -402,7 +402,13 @@ abstract class AbstractFileJobResult extends AbstractJobResult implements FileJo
         $totalSize = strlen($decoded);
 
         // ✅ Enviar: [0x01][4 bytes: tamaño][datos...]
-        $server->send($fd, chr(self::RESPONSE_TYPE_STREAM) . pack('N', $totalSize));
+        //$server->send($fd, chr(self::RESPONSE_TYPE_STREAM) . pack('N', $totalSize));
+
+        $header = chr(0x01) . pack('N', $totalSize);
+        echo "[SERVIDOR] Enviando header: " . bin2hex($header) . "\n";
+        echo "[SERVIDOR] Primer byte (marcador): 0x" . bin2hex(chr(0x01)) . "\n";
+        echo "[SERVIDOR] Tamaño: {$totalSize} -> 0x" . bin2hex(pack('N', $totalSize)) . "\n";
+        $server->send($fd, $header);
 
         $offset = 0;
         $inCoroutine = Coroutine::getCid() > 0;
