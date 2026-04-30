@@ -493,6 +493,10 @@ EOF;
                     sprintf('No se pudo conectar a %s:%s', $this->serverCfg->host, $this->serverCfg->port)
                 );
             }
+            $this->set([
+                'timeout' => 60,       // 60 segundos para recv()
+                'keep_alive' => true,  // Mantener conexión viva
+            ]);
         }
     }
 
