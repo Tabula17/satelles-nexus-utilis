@@ -24,6 +24,7 @@ class BasisFileClientTcp extends Client
     //  Marcadores de tipo de respuesta
     final protected const int RESPONSE_TYPE_JSON = 0x00;
     final protected const int RESPONSE_TYPE_STREAM = 0x01;
+    private string $readBuffer = '';
     public function __construct(
         protected TCPServerConfig $serverCfg,
         int                       $sockType = SOCK_STREAM
@@ -144,7 +145,7 @@ class BasisFileClientTcp extends Client
      */
     protected function receiveStreamToMemory(): string
     {
-        $header = $this->recvAll(4);
+        $header = $this->recvExact(4);
 
         if ($header === false || strlen($header) < 4) {
             throw new RuntimeException('No se pudo leer el header del archivo');
@@ -217,7 +218,7 @@ class BasisFileClientTcp extends Client
      */
     protected function receiveStreamToFile(string $outputPath): bool
     {
-        $header = $this->recvAll(4);
+        $header = $this->recvExact(4);
 
         if ($header === false || strlen($header) < 4) {
             throw new RuntimeException('No se pudo leer el header del archivo');
@@ -294,7 +295,7 @@ class BasisFileClientTcp extends Client
                 $type = ord($typeByte);
 
                 // Leer longitud (4 bytes)
-                $lengthBytes = $this->recvAll(4);
+                $lengthBytes = $this->recvExact(4);
 
                 if ($lengthBytes === false || strlen($lengthBytes) < 4) {
                     throw new RuntimeException('Frame incompleto: no se pudo leer longitud');
@@ -303,7 +304,7 @@ class BasisFileClientTcp extends Client
                 $length = unpack('N', $lengthBytes)[1];
 
                 // Leer datos del frame
-                $data = $this->recvAll($length);
+                $data = $this->recvExact($length);
 
                 if ($data === false || strlen($data) < $length) {
                     throw new RuntimeException('Frame incompleto: datos insuficientes');
@@ -358,26 +359,76 @@ class BasisFileClientTcp extends Client
     }
 
     /**
-     * Recibe exactamente N bytes
+     * Lee exactamente N bytes del socket
      */
+    protected function recvExact(int $length): string|false
+    {
+        // Si hay datos en el buffer, usarlos primero
+        if (strlen($this->readBuffer) >= $length) {
+            $data = substr($this->readBuffer, 0, $length);
+            $this->readBuffer = substr($this->readBuffer, $length);
+            return $data;
+        }
+
+        // Leer datos del socket
+        $chunk = $this->recv($length);
+
+        if ($chunk === false || $chunk === '') {
+            return false;
+        }
+
+        $this->readBuffer .= $chunk;
+
+        // Si ya tenemos suficientes datos, devolver
+        if (strlen($this->readBuffer) >= $length) {
+            $data = substr($this->readBuffer, 0, $length);
+            $this->readBuffer = substr($this->readBuffer, $length);
+            return $data;
+        }
+
+        // Seguir leyendo hasta completar
+        return $this->recvAll($length);
+    }
+
     protected function recvAll(int $length): string|false
     {
+        // Usar el buffer primero
         $data = '';
-        $remaining = $length;
+        $needed = $length;
 
-        while ($remaining > 0) {
-            $chunk = $this->recv($remaining);
+        if (strlen($this->readBuffer) > 0) {
+            $takeFromBuffer = min(strlen($this->readBuffer), $needed);
+            $data .= substr($this->readBuffer, 0, $takeFromBuffer);
+            $this->readBuffer = substr($this->readBuffer, $takeFromBuffer);
+            $needed -= $takeFromBuffer;
+        }
+
+        if ($needed <= 0) {
+            return $data;
+        }
+
+        // Leer el resto del socket
+        while ($needed > 0) {
+            $chunk = $this->recv($needed);
 
             if ($chunk === false || $chunk === '') {
                 return false;
             }
 
             $data .= $chunk;
-            $remaining -= strlen($chunk);
+            $needed -= strlen($chunk);
+
+            // Si recibimos más de lo necesario, guardar el exceso
+            if ($needed < 0) {
+                $this->readBuffer = substr($data, $length);
+                $data = substr($data, 0, $length);
+                break;
+            }
         }
 
         return $data;
     }
+
 
     /**
      * Recibe una respuesta JSON completa
