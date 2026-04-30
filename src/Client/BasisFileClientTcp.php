@@ -188,11 +188,12 @@ class BasisFileClientTcp extends Client
         // Leer el primer byte (marcador de tipo)
         $typeByte = $this->recv(1);
 
+        echo "Type byte recibido: " . strlen($typeByte) . " bytes, hex: " . bin2hex($typeByte) . "\n";
+
         if ($typeByte === false || $typeByte === '') {
             throw new RuntimeException('Conexión cerrada inesperadamente');
         }
         $type = ord($typeByte[0]);
-        echo $type;
 
         if ($type === self::RESPONSE_TYPE_JSON) {
             $json = $this->receiveJson();
@@ -223,6 +224,7 @@ class BasisFileClientTcp extends Client
         }
 
         $totalSize = unpack('N', $header)[1];
+        echo "Tamaño: {$totalSize}\n";
 
         if ($totalSize === 0) {
             throw new RuntimeException('El servidor reportó error (tamaño 0)');
