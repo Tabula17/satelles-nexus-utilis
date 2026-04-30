@@ -191,8 +191,8 @@ class BasisFileClientTcp extends Client
         if ($typeByte === false || $typeByte === '') {
             throw new RuntimeException('Conexión cerrada inesperadamente');
         }
-        echo $typeByte;
-        $type = ord($typeByte);
+        $type = ord($typeByte[0]);
+        echo $type;
 
         if ($type === self::RESPONSE_TYPE_JSON) {
             $json = $this->receiveJson();
