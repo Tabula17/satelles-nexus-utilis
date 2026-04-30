@@ -19,6 +19,9 @@ abstract class AbstractFileJobResult extends AbstractJobResult implements FileJo
     final protected const int FRAME_TYPE_HEADER = 0x04;
     final protected const int FRAME_TYPE_END = 0x05;
 
+    //  Marcadores de tipo de respuesta
+    final protected const int RESPONSE_TYPE_JSON = 0x00;
+    final protected const int RESPONSE_TYPE_STREAM = 0x01;
     public readonly bool $success;
     public readonly ?string $outputPath;
     public readonly ?string $base64Content;
@@ -130,7 +133,7 @@ abstract class AbstractFileJobResult extends AbstractJobResult implements FileJo
             return false;
         }
 
-       $totalBytes = 0;
+        $totalBytes = 0;
 
         try {
             if ($this->isStream() && !$this->isFile()) {
@@ -262,13 +265,14 @@ abstract class AbstractFileJobResult extends AbstractJobResult implements FileJo
             return $this->streamBase64ToTcp($server, $fd, $this->base64Content, $chunkSize);
         }
 
-        $this->sendFrame($server, $fd, self::FRAME_TYPE_ERROR, json_encode(['error' => 'No content available']));
+        // ✅ Enviar error con marcador JSON
+        $errorJson = json_encode(['error' => 'No content available']);
+        $server->send($fd, chr(self::RESPONSE_TYPE_JSON) . $errorJson);
         return false;
     }
-
     public function streamToTcpWithProgress(Server $server, int $fd, bool $sendProgress = true, int $chunkSize = 1048576): bool
     {
-        if (!$this->isFile()) {
+        if (!$this->isFile() || $this->outputPath === null) {
             return $this->streamToTcp($server, $fd, $chunkSize);
         }
 
@@ -286,7 +290,7 @@ abstract class AbstractFileJobResult extends AbstractJobResult implements FileJo
         }
 
         try {
-            // Enviar header con metadata
+            // ✅ El primer frame ya indica que es streaming con progreso
             $this->sendFrame($server, $fd, self::FRAME_TYPE_HEADER, json_encode([
                 'jobId' => $this->jobId,
                 'size' => $fileSize,
@@ -308,7 +312,6 @@ abstract class AbstractFileJobResult extends AbstractJobResult implements FileJo
                 $chunkLength = strlen($chunk);
                 $sentBytes += $chunkLength;
 
-                // Enviar progreso si es necesario (sin mezclar con datos)
                 if ($sendProgress) {
                     $currentProgress = (int)(($sentBytes / $fileSize) * 100);
 
@@ -322,7 +325,6 @@ abstract class AbstractFileJobResult extends AbstractJobResult implements FileJo
                     }
                 }
 
-                // Enviar chunk de datos (en frame separado)
                 $this->sendFrame($server, $fd, self::FRAME_TYPE_DATA, $chunk);
 
                 if ($inCoroutine && $sentBytes % ($chunkSize * 5) === 0) {
@@ -330,7 +332,6 @@ abstract class AbstractFileJobResult extends AbstractJobResult implements FileJo
                 }
             }
 
-            // Enviar frame de finalización
             $this->sendFrame($server, $fd, self::FRAME_TYPE_END, json_encode([
                 'totalSent' => $sentBytes,
                 'success' => $sentBytes === $fileSize
@@ -346,7 +347,9 @@ abstract class AbstractFileJobResult extends AbstractJobResult implements FileJo
     private function streamFileToTcp(Server $server, int $fd, string $filePath, int $chunkSize): bool
     {
         if (!file_exists($filePath)) {
-            $server->send($fd, pack('N', 0));
+            // Enviar error como JSON con marcador 0x00
+            $errorJson = json_encode(['error' => 'File not found']);
+            $server->send($fd, chr(self::RESPONSE_TYPE_JSON) . $errorJson);
             return false;
         }
 
@@ -354,13 +357,14 @@ abstract class AbstractFileJobResult extends AbstractJobResult implements FileJo
         $handle = fopen($filePath, 'rb');
 
         if ($handle === false) {
-            $server->send($fd, pack('N', 0));
+            $errorJson = json_encode(['error' => 'Cannot open file']);
+            $server->send($fd, chr(self::RESPONSE_TYPE_JSON) . $errorJson);
             return false;
         }
 
         try {
-            // Enviar header con el tamaño total
-            $server->send($fd, pack('N', $fileSize));
+            // ✅ Enviar: [0x01][4 bytes: tamaño archivo][datos...]
+            $server->send($fd, chr(self::RESPONSE_TYPE_STREAM) . pack('N', $fileSize));
 
             $sentBytes = 0;
             $inCoroutine = Coroutine::getCid() > 0;
@@ -392,7 +396,8 @@ abstract class AbstractFileJobResult extends AbstractJobResult implements FileJo
         $decoded = base64_decode($base64Content);
         $totalSize = strlen($decoded);
 
-        $server->send($fd, pack('N', $totalSize));
+        // ✅ Enviar: [0x01][4 bytes: tamaño][datos...]
+        $server->send($fd, chr(self::RESPONSE_TYPE_STREAM) . pack('N', $totalSize));
 
         $offset = 0;
         $inCoroutine = Coroutine::getCid() > 0;

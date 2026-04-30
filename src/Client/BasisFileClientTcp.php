@@ -21,6 +21,9 @@ class BasisFileClientTcp extends Client
     protected const int FRAME_TYPE_HEADER = 0x04;
     protected const int FRAME_TYPE_END = 0x05;
 
+    //  Marcadores de tipo de respuesta
+    final protected const int RESPONSE_TYPE_JSON = 0x00;
+    final protected const int RESPONSE_TYPE_STREAM = 0x01;
     public function __construct(
         protected TCPServerConfig $serverCfg,
         int                       $sockType = SOCK_STREAM
@@ -110,14 +113,15 @@ class BasisFileClientTcp extends Client
      */
     protected function receiveResponseToMemory(): string
     {
-        $peek = $this->recv(1);//, MSG_PEEK);
+        // Leer el primer byte (marcador de tipo)
+        $typeByte = $this->recv(1);
 
-        if ($peek === false || $peek === '') {
+        if ($typeByte === false || $typeByte === '') {
             throw new RuntimeException('Conexión cerrada inesperadamente');
         }
+        $type = ord($typeByte);
 
-        // Si es JSON, puede contener base64 o error
-        if ($peek === '{') {
+        if ($type === self::RESPONSE_TYPE_JSON) {
             $json = $this->receiveJson();
 
             if (isset($json['error'])) {
@@ -181,13 +185,15 @@ class BasisFileClientTcp extends Client
      */
     protected function receiveResponse(string $outputPath): bool
     {
-        $peek = $this->recv(1);//, MSG_PEEK);
+        // Leer el primer byte (marcador de tipo)
+        $typeByte = $this->recv(1);
 
-        if ($peek === false || $peek === '') {
+        if ($typeByte === false || $typeByte === '') {
             throw new RuntimeException('Conexión cerrada inesperadamente');
         }
+        $type = ord($typeByte);
 
-        if ($peek === '{') {
+        if ($type === self::RESPONSE_TYPE_JSON) {
             $json = $this->receiveJson();
 
             if (isset($json['error'])) {
@@ -197,7 +203,6 @@ class BasisFileClientTcp extends Client
             if (($json['status'] ?? '') === 'failed') {
                 throw new RuntimeException('Conversión fallida: ' . ($json['message'] ?? 'Unknown error'));
             }
-
             // Si es una respuesta JSON exitosa pero no tiene archivo
             return true;
         }
@@ -205,7 +210,6 @@ class BasisFileClientTcp extends Client
         // Si no es JSON, es streaming de archivo
         return $this->receiveStreamToFile($outputPath);
     }
-
     /**
      * Recibe un archivo por streaming y lo guarda en disco
      */
@@ -255,7 +259,6 @@ class BasisFileClientTcp extends Client
             }
         }
     }
-
 
     /**
      * Recibe respuesta con protocolo de framing (soporta progreso)
