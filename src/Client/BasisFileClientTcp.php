@@ -25,6 +25,7 @@ class BasisFileClientTcp extends Client
     final protected const int RESPONSE_TYPE_JSON = 0x00;
     final protected const int RESPONSE_TYPE_STREAM = 0x01;
     private string $readBuffer = '';
+
     public function __construct(
         protected TCPServerConfig $serverCfg,
         int                       $sockType = SOCK_STREAM
@@ -67,8 +68,8 @@ class BasisFileClientTcp extends Client
                 . $jsonMetadata                 // JSON de metadatos
                 . pack('J', $fileSize);         // Tamaño del archivo (8 bytes, big-endian)
 
-            echo "[CLIENTE DEBUG] Header completo: " . strlen($header) . " bytes\n";
-            echo "[CLIENTE DEBUG] Primeros 30 bytes del header: " . bin2hex(substr($header, 0, 30)) . "\n";
+            // echo "[CLIENTE DEBUG] Header completo: " . strlen($header) . " bytes\n";
+            // echo "[CLIENTE DEBUG] Primeros 30 bytes del header: " . bin2hex(substr($header, 0, 30)) . "\n";
 
             // Enviar TODO el header de UNA SOLA VEZ
             if (!$this->send($header)) {
@@ -77,7 +78,7 @@ class BasisFileClientTcp extends Client
             // ================================================================
 
             // 5. Enviar archivo en chunks
-            echo "[CLIENTE DEBUG] Enviando archivo...\n";
+            // echo "[CLIENTE DEBUG] Enviando archivo...\n";
             $sentBytes = 0;
             while (!feof($handle)) {
                 $chunk = fread($handle, self::CHUNK_SIZE);
@@ -93,7 +94,7 @@ class BasisFileClientTcp extends Client
                 $sentBytes += strlen($chunk);
             }
 
-            echo "[CLIENTE DEBUG] Total enviado: {$sentBytes} bytes\n";
+            // echo "[CLIENTE DEBUG] Total enviado: {$sentBytes} bytes\n";
             return $sentBytes === $fileSize;
 
         } finally {
@@ -189,7 +190,7 @@ class BasisFileClientTcp extends Client
         // Leer el primer byte (marcador de tipo)
         $typeByte = $this->recvExact(1);
 
-        echo "Type byte recibido: " . strlen($typeByte) . " bytes, hex: " . bin2hex($typeByte) . "\n";
+        // echo "Type byte recibido: " . strlen($typeByte) . " bytes, hex: " . bin2hex($typeByte) . "\n";
 
         if ($typeByte === false || $typeByte === '') {
             throw new RuntimeException('Conexión cerrada inesperadamente');
@@ -213,6 +214,7 @@ class BasisFileClientTcp extends Client
         // Si no es JSON, es streaming de archivo
         return $this->receiveStreamToFile($outputPath);
     }
+
     /**
      * Recibe un archivo por streaming y lo guarda en disco
      */
@@ -225,7 +227,7 @@ class BasisFileClientTcp extends Client
         }
 
         $totalSize = unpack('N', $header)[1];
-        echo "Tamaño: {$totalSize}\n";
+        // echo "Tamaño: {$totalSize}\n";
 
         if ($totalSize === 0) {
             throw new RuntimeException('El servidor reportó error (tamaño 0)');
@@ -246,12 +248,15 @@ class BasisFileClientTcp extends Client
 
                 $chunk = $this->recv($readSize);
 
+                // ✅ Si recv devuelve vacío, el servidor cerró la conexión
                 if ($chunk === false || $chunk === '') {
-                    throw new RuntimeException('Conexión interrumpida durante la transferencia');
+                    break;  // Salir del bucle, el servidor terminó de enviar
                 }
 
                 fwrite($handle, $chunk);
                 $receivedBytes += strlen($chunk);
+
+                //echo "Progreso: {$receivedBytes}/{$totalSize}\r";
             }
 
             return $receivedBytes === $totalSize;
