@@ -20,10 +20,6 @@ class BasisFileClientTcp extends Client
     protected const int FRAME_TYPE_ERROR = 0x03;
     protected const int FRAME_TYPE_HEADER = 0x04;
     protected const int FRAME_TYPE_END = 0x05;
-
-    //  Marcadores de tipo de respuesta
-    final protected const int RESPONSE_TYPE_JSON = 0x00;
-    final protected const int RESPONSE_TYPE_STREAM = 0x01;
     private string $readBuffer = '';
 
     public function __construct(
@@ -102,18 +98,6 @@ class BasisFileClientTcp extends Client
         }
     }
 
-    protected function sendJsonMessage(array $data): bool|int
-    {
-        $this->ensureConnected();
-
-        // ✅ Enviar byte marcador de JSON (0x00) + JSON
-        return $this->send(chr(0x00) . json_encode($data));
-    }
-    protected function receiveResponse(string $outputPath): bool
-    {
-        return $this->receiveResponseWithFraming($outputPath, null);
-    }
-
     protected function receiveResponseToMemory(): string
     {
         // Guardar en archivo temporal
@@ -122,101 +106,6 @@ class BasisFileClientTcp extends Client
         $content = file_get_contents($tempFile);
         @unlink($tempFile);
         return $content;
-    }
-
-    /**
-     * Recibe un archivo por streaming y lo devuelve como string
-     */
-    protected function receiveStreamToMemory(): string
-    {
-        $header = $this->recvExact(4);
-
-        if ($header === false || strlen($header) < 4) {
-            throw new RuntimeException('No se pudo leer el header del archivo');
-        }
-
-        $totalSize = unpack('N', $header)[1];
-
-        if ($totalSize === 0) {
-            throw new RuntimeException('El servidor reportó error (tamaño 0)');
-        }
-
-        $content = '';
-        $receivedBytes = 0;
-
-        while ($receivedBytes < $totalSize) {
-            $remaining = $totalSize - $receivedBytes;
-            $readSize = min(self::CHUNK_SIZE, $remaining);
-
-            $chunk = $this->recv($readSize);
-
-            if ($chunk === false || $chunk === '') {
-                throw new RuntimeException('Conexión interrumpida durante la transferencia');
-            }
-
-            $content .= $chunk;
-            $receivedBytes += strlen($chunk);
-        }
-
-        if ($receivedBytes !== $totalSize) {
-            throw new RuntimeException('Transferencia incompleta');
-        }
-
-        return $content;
-    }
-
-    /**
-     * Recibe un archivo por streaming y lo guarda en disco
-     */
-    protected function receiveStreamToFile(string $outputPath): bool
-    {
-        $header = $this->recvExact(4);
-
-        if ($header === false || strlen($header) < 4) {
-            throw new RuntimeException('No se pudo leer el header del archivo');
-        }
-
-        $totalSize = unpack('N', $header)[1];
-        // echo "Tamaño: {$totalSize}\n";
-
-        if ($totalSize === 0) {
-            throw new RuntimeException('El servidor reportó error (tamaño 0)');
-        }
-
-        $handle = fopen($outputPath, 'wb');
-
-        if ($handle === false) {
-            throw new RuntimeException('No se pudo crear archivo: ' . $outputPath);
-        }
-
-        $receivedBytes = 0;
-
-        try {
-            while ($receivedBytes < $totalSize) {
-                $remaining = $totalSize - $receivedBytes;
-                $readSize = min(self::CHUNK_SIZE, $remaining);
-
-                $chunk = $this->recv($readSize);
-
-                // ✅ Si recv devuelve vacío, el servidor cerró la conexión
-                if ($chunk === false || $chunk === '') {
-                    break;  // Salir del bucle, el servidor terminó de enviar
-                }
-
-                fwrite($handle, $chunk);
-                $receivedBytes += strlen($chunk);
-
-                //echo "Progreso: {$receivedBytes}/{$totalSize}\r";
-            }
-
-            return $receivedBytes === $totalSize;
-
-        } finally {
-            fclose($handle);
-            if ($receivedBytes !== $totalSize) {
-                @unlink($outputPath);
-            }
-        }
     }
 
     /**
@@ -383,7 +272,6 @@ class BasisFileClientTcp extends Client
 
         return $data;
     }
-
 
     /**
      * Recibe una respuesta JSON completa
