@@ -349,7 +349,7 @@ abstract class AbstractFileJobResult extends AbstractJobResult implements FileJo
         if (!file_exists($filePath)) {
             // Enviar error como JSON con marcador 0x00
             $errorJson = json_encode(['error' => 'File not found']);
-            $server->send($fd, chr(self::RESPONSE_TYPE_JSON) . $errorJson);
+            $server->sendwait($fd, chr(self::RESPONSE_TYPE_JSON) . $errorJson);
             return false;
         }
 
@@ -358,7 +358,7 @@ abstract class AbstractFileJobResult extends AbstractJobResult implements FileJo
 
         if ($handle === false) {
             $errorJson = json_encode(['error' => 'Cannot open file']);
-            $server->send($fd, chr(self::RESPONSE_TYPE_JSON) . $errorJson);
+            $server->sendwait($fd, chr(self::RESPONSE_TYPE_JSON) . $errorJson);
             return false;
         }
 
@@ -369,7 +369,7 @@ abstract class AbstractFileJobResult extends AbstractJobResult implements FileJo
             echo "[SERVIDOR] Enviando header: " . bin2hex($header) . "\n";
             echo "[SERVIDOR] Primer byte (marcador): 0x" . bin2hex(chr(0x01)) . "\n";
             echo "[SERVIDOR] Tamaño: {$fileSize} -> 0x" . bin2hex(pack('N', $fileSize)) . "\n";
-            $server->send($fd, $header);
+            $server->sendwait($fd, $header);
 
             $sentBytes = 0;
             $inCoroutine = Coroutine::getCid() > 0;
@@ -381,7 +381,7 @@ abstract class AbstractFileJobResult extends AbstractJobResult implements FileJo
                     return false;
                 }
 
-                $server->send($fd, $chunk);
+                $server->sendwait($fd, $chunk);
                 $sentBytes += strlen($chunk);
 
                 if ($inCoroutine && $sentBytes % ($chunkSize * 5) === 0) {
@@ -408,14 +408,14 @@ abstract class AbstractFileJobResult extends AbstractJobResult implements FileJo
         echo "[SERVIDOR] Enviando header: " . bin2hex($header) . "\n";
         echo "[SERVIDOR] Primer byte (marcador): 0x" . bin2hex(chr(0x01)) . "\n";
         echo "[SERVIDOR] Tamaño: {$totalSize} -> 0x" . bin2hex(pack('N', $totalSize)) . "\n";
-        $server->send($fd, $header);
+        $server->sendwait($fd, $header);
 
         $offset = 0;
         $inCoroutine = Coroutine::getCid() > 0;
 
         while ($offset < $totalSize) {
             $chunk = substr($decoded, $offset, $chunkSize);
-            $server->send($fd, $chunk);
+            $server->sendwait($fd, $chunk);
             $offset += $chunkSize;
 
             if ($inCoroutine && $offset % ($chunkSize * 5) === 0) {
@@ -431,7 +431,7 @@ abstract class AbstractFileJobResult extends AbstractJobResult implements FileJo
      */
     private function sendFrame(Server $server, int $fd, int $type, string $data): void
     {
-        $server->send($fd, chr($type) . pack('N', strlen($data)) . $data);
+        $server->sendwait($fd, chr($type) . pack('N', strlen($data)) . $data);
     }
 
     /**
