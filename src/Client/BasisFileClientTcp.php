@@ -291,7 +291,7 @@ class BasisFileClientTcp extends Client
         try {
             while (true) {
                 // Leer tipo de frame (1 byte)
-                $typeByte = $this->recv(1);
+                $typeByte = $this->recvExact(1);
 
                 if ($typeByte === false || $typeByte === '') {
                     break;
