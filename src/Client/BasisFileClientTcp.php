@@ -109,36 +109,19 @@ class BasisFileClientTcp extends Client
         // ✅ Enviar byte marcador de JSON (0x00) + JSON
         return $this->send(chr(0x00) . json_encode($data));
     }
+    protected function receiveResponse(string $outputPath): bool
+    {
+        return $this->receiveResponseWithFraming($outputPath, null);
+    }
 
-    /**
-     * Recibe respuesta y la guarda en memoria
-     */
     protected function receiveResponseToMemory(): string
     {
-        // Leer el primer byte (marcador de tipo)
-        $typeByte = $this->recv(1);
-
-        if ($typeByte === false || $typeByte === '') {
-            throw new RuntimeException('Conexión cerrada inesperadamente');
-        }
-        $type = ord($typeByte);
-
-        if ($type === self::RESPONSE_TYPE_JSON) {
-            $json = $this->receiveJson();
-
-            if (isset($json['error'])) {
-                throw new RuntimeException('Error del servidor: ' . $json['error']);
-            }
-
-            if (isset($json['base64Content'])) {
-                return base64_decode($json['base64Content']);
-            }
-
-            throw new RuntimeException('Respuesta no contiene contenido');
-        }
-
-        // Si no es JSON, es streaming de archivo (lo guardamos en memoria)
-        return $this->receiveStreamToMemory();
+        // Guardar en archivo temporal
+        $tempFile = tempnam(sys_get_temp_dir(), 'adiutor_');
+        $this->receiveResponseWithFraming($tempFile, null);
+        $content = file_get_contents($tempFile);
+        @unlink($tempFile);
+        return $content;
     }
 
     /**
@@ -180,39 +163,6 @@ class BasisFileClientTcp extends Client
         }
 
         return $content;
-    }
-
-    /**
-     * Recibe la respuesta del servidor (detecta si es JSON o streaming)
-     */
-    protected function receiveResponse(string $outputPath): bool
-    {
-        // Leer el primer byte (marcador de tipo)
-        $typeByte = $this->recvExact(1);
-
-        // echo "Type byte recibido: " . strlen($typeByte) . " bytes, hex: " . bin2hex($typeByte) . "\n";
-
-        if ($typeByte === false || $typeByte === '') {
-            throw new RuntimeException('Conexión cerrada inesperadamente');
-        }
-        $type = ord($typeByte[0]);
-
-        if ($type === self::RESPONSE_TYPE_JSON) {
-            $json = $this->receiveJson();
-
-            if (isset($json['error'])) {
-                throw new RuntimeException('Error del servidor: ' . $json['error']);
-            }
-
-            if (($json['status'] ?? '') === 'failed') {
-                throw new RuntimeException('Conversión fallida: ' . ($json['message'] ?? 'Unknown error'));
-            }
-            // Si es una respuesta JSON exitosa pero no tiene archivo
-            return true;
-        }
-
-        // Si no es JSON, es streaming de archivo
-        return $this->receiveResponseWithFraming($outputPath, null);
     }
 
     /**
