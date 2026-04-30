@@ -187,7 +187,7 @@ class BasisFileClientTcp extends Client
     protected function receiveResponse(string $outputPath): bool
     {
         // Leer el primer byte (marcador de tipo)
-        $typeByte = $this->recv(1);
+        $typeByte = $this->recvExact(1);
 
         echo "Type byte recibido: " . strlen($typeByte) . " bytes, hex: " . bin2hex($typeByte) . "\n";
 
