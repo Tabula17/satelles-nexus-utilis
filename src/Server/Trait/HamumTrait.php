@@ -306,10 +306,11 @@ trait HamumTrait
     {
         $this->hookedEvents[$event_name][] = $callback;
         $hookedCallback = function (...$args) use ($event_name) {
-            $beforeEventName = 'onBefore' . ucfirst($event_name);
-            if (!$this->eventsSupported($beforeEventName) && method_exists($this, $beforeEventName)) {
+            $beforeEventName = ucfirst($event_name);
+            $beforeEventMethod = 'onBefore' . ucfirst($event_name);
+            if (!$this->eventsSupported($beforeEventName) && method_exists($this, $beforeEventMethod)) {
                 $this->logger?->debug("Calling before event handler for event $event_name");
-                if ($this->$beforeEventName(...$args) === false) {
+                if ($this->$beforeEventMethod(...$args) === false) {
                     $this->logger?->debug("Before event handler for event $event_name returned false. Stopping execution.");
                     return;
                 }
