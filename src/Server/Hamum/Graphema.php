@@ -226,7 +226,7 @@ abstract class Graphema extends Server implements HamumServerInterface
 
     public function hasRequestHandlers(string $protocolAction): bool
     {
-        return $this->requestHandlers[$protocolAction]->offsetExists($protocolAction) && $this->requestHandlers[$protocolAction]->count() > 0;
+        return isset($this->requestHandlers[$protocolAction]) && $this->requestHandlers[$protocolAction]->count() > 0;
     }
 
     public function removeRequestHandlers(string $protocolAction): void

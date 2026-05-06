@@ -67,7 +67,7 @@ abstract class Basis extends Server implements HamumServerInterface
 
     public function hasReceiveHandlers(string $protocolAction): bool
     {
-        return $this->receiveHandlers[$protocolAction]?->offsetExists($protocolAction) && $this->receiveHandlers[$protocolAction]?->count() > 0;
+        return isset($this->receiveHandlers[$protocolAction]) && $this->receiveHandlers[$protocolAction]?->count() > 0;
     }
 
     public function removeReceiveHandlers(string $protocolAction): void
@@ -107,7 +107,7 @@ abstract class Basis extends Server implements HamumServerInterface
 
     public function hasPacketHandlers(string $protocolAction): bool
     {
-        return $this->packetHandlers[$protocolAction]->offsetExists($protocolAction) && $this->packetHandlers[$protocolAction]->count() > 0;
+        return isset($this->packetHandlers[$protocolAction]) && $this->packetHandlers[$protocolAction]->count() > 0;
     }
 
     public function removePacketHandlers(string $protocolAction): void
@@ -147,7 +147,7 @@ abstract class Basis extends Server implements HamumServerInterface
 
     public function hasConnectHandlers(string $protocolAction): bool
     {
-        return $this->connectHandlers[$protocolAction]->offsetExists($protocolAction) && $this->connectHandlers[$protocolAction]->count() > 0;
+        return isset($this->connectHandlers[$protocolAction]) && $this->connectHandlers[$protocolAction]->count() > 0;
     }
 
     public function removeConnectHandlers(string $protocolAction): void

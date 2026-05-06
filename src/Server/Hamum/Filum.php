@@ -98,7 +98,7 @@ abstract class Filum extends Server implements HamumServerInterface
 
     public function hasRequestHandlers(string $protocolAction): bool
     {
-        return $this->requestHandlers[$protocolAction]->offsetExists($protocolAction) && $this->requestHandlers[$protocolAction]->count() > 0;
+        return isset($this->requestHandlers[$protocolAction]) && $this->requestHandlers[$protocolAction]->count() > 0;
     }
 
     public function removeRequestHandlers(string $protocolAction): void
@@ -124,7 +124,7 @@ abstract class Filum extends Server implements HamumServerInterface
 
     public function hasReceiveHandlers(string $protocolAction): bool
     {
-        return $this->receiveHandlers[$protocolAction]->offsetExists($protocolAction) && $this->receiveHandlers[$protocolAction]->count() > 0;
+        return isset($this->receiveHandlers[$protocolAction]) && $this->receiveHandlers[$protocolAction]->count() > 0;
     }
 
     public function removeReceiveHandlers(string $protocolAction): void
@@ -164,7 +164,7 @@ abstract class Filum extends Server implements HamumServerInterface
 
     public function hasConnectHandlers(string $protocolAction): bool
     {
-        return $this->connectHandlers[$protocolAction]->offsetExists($protocolAction) && $this->connectHandlers[$protocolAction]->count() > 0;
+        return isset($this->connectHandlers[$protocolAction]) && $this->connectHandlers[$protocolAction]->count() > 0;
     }
 
     public function removeConnectHandlers(string $protocolAction): void
@@ -207,7 +207,7 @@ abstract class Filum extends Server implements HamumServerInterface
 
     public function hasMessageHandlers(string $protocolAction): bool
     {
-        return $this->messageHandlers[$protocolAction]->offsetExists($protocolAction) && $this->messageHandlers[$protocolAction]->count() > 0;
+        return isset($this->messageHandlers[$protocolAction]) && $this->messageHandlers[$protocolAction]->count() > 0;
     }
 
     public function removeMessageHandlers(string $protocolAction): void
@@ -252,7 +252,7 @@ abstract class Filum extends Server implements HamumServerInterface
 
     public function hasOpenHandlers(string $protocolAction): bool
     {
-        return $this->openHandlers[$protocolAction]->offsetExists($protocolAction) && $this->openHandlers[$protocolAction]->count() > 0;
+        return isset($this->openHandlers[$protocolAction]) && $this->openHandlers[$protocolAction]->count() > 0;
     }
 
     public function removeOpenHandlers(string $protocolAction): void
@@ -289,7 +289,7 @@ abstract class Filum extends Server implements HamumServerInterface
 
     public function hasDisconnectHandlers(string $protocolAction): bool
     {
-        return $this->disconnectHandlers[$protocolAction]->offsetExists($protocolAction) && $this->disconnectHandlers[$protocolAction]->count() > 0;
+        return isset($this->disconnectHandlers[$protocolAction]) && $this->disconnectHandlers[$protocolAction]->count() > 0;
     }
 
     public function removeDisconnectHandlers(string $protocolAction): void

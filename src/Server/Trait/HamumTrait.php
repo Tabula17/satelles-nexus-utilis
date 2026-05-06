@@ -517,7 +517,7 @@ trait HamumTrait
 
     public function hasFinishHandlers(string $protocolAction): bool
     {
-        return $this->finishHandlers[$protocolAction]->offsetExists($protocolAction) && $this->finishHandlers[$protocolAction]->count() > 0;
+        return isset($this->finishHandlers[$protocolAction]) && $this->finishHandlers[$protocolAction]->count() > 0;
     }
 
     public function removeFinishHandlers(string $protocolAction): void
