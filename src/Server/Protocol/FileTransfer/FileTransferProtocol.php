@@ -49,6 +49,7 @@ class FileTransferProtocol implements ProtocolManagerInterface
             throw new RuntimeException(sprintf('Directory "%s" is not writable', $storagePath));
         }
         $this->receiveCallbacks = new CallbacksCollection();
+        $this->initTables();
 
         //$this->registerProtocolHandlers(); // se ejecuta cuando el servidor se inicia (MatrixTrait->addProtocolManager)
     }
@@ -70,7 +71,7 @@ class FileTransferProtocol implements ProtocolManagerInterface
         // $this->server->registerConnectHandlers('file_transfer_connect', [$this, 'handleConnection'], 'file_transfer');
     }
 
-    private function initTable(): void
+    private function initTables(): void
     {
         // Tabla para estado numérico con operaciones atómicas
         $this->transferState = new Table(2048);
