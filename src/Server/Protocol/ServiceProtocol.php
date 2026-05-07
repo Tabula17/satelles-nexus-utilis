@@ -90,6 +90,10 @@ enum ServiceProtocol: string
      */
     case REQRES = 'Definition-Response Pattern';
     /**
+     * Represents the TCP File Transfer Protocol.
+     */
+    case TCPFILE = 'TCP File Transfer Protocol';
+    /**
      * Represents a generic or custom protocol.
      */
     case GENERIC = 'Generic/other Protocol: unspecified or custom';
@@ -174,6 +178,7 @@ enum ServiceProtocol: string
             'WAMP' => self::WAMP,
             'WAMP2' => self::WAMP2,
             'REQRES' => self::REQRES,
+            'TCPFILE' => self::TCPFILE,
             'OTHER', 'GENERIC' => self::GENERIC,
             default => self::UNKNOWN,
         };
@@ -192,6 +197,7 @@ enum ServiceProtocol: string
             self::WAMP => 'wamp',
             self::WAMP2 => 'wamp2',
             self::REQRES => 'reqres',
+            self::TCPFILE => 'tcpfile',
             self::GENERIC => 'generic',
             default => 'unknown',
         };

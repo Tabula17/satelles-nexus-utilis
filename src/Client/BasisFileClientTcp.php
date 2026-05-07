@@ -10,6 +10,10 @@ use Swoole\Coroutine\Client;
 use Tabula17\Satelles\Nexus\Utilis\Protocol\FileServerActionsEnum;
 use Tabula17\Satelles\Utilis\Config\TCPServerConfig;
 
+/**
+ * @deprecated Esta clase es una implementación inicial para pruebas.
+ *
+ */
 class BasisFileClientTcp extends Client
 {
     protected const int CHUNK_SIZE = 1048576; // 1MB
