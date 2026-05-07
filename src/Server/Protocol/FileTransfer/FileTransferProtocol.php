@@ -161,7 +161,7 @@ class FileTransferProtocol implements ProtocolManagerInterface
     /**
      * Inicia una transferencia de archivo desde el servidor al cliente
      */
-    public function sendFile(Server $server, int $fd, string $filePath, ?string $fileName = null, CallbacksCollection|callable|null $onComplete = null): bool
+    public function sendFile(Server $server, int $fd, string $filePath, ?string $fileName = null, CallbacksCollection|TransferCompleteInterface|null $onComplete = null): bool
     {
         if (!file_exists($filePath)) {
             $this->logger?->error("File not found: {$filePath}");
@@ -188,7 +188,7 @@ class FileTransferProtocol implements ProtocolManagerInterface
         // Agregar callbacks para manejar errores y completar la transferencia asociados al transferId
         // De esta forma cada llamada a sendFile() puede tener su propia lógica de error y completado
         if ($onComplete) {
-            if(!$onComplete instanceof CallbacksCollection) {
+            if (!$onComplete instanceof CallbacksCollection) {
                 $onComplete = new CallbacksCollection([$onComplete]);
             }
             $this->completeCallbacks[$transferId] = $onComplete;
@@ -530,7 +530,8 @@ class FileTransferProtocol implements ProtocolManagerInterface
     }
 
     private function onTransferComplete(string $transferId, string $finalPath, bool $success): void
-    {$transfer = $this->getActiveTransfer($transferId);
+    {
+        $transfer = $this->getActiveTransfer($transferId);
         $isSender = $transfer ? $transfer['is_sender'] : false;
 
         if ($isSender) {
@@ -571,6 +572,7 @@ class FileTransferProtocol implements ProtocolManagerInterface
             }
         }
     }
+
     /**
      * Encuentra chunks faltantes analizando el archivo temporal
      */
