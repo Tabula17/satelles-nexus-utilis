@@ -14,10 +14,6 @@ use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request\Action;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ServiceProtocol;
 use Throwable;
 
-/**
- * @deprecated Este protocolo es un ejemplo de implementación de transferencia de archivos. El desarrollo está incompleto. El desarrollo ahora está centrado en FileTransferClient. Un cliente para microservicios mas simple.
- *
- */
 class FileTransferProtocol implements ProtocolManagerInterface
 {
     // Comandos del protocolo

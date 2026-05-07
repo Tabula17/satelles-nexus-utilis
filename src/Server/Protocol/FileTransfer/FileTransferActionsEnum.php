@@ -1,9 +1,7 @@
 <?php
 
 namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\FileTransfer;
-/**
- * @deprecated Parte de FileTransferProtocol
- */
+
 enum FileTransferActionsEnum: string
 {
     case TransferInit = 'file_transfer_init';

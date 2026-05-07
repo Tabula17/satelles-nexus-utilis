@@ -4,9 +4,6 @@ namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\FileTransfer;
 
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request\Action;
 
-/**
- * @deprecated Parte de FileTransferProtocol
- */
 class Definition extends Action
 {
     private array $properties;
