@@ -4,7 +4,7 @@ namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\FileTransfer;
 
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\FileTransfer\TransferCompleteInterface;
 
-class AnonymusWrapper implements TransferCompleteInterface
+class AnonymousWrapper implements TransferCompleteInterface
 {
     private array $callbacks;
     public function __construct(callable...$args)
