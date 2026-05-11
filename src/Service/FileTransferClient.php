@@ -7,13 +7,11 @@ use Swoole\Client;
 use Swoole\Server;
 use Swoole\Timer;
 use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\FileTransfer\CallbacksCollection;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\FileTransfer\FileTransferActionsEnum;
+use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\FileTransfer\FileTransferMetadata;
 
 class FileTransferClient
 {
-    const int CMD_INIT_TRANSFER = 0x01;
-    const int CMD_DATA_CHUNK = 0x02;
-    const int CMD_TRANSFER_COMPLETE = 0x03;
-    const int CMD_TRANSFER_ERROR = 0x04;
     const int CMD_REQUEST_RESEND = 0x05;
 
     const int CHUNK_SIZE = 65536;
@@ -25,11 +23,13 @@ class FileTransferClient
 
     // Referencia al servidor Swoole para usar su event loop
     private ?Server $server = null;
-    private ?int $serverFd = null;
+    private array $transferMetadata = [];
 
     public function __construct(
         protected readonly ?LoggerInterface $logger = null
-    ) {}
+    )
+    {
+    }
 
     /**
      * Inicializa el cliente dentro del contexto de un Swoole\Server
@@ -69,14 +69,24 @@ class FileTransferClient
     }
 
     /**
+     * Recupera los metadatos asociados a una transferencia
+     */
+    public function getTransferMetadata(string $transferId): ?FileTransferMetadata
+    {
+        return $this->transferMetadata[$transferId] ?? null;
+    }
+
+    /**
      * Envía un archivo a otro microservicio
      * Este método no bloquea y retorna inmediatamente
      */
     public function sendFileToMicroservice(
-        string $filePath,
-        ?string $fileName = null,
-        ?CallbacksCollection $onComplete = null
-    ): ?string {
+        string                $filePath,
+        ?string               $fileName = null,
+        ?CallbacksCollection  $onComplete = null,
+        ?FileTransferMetadata $metadata = null
+    ): ?string
+    {
         if (!$this->client || !$this->client->isConnected()) {
             $this->logger?->error("Not connected to target microservice");
             return null;
@@ -114,12 +124,13 @@ class FileTransferClient
 
         // Enviar comando de inicio (asíncrono, no bloquea)
         $initPacket = json_encode([
-            'action' => 'file_transfer_init',
+            'action' => FileTransferActionsEnum::TransferInit->value,
             'transfer_id' => $transferId,
             'file_name' => $fileName,
             'file_size' => $fileSize,
             'chunk_size' => self::CHUNK_SIZE,
-            'total_chunks' => $totalChunks
+            'total_chunks' => $totalChunks,
+            'metadata' => $metadata?->toArray() ?? []
         ]);
 
         $this->client->send($initPacket);
@@ -189,7 +200,7 @@ class FileTransferClient
             }
 
             $chunkPacket = json_encode([
-                'action' => 'file_transfer_chunk',
+                'action' => FileTransferActionsEnum::TransferChunk->value,
                 'transfer_id' => $transferId,
                 'chunk_index' => $chunkIndex,
                 'data' => base64_encode($chunkData)
@@ -205,7 +216,7 @@ class FileTransferClient
         } else {
             // Enviar notificación de completado
             $completePacket = json_encode([
-                'action' => 'file_transfer_complete',
+                'action' => FileTransferActionsEnum::TransferComplete->value,
                 'transfer_id' => $transferId,
                 'total_chunks' => $transfer['total_chunks'],
                 'transfer_time' => microtime(true) - $transfer['start_time']
@@ -244,6 +255,7 @@ class FileTransferClient
     private function handleSendResponse(string $transferId, array $packet): void
     {
         $transfer = $this->pendingTransfers[$transferId];
+        $metadata = $this->transferMetadata[$transferId] ?? new FileTransferMetadata();
 
         if (isset($packet['error'])) {
             // El servidor reportó un error
@@ -256,6 +268,10 @@ class FileTransferClient
             $this->resendChunks($transferId, $packet['missing_chunks'] ?? []);
             return;
         }
+        // El servidor puede devolver metadatos de respuesta
+        $responseMetadata = isset($packet['response_metadata'])
+            ? FileTransferMetadata::fromArray($packet['response_metadata'])
+            : null;
 
         // Asumimos confirmación exitosa
         $elapsed = microtime(true) - $transfer['start_time'];
@@ -263,7 +279,7 @@ class FileTransferClient
             "Microservice confirmed transfer {$transferId} in {$elapsed}s"
         );
 
-        $this->executeCallbacks($transferId, $transfer['file_path'], true);
+        $this->executeCallbacks($transferId, $transfer['file_path'], true, $metadata, $responseMetadata);
         $this->cleanupTransfer($transferId);
     }
 
@@ -282,7 +298,7 @@ class FileTransferClient
 
             if ($chunkData !== false) {
                 $chunkPacket = json_encode([
-                    'action' => 'file_transfer_chunk',
+                    'action' => FileTransferActionsEnum::TransferChunk->value,
                     'transfer_id' => $transferId,
                     'chunk_index' => $chunkIndex,
                     'data' => base64_encode($chunkData)
@@ -304,7 +320,11 @@ class FileTransferClient
         $this->cleanupTransfer($transferId);
     }
 
-    private function executeCallbacks(string $transferId, string $finalPath, bool $success): void
+    private function executeCallbacks(
+        string                $transferId,
+        string                $finalPath, bool $success,
+        ?FileTransferMetadata $requestMetadata = null,
+        ?FileTransferMetadata $responseMetadata = null): void
     {
         if (!isset($this->sendCompleteCallbacks[$transferId])) {
             return;
@@ -315,7 +335,7 @@ class FileTransferClient
 
         foreach ($callbacks as $callback) {
             try {
-                $callback($transferId, $finalPath, $success);
+                $callback($transferId, $finalPath, $success, $requestMetadata, $responseMetadata);
             } catch (\Throwable $e) {
                 $this->logger?->error(
                     "Error in transfer callback for {$transferId}: {$e->getMessage()}"
@@ -326,7 +346,8 @@ class FileTransferClient
 
     private function cleanupTransfer(string $transferId): void
     {
-        unset($this->pendingTransfers[$transferId]);
+        unset($this->pendingTransfers[$transferId],
+            $this->transferMetadata[$transferId]);
     }
 
     private function scheduleReconnect(string $host, int $port): void

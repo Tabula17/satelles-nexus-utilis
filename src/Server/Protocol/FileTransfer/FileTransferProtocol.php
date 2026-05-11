@@ -28,7 +28,9 @@ class FileTransferProtocol implements ProtocolManagerInterface
 
     private array $activeTransfers = [];
     protected array $completeCallbacks = [];
+    protected array $completeCallbacksMetadata = [];
     protected CallbacksCollection $receiveCallbacks;
+    private array $receiveCallbacksMetadata = [];
     protected readonly string $storagePath;
 
     private Table $transferState;
@@ -161,7 +163,14 @@ class FileTransferProtocol implements ProtocolManagerInterface
     /**
      * Inicia una transferencia de archivo desde el servidor al cliente
      */
-    public function sendFile(Server $server, int $fd, string $filePath, ?string $fileName = null, CallbacksCollection|TransferCompleteInterface|null $onComplete = null): bool
+    public function sendFile(
+        Server                                             $server,
+        int                                                $fd,
+        string                                             $filePath,
+        ?string                                            $fileName = null,
+        CallbacksCollection|TransferCompleteInterface|null $onComplete = null,
+        ?FileTransferMetadata                              $metadata = null
+    ): bool
     {
         if (!file_exists($filePath)) {
             $this->logger?->error("File not found: {$filePath}");
@@ -192,6 +201,7 @@ class FileTransferProtocol implements ProtocolManagerInterface
                 $onComplete = new CallbacksCollection([$onComplete]);
             }
             $this->completeCallbacks[$transferId] = $onComplete;
+            $this->completeCallbacksMetadata[$transferId] = $metadata ?? new FileTransferMetadata();
         }
         // Enviar comando de inicio
         $initPacket = $this->createPacket(self::CMD_INIT_TRANSFER, [
@@ -267,6 +277,7 @@ class FileTransferProtocol implements ProtocolManagerInterface
 
             $server->send($transfer['fd'], $completePacket);
             $this->logger?->info("Transfer {$transferId} completed in " . (microtime(true) - $transfer['start_time']) . "s");
+            $this->onTransferComplete($transferId, $transfer['file_path'], true);
         }
     }
 
@@ -288,6 +299,12 @@ class FileTransferProtocol implements ProtocolManagerInterface
             'received_chunks' => 0,
             'is_sender' => false
         ]);
+
+        $metadata = isset($packet['metadata'])
+            ? FileTransferMetadata::fromArray($packet['metadata'])
+            : new FileTransferMetadata();
+
+        $this->receiveCallbacksMetadata[$transferId] = $metadata;
 
         // Crear archivo temporal (cada worker escribe en el mismo archivo compartido)
         $tempFile = $this->storagePath . '/' . $transferId . '.part';
@@ -536,13 +553,14 @@ class FileTransferProtocol implements ProtocolManagerInterface
 
         if ($isSender) {
             // Callbacks específicos para esta transferencia de envío
-            if (isset($this->sendCompleteCallbacks[$transferId])) {
-                $callbacks = $this->sendCompleteCallbacks[$transferId];
-                unset($this->sendCompleteCallbacks[$transferId]);
-
+            if (isset($this->completeCallbacks[$transferId])) {
+                $callbacks = $this->completeCallbacks[$transferId];
+                unset($this->completeCallbacks[$transferId]);
+                $metadata = $this->completeCallbacksMetadata[$transferId] ?? null;
+                unset($this->completeCallbacksMetadata[$transferId]);
                 foreach ($callbacks as $callback) {
                     try {
-                        $callback($transferId, $finalPath, $success);
+                        $callback($transferId, $finalPath, $success, null, $metadata);
                     } catch (Throwable $e) {
                         $this->logger?->error(
                             "Error in send complete callback for transfer {$transferId}: {$e->getMessage()}"
@@ -551,10 +569,15 @@ class FileTransferProtocol implements ProtocolManagerInterface
                 }
             }
         } else {
+            $metadata = FileTransferMetadata::fromArray($this->receiveCallbacksMetadata[$transferId] ?? []);
+            unset($this->receiveCallbacksMetadata[$transferId]);
+            $completeMetadata = $this->completeCallbacksMetadata[$transferId] ?? null;
+            unset($this->completeCallbacksMetadata[$transferId]);
             // Callbacks generales de recepción
             foreach ($this->receiveCallbacks as $callback) {
                 try {
-                    $callback($transferId, $finalPath, $success);
+                    /** @var TransferCompleteInterface $callback */
+                    $callback($transferId, $finalPath, $success, $metadata, $completeMetadata);
                 } catch (Throwable $e) {
                     $this->logger?->error(
                         "Error in receive complete callback for transfer {$transferId}: {$e->getMessage()}"

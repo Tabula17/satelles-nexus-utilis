@@ -12,10 +12,10 @@ class AnonymousWrapper implements TransferCompleteInterface
         $this->callbacks = $args;
     }
 
-    public function __invoke(string $transferId, string $finalPath, bool $success): bool
+    public function __invoke(string $transferId, string $finalPath, bool $success, ?FileTransferMetadata $requestMetadata = null, ?FileTransferMetadata $responseMetadata = null): bool
     {
         foreach ($this->callbacks as $callback) {
-            $callback($transferId, $finalPath, $success);
+            $callback($transferId, $finalPath, $success, $requestMetadata, $responseMetadata);
         }
         return true;
     }
