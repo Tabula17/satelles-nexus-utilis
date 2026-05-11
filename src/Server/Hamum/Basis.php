@@ -79,7 +79,8 @@ abstract class Basis extends Server implements HamumServerInterface
 
     public function handleReceiveEvent(Server $server, int $fd, int $reactorId, string $data): void
     {
-        $this?->logger?->debug("Handling receive event for fd {$fd} with data: {$data}");
+        $bytes = strlen($data);
+        $this?->logger?->debug("Handling receive event for fd {$fd} with data: {$bytes}");
         $protocolAction = json_validate($data) ? json_decode($data, true)['action'] : '';
         if ($this->hasReceiveHandlers($protocolAction)) {
             $eventHandlers = array_merge($this->getEventActionHandlers('receive', $protocolAction), $this->getEventActionHandlers('receive', '*'));
