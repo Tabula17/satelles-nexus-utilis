@@ -7,10 +7,10 @@ use Swoole\Coroutine\System;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\Http\Server;
-use Tabula17\Satelles\Nexus\Utilis\Server\MimeTypes;
 use Tabula17\Satelles\Nexus\Utilis\Server\Trait\HamumTrait;
 use Tabula17\Satelles\Utilis\Collection\CallableCollection;
 use Tabula17\Satelles\Utilis\Config\TCPServerConfig;
+use Tabula17\Satelles\Utilis\File\MimeTypes;
 
 abstract class Graphema extends Server implements HamumServerInterface
 {

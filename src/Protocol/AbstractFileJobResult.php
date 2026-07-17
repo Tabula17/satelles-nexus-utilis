@@ -9,7 +9,7 @@ use Swoole\Coroutine\Channel;
 use Swoole\Coroutine\System;
 use Swoole\Http\Response;
 use Swoole\Server;
-use Tabula17\Satelles\Nexus\Utilis\Server\MimeTypes;
+use Tabula17\Satelles\Utilis\File\MimeTypes;
 use Tabula17\Satelles\Utilis\Job\AbstractJobResult;
 
 abstract class AbstractFileJobResult extends AbstractJobResult implements FileJobResultInterface
