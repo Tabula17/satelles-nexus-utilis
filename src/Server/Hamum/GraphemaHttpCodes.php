@@ -2,7 +2,9 @@
 
 namespace Tabula17\Satelles\Nexus\Utilis\Server\Hamum;
 
-enum GraphemaHttpCodes
+use JsonSerializable;
+
+enum GraphemaHttpCodes implements JsonSerializable
 {
     // 1xx: Informational
     case CONTINUE;
@@ -387,6 +389,18 @@ enum GraphemaHttpCodes
 
         return $enum;
     }
+    public static function tryFrom(int $code): ?self
+    {
+        try {
+            return self::getOrFail($code);
+        } catch (\InvalidArgumentException) {
+            return null;
+        }
+    }
+    public static function from(int $code): self
+    {
+        return self::getOrFail($code);
+    }
 
     /**
      * Verifica si un código HTTP es válido
@@ -478,5 +492,10 @@ HTML;
         }
 
         return $this->html();
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return $this->httpCode();
     }
 }

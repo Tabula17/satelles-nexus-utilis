@@ -21,6 +21,9 @@ class DbConfig extends ConnectionConfig
      * @var DriversEnum $driver
      */
     protected(set) DriversEnum $driver {
+        /**
+         * @throws InvalidArgumentException
+         */
         set(DriversEnum|string $driver) {
             if (is_string($driver)) {
                 $driver = DriversEnum::fromName($driver);
