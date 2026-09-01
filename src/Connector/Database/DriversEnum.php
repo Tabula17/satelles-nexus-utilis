@@ -19,7 +19,7 @@ enum DriversEnum: string
     public static function fromName(string $value): DriversEnum
     {
         return match ($value) {
-            'mysql', 'mariadb', 'maria' => self::MYSQL,
+            'mysql', 'mysqli', 'mariadb', 'maria' => self::MYSQL,
             'mssql', 'sqlsrv' => self::SQLSRV,
             'pgsql', 'postgres', 'postgresql' => self::PGSQL,
             'sqlite' => self::SQLITE,
@@ -38,15 +38,38 @@ enum DriversEnum: string
         return in_array($driver, self::getAvailableDrivers(), true);
     }
 
-    public static function isAvailable(string|DriversEnum $driver): bool
+    public function native(): string
     {
-        $driver = $driver instanceof self ? $driver->value : $driver;
-        if (!self::isSupported($driver)) {
+        return match ($this) {
+            self::MYSQL => 'mysqli',
+            self::SQLSRV => 'sqlsrv',
+            self::PGSQL => 'pgsql',
+            self::SQLITE => 'sqlite',
+            self::ORACLE => 'oci8',
+        };
+    }
+
+    public function supportNative(): bool
+    {
+        return extension_loaded($this->native());
+    }
+
+    public function pdo(): string
+    {
+        return 'pdo_' . $this->value;
+    }
+
+    public function supportPdo(): bool
+    {
+        return extension_loaded($this->pdo());
+    }
+
+    public static function isAvailable(string|self $driver): bool
+    {
+        if (is_string($driver) && !self::isSupported($driver)) {
             return false;
         }
-        if (!str_starts_with($driver, 'pdo_')) {
-            $driver = 'pdo_' . $driver;
-        }
-        return extension_loaded($driver);
+        $driver = $driver instanceof self ? $driver : self::fromName($driver);
+        return $driver->supportPdo() || $driver->supportNative();
     }
 }

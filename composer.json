@@ -62,6 +62,11 @@
   "suggest": {
     "ext-redis": "Redis extension for caching",
     "ext-memcached": "Memcached extension for caching",
+    "ext-mysqli": "MySQL extension for database connectivity",
+    "ext-pgsql": "PostgreSQL extension for database connectivity",
+    "ext-sqlite3": "SQLite3 extension for database connectivity",
+    "ext-oci8": "Oracle extension for database connectivity",
+    "ext-sqlsrv": "SQL Server extension for database connectivity",
     "monolog/monolog": "Logging",
     "bramus/monolog-colored-line-formatter": "dev-master"
   }
