@@ -122,7 +122,7 @@ class DbConfig extends ConnectionConfig
                 }
                 break;
             case DriversEnum::ORACLE:
-                if ($this->unixSocket) {
+                if (isset($this->unixSocket)) {
                     $dsn = "oci:dbname=//{$this->unixSocket}";
                 } else {
                     $host = $this->host;
