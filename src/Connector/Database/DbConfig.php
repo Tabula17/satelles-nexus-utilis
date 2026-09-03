@@ -229,7 +229,7 @@ class DbConfig extends ConnectionConfig
                 }
                 $arguments['connection_string'] = $this->createPdoDsn();
                 if (isset($this->charset)) {
-                    $arguments['character_set'] = $this->charset;
+                    $arguments['encoding'] = $this->charset;
                 }
                 return oci_connect(...$arguments);
             case 'sqlite':
