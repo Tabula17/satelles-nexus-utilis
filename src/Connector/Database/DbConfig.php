@@ -231,6 +231,7 @@ class DbConfig extends ConnectionConfig
                 if (isset($this->charset)) {
                     $arguments['encoding'] = $this->charset;
                 }
+                var_export($arguments);
                 return oci_connect(...$arguments);
             case 'sqlite':
                 return new SQLite3($this->host);
