@@ -185,7 +185,7 @@ class DbConfig extends ConnectionConfig
                     }
                 }
                 if (isset($this->dbname)) {
-                    $arguments['dbname'] = $this->dbname;
+                    $arguments['database'] = $this->dbname;
                 }
                 if (isset($this->username)) {
                     $arguments['username'] = $this->username;
