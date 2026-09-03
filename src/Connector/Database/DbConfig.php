@@ -260,7 +260,7 @@ class DbConfig extends ConnectionConfig
     /**
      * @throws InvalidArgumentException
      */
-    public function getDbConnector()
+    public function getConnector(): mixed
     {
         if ($this->usePdo) {
             if (!$this->driver->supportPdo()) {
