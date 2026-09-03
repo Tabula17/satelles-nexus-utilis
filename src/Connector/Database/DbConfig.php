@@ -258,7 +258,10 @@ class DbConfig extends ConnectionConfig
     }
 
     /**
-     * @throws InvalidArgumentException
+     * Retrieves a connector instance based on the configured database driver and connection type.
+     *
+     * @return mixed The connector instance, either a PDO connection or a native connection, depending on the driver's support.
+     * @throws InvalidArgumentException If the specified database driver does not support the required connection type.
      */
     public function getConnector(): mixed
     {
