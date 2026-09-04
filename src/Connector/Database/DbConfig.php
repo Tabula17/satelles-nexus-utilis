@@ -138,14 +138,14 @@ class DbConfig extends ConnectionConfig
                     $dsn .= "/{$this->dbname}";
                 }
                 if (isset($this->charset)) {
-                    $dsn .= ";charset={$this->charset}";
+                    $this->dsnOptions['charset'] = $this->charset;
                 }
                 break;
             case DriversEnum::SQLITE:
                 $dsn = "sqlite:{$this->dbname}";
                 break;
         }
-        if (isset($this->dsnOptions)) {
+        if (isset($this->dsnOptions) && count($this->dsnOptions) > 0) {
             $dsn .= ';';
             foreach ($this->dsnOptions as $key => $value) {
                 $dsn .= "{$key}={$value};";
@@ -231,6 +231,7 @@ class DbConfig extends ConnectionConfig
                     $arguments['password'] = $this->password;
                 }
                 $arguments['connection_string'] = substr(strstr($this->createPdoDsn(), '='), 1);
+                $arguments['connection_string'] = str_contains($arguments['connection_string'], ';') ? strstr($arguments['connection_string'], ';', true) : $arguments['connection_string'];
                 if (isset($this->charset)) {
                     $arguments['encoding'] = $this->charset;
                 }
