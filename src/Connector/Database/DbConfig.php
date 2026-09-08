@@ -39,6 +39,10 @@ class DbConfig extends ConnectionConfig
     protected(set) array $dsnOptions = [];
     public array $metadata = [];
 
+    private ?PDO $pdoConnection = null;
+    private mixed $nativeConnection = null;
+
+
     /**
      * Checks if a connection to the specified host and port can be established.
      *
@@ -204,7 +208,7 @@ class DbConfig extends ConnectionConfig
                 $arguments = [];
                 $server = $this->host;
                 if (isset($this->port)) {
-                    $server .= ",{$this->port}";
+                    $server .= ", {$this->port}";
                 }
                 if (isset($this->dbname)) {
                     $arguments['Database'] = $this->dbname;
@@ -215,12 +219,10 @@ class DbConfig extends ConnectionConfig
                 if (isset($this->password)) {
                     $arguments['PWD'] = $this->password;
                 }
-                if (isset($this->options)) {
-                    $arguments['ConnectionOptions'] = $this->options;
-                }
                 if (isset($this->charset)) {
                     $arguments['CharacterSet'] = $this->charset;
                 }
+                $arguments = array_merge($arguments, $this->dsnOptions, $this->options);
                 return sqlsrv_connect($server, $arguments);
             case 'oci8':
                 $arguments = [];
@@ -262,22 +264,79 @@ class DbConfig extends ConnectionConfig
     }
 
     /**
-     * Retrieves a connector instance based on the configured database driver and connection type.
-     *
+     * Returns the database connector instance based on the configuration.
+     * If PDO is used, it returns a PDO instance; otherwise, it returns the native database connection instance.
+     * If the connection has not been established yet or if $invalidate is true, it will create a new connection.
+     * @param bool $asNew
      * @return mixed The connector instance, either a PDO connection or a native connection, depending on the driver's support.
      * @throws InvalidArgumentException If the specified database driver does not support the required connection type.
      */
-    public function getConnector(): mixed
+    public function getConnector(bool $asNew = false): mixed
     {
         if ($this->usePdo) {
             if (!$this->driver->supportPdo()) {
                 throw new InvalidArgumentException(sprintf(ExceptionDefinitions::DATABASE_DRIVER_NOT_SUPPORTED->value, $this->driver->value));
             }
-            return $this->getPdoConnection();
+            if (!$this->pdoConnection || $asNew) {
+                $this->pdoConnection = $this->getPdoConnection();
+            }
+            return $this->pdoConnection;
         }
         if (!$this->driver->supportNative()) {
             throw new InvalidArgumentException(sprintf(ExceptionDefinitions::DATABASE_DRIVER_NOT_SUPPORTED->value, $this->driver->value));
         }
-        return $this->getNativeConnection();
+        if (!$this->nativeConnection || $asNew) {
+            $this->nativeConnection = $this->getNativeConnection();
+        }
+        return $this->nativeConnection;
+    }
+
+    public function close(): void
+    {
+        if (isset($this->pdoConnection)) {
+            $this->pdoConnection = null;
+        }
+        if (isset($this->nativeConnection)) {
+            try {
+                switch ($this->driver->native()) {
+                    case 'mysqli':
+                        $this->nativeConnection->close();
+                        break;
+                    case 'oci8':
+                        oci_close($this->nativeConnection);
+                        break;
+                    case 'pgsql':
+                        pg_close($this->nativeConnection);
+                        break;
+                    case 'sqlsrv':
+                        sqlsrv_close($this->nativeConnection);
+                        break;
+                }
+            } catch (\Throwable $ignored) {
+            }
+            $this->nativeConnection = null;
+        }
+    }
+
+    public function copy(): static
+    {
+        return clone $this;
+    }
+
+    public function hasConnector(): bool
+    {
+        return isset($this->nativeConnection) || isset($this->pdoConnection);
+    }
+
+    public function __invoke(bool $asNew = true): mixed
+    {
+        return $this->getConnector($asNew);
+    }
+
+    public function __destruct()
+    {
+        if ($this->hasConnector()) {
+            $this->close();
+        }
     }
 }
