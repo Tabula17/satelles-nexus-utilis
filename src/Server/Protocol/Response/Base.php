@@ -1,12 +1,12 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response;
+namespace Tabula17\Satelles\Utilis\Server\Protocol\Response;
 
-use Tabula17\Satelles\Nexus\Utilis\Exception\UnexpectedValueException;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Data\Stats;
+use Tabula17\Satelles\Utilis\Exception\UnexpectedValueException;
+use Tabula17\Satelles\Utilis\Server\Protocol\Data\Stats;
 use Tabula17\Satelles\Utilis\Collection\CallableCollection;
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
+use Tabula17\Satelles\Utilis\Server\Protocol\Status;
 
 abstract class Base extends AbstractDescriptor implements ResponseInterface
 {

@@ -35,7 +35,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Tabula17\\Satelles\\Nexus\\Utilis\\": "src/"
+      "Tabula17\\Satelles\\Utilis\\": "src/"
     }
   },
   "repositories": [

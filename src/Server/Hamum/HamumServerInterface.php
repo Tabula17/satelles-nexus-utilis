@@ -1,6 +1,6 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Hamum;
+namespace Tabula17\Satelles\Utilis\Server\Hamum;
 
 interface HamumServerInterface
 {

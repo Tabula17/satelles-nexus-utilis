@@ -1,13 +1,13 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\Pubsub\Request;
+namespace Tabula17\Satelles\Utilis\Server\Protocol\Managers\Pubsub\Request;
 
-use Tabula17\Satelles\Nexus\Utilis\Exception\RuntimeException;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\Pubsub\Definition;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\Pubsub\PayloadDescriptor\TopicDescriptor;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request\Payload;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\Base;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
+use Tabula17\Satelles\Utilis\Exception\RuntimeException;
+use Tabula17\Satelles\Utilis\Server\Protocol\Managers\Pubsub\Definition;
+use Tabula17\Satelles\Utilis\Server\Protocol\Managers\Pubsub\PayloadDescriptor\TopicDescriptor;
+use Tabula17\Satelles\Utilis\Server\Protocol\Request\Payload;
+use Tabula17\Satelles\Utilis\Server\Protocol\Response\Base;
+use Tabula17\Satelles\Utilis\Server\Protocol\Status;
 
 class Subscribe extends Payload
 {

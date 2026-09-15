@@ -1,8 +1,8 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\Type;
+namespace Tabula17\Satelles\Utilis\Server\Protocol\Response\Type;
 
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
+use Tabula17\Satelles\Utilis\Server\Protocol\Status;
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
 
 class StatusDescriptor extends AbstractDescriptor

@@ -1,21 +1,21 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\JsonRpc;
+namespace Tabula17\Satelles\Utilis\Server\Protocol\Managers\JsonRpc;
 
 use Psr\Log\LoggerInterface;
 use Swoole\Coroutine;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\Table;
-use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\GraphemaHttpCodes;
-use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\JsonRpc\ResponseDescriptor\ResultResponse;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ProtocolManagerInterface;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\Base;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Rpc\RpcProcessorCollection;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Rpc\RpcProcessorInterface;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ServiceProtocol;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
+use Tabula17\Satelles\Utilis\Definition\GraphemaHttpCodes;
+use Tabula17\Satelles\Utilis\Server\Hamum\HamumServerInterface;
+use Tabula17\Satelles\Utilis\Server\Protocol\Managers\JsonRpc\ResponseDescriptor\ResultResponse;
+use Tabula17\Satelles\Utilis\Server\Protocol\ProtocolManagerInterface;
+use Tabula17\Satelles\Utilis\Server\Protocol\Response\Base;
+use Tabula17\Satelles\Utilis\Server\Protocol\Rpc\RpcProcessorCollection;
+use Tabula17\Satelles\Utilis\Server\Protocol\Rpc\RpcProcessorInterface;
+use Tabula17\Satelles\Utilis\Server\Protocol\ServiceProtocol;
+use Tabula17\Satelles\Utilis\Server\Protocol\Status;
 use Tabula17\Satelles\Utilis\Exception\UnexpectedValueException;
 
 class JsonRpcManager implements ProtocolManagerInterface

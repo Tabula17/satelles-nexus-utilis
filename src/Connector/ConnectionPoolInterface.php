@@ -1,12 +1,12 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Connector;
+namespace Tabula17\Satelles\Utilis\Connector;
 
 
 use Swoole\ConnectionPool;
 use Swoole\Database\PDOProxy;
-use Tabula17\Satelles\Nexus\Utilis\Connector\Pool\PoolCollection;
-use Tabula17\Satelles\Nexus\Utilis\Connector\Pool\PoolDescriptor;
+use Tabula17\Satelles\Utilis\Connector\Pool\PoolCollection;
+use Tabula17\Satelles\Utilis\Connector\Pool\PoolDescriptor;
 use Tabula17\Satelles\Utilis\Collection\ConnectionCollection;
 use Tabula17\Satelles\Utilis\Config\ConnectionConfig;
 

@@ -2,12 +2,12 @@
 declare(strict_types=1);
 include_once __DIR__ . '/../../../../../vendor/autoload.php';
 
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Data\Stats;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\Pubsub\Definition;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\Pubsub\Request\Publish;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\Pubsub\Request\Subscribe;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\Pubsub\Request\Unsubscribe;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\StatusResponse;
+use Tabula17\Satelles\Utilis\Server\Protocol\Data\Stats;
+use Tabula17\Satelles\Utilis\Server\Protocol\Managers\Pubsub\Definition;
+use Tabula17\Satelles\Utilis\Server\Protocol\Managers\Pubsub\Request\Publish;
+use Tabula17\Satelles\Utilis\Server\Protocol\Managers\Pubsub\Request\Subscribe;
+use Tabula17\Satelles\Utilis\Server\Protocol\Managers\Pubsub\Request\Unsubscribe;
+use Tabula17\Satelles\Utilis\Server\Protocol\Response\StatusResponse;
 
 $pubsub = new Definition(
     [

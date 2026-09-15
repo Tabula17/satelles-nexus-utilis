@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 include_once __DIR__ . '/../../../vendor/autoload.php';
 
-use Tabula17\Satelles\Nexus\Utilis\Connector\Database\DbConfig;
-use Tabula17\Satelles\Nexus\Utilis\Connector\Database\Driver\MysqliDriver;
-use Tabula17\Satelles\Nexus\Utilis\Connector\Database\Driver\OciDriver;
-use Tabula17\Satelles\Nexus\Utilis\Connector\Database\Driver\PdoDriver;
-use Tabula17\Satelles\Nexus\Utilis\Connector\Database\Driver\SqlSrvDriver;
-use Tabula17\Satelles\Nexus\Utilis\Connector\Database\DriversEnum;
-use Tabula17\Satelles\Nexus\Utilis\Connector\Database\OperationsEnum;
+use Tabula17\Satelles\Utilis\Connector\Database\DbConfig;
+use Tabula17\Satelles\Utilis\Connector\Database\Driver\MysqliDriver;
+use Tabula17\Satelles\Utilis\Connector\Database\Driver\OciDriver;
+use Tabula17\Satelles\Utilis\Connector\Database\Driver\PdoDriver;
+use Tabula17\Satelles\Utilis\Connector\Database\Driver\SqlSrvDriver;
+use Tabula17\Satelles\Utilis\Connector\Database\DriversEnum;
+use Tabula17\Satelles\Utilis\Connector\Database\OperationsEnum;
 
 $tiempo_inicio = microtime(true);
 $memoria_inicio = memory_get_usage();

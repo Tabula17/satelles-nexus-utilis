@@ -1,6 +1,6 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Process;
+namespace Tabula17\Satelles\Utilis\Process;
 
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
 

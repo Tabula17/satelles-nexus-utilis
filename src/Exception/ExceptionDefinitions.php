@@ -1,6 +1,6 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Exception;
+namespace Tabula17\Satelles\Utilis\Exception;
 
 enum ExceptionDefinitions: string
 {

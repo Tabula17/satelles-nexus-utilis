@@ -1,6 +1,6 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol;
+namespace Tabula17\Satelles\Utilis\Server\Protocol;
 
 enum Status: string
 {

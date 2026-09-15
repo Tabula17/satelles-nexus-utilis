@@ -1,13 +1,13 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Trait;
+namespace Tabula17\Satelles\Utilis\Server\Trait;
 
 use Psr\Log\LoggerInterface;
 use Swoole\Server;
-use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ProtocolManagerCollection;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ProtocolManagerInterface;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request\Action;
+use Tabula17\Satelles\Utilis\Server\Hamum\HamumServerInterface;
+use Tabula17\Satelles\Utilis\Server\Protocol\ProtocolManagerCollection;
+use Tabula17\Satelles\Utilis\Server\Protocol\ProtocolManagerInterface;
+use Tabula17\Satelles\Utilis\Server\Protocol\Request\Action;
 
 trait MatrixTrait
 {

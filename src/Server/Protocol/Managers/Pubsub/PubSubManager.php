@@ -1,25 +1,25 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\Pubsub;
+namespace Tabula17\Satelles\Utilis\Server\Protocol\Managers\Pubsub;
 
 use Psr\Log\LoggerInterface;
 use Swoole\Http\Request;
 use Swoole\Table;
-use Tabula17\Satelles\Nexus\Utilis\Exception\RuntimeException;
-use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\Filum;
-use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Data\Stats;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\Pubsub\PayloadDescriptor\PublishDelivery;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\Pubsub\Request\Publish;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\Pubsub\Request\Subscribe;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\Pubsub\Request\Unsubscribe;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\Pubsub\Subscription\ChannelDescriptor;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\Pubsub\Subscription\SubscriberDescriptor;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\Pubsub\Subscription\SubscriptionDescriptor;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ProtocolManagerInterface;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\StatusResponse as ResponseStatus;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ServiceProtocol;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
+use Tabula17\Satelles\Utilis\Exception\RuntimeException;
+use Tabula17\Satelles\Utilis\Server\Hamum\Filum;
+use Tabula17\Satelles\Utilis\Server\Hamum\HamumServerInterface;
+use Tabula17\Satelles\Utilis\Server\Protocol\Data\Stats;
+use Tabula17\Satelles\Utilis\Server\Protocol\Managers\Pubsub\PayloadDescriptor\PublishDelivery;
+use Tabula17\Satelles\Utilis\Server\Protocol\Managers\Pubsub\Request\Publish;
+use Tabula17\Satelles\Utilis\Server\Protocol\Managers\Pubsub\Request\Subscribe;
+use Tabula17\Satelles\Utilis\Server\Protocol\Managers\Pubsub\Request\Unsubscribe;
+use Tabula17\Satelles\Utilis\Server\Protocol\Managers\Pubsub\Subscription\ChannelDescriptor;
+use Tabula17\Satelles\Utilis\Server\Protocol\Managers\Pubsub\Subscription\SubscriberDescriptor;
+use Tabula17\Satelles\Utilis\Server\Protocol\Managers\Pubsub\Subscription\SubscriptionDescriptor;
+use Tabula17\Satelles\Utilis\Server\Protocol\ProtocolManagerInterface;
+use Tabula17\Satelles\Utilis\Server\Protocol\Response\StatusResponse as ResponseStatus;
+use Tabula17\Satelles\Utilis\Server\Protocol\ServiceProtocol;
+use Tabula17\Satelles\Utilis\Server\Protocol\Status;
 use Tabula17\Satelles\Utilis\Exception\UnexpectedValueException;
 
 class PubSubManager implements ProtocolManagerInterface

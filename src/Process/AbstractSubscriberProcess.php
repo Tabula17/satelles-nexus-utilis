@@ -1,10 +1,10 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Process;
+namespace Tabula17\Satelles\Utilis\Process;
 
 use Psr\Log\LoggerInterface;
 use Swoole\Process;
-use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
+use Tabula17\Satelles\Utilis\Server\Hamum\HamumServerInterface;
 
 abstract class AbstractSubscriberProcess
 {

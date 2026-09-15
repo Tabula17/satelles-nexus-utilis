@@ -1,6 +1,6 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\Type;
+namespace Tabula17\Satelles\Utilis\Server\Protocol\Response\Type;
 
 
 use InvalidArgumentException;

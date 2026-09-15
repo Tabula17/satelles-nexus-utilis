@@ -1,10 +1,10 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Hamum;
+namespace Tabula17\Satelles\Utilis\Server\Hamum;
 
 use Psr\Log\LoggerInterface;
 use Swoole\Server;
-use Tabula17\Satelles\Nexus\Utilis\Server\Trait\HamumTrait;
+use Tabula17\Satelles\Utilis\Server\Trait\HamumTrait;
 use Tabula17\Satelles\Utilis\Collection\CallableCollection;
 use Tabula17\Satelles\Utilis\Config\TCPServerConfig;
 

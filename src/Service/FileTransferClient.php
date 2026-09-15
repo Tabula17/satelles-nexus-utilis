@@ -1,14 +1,14 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Service;
+namespace Tabula17\Satelles\Utilis\Service;
 
 use Psr\Log\LoggerInterface;
 use Swoole\Client;
 use Swoole\Server;
 use Swoole\Timer;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\FileTransfer\CallbacksCollection;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\FileTransfer\FileTransferActionsEnum;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\FileTransfer\FileTransferMetadata;
+use Tabula17\Satelles\Utilis\Server\Protocol\FileTransfer\CallbacksCollection;
+use Tabula17\Satelles\Utilis\Server\Protocol\FileTransfer\FileTransferActionsEnum;
+use Tabula17\Satelles\Utilis\Server\Protocol\FileTransfer\FileTransferMetadata;
 
 class FileTransferClient
 {

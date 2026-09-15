@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tabula17\Satelles\Nexus\Utilis\Protocol;
+namespace Tabula17\Satelles\Utilis\Protocol;
 
 use Swoole\Coroutine;
 use Swoole\Coroutine\Channel;

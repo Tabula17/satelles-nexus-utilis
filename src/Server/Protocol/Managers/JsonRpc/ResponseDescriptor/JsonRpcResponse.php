@@ -1,8 +1,8 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\JsonRpc\ResponseDescriptor;
+namespace Tabula17\Satelles\Utilis\Server\Protocol\Managers\JsonRpc\ResponseDescriptor;
 
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\Type\ErrorDescriptor;
+use Tabula17\Satelles\Utilis\Server\Protocol\Response\Type\ErrorDescriptor;
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
 
 //<-- {"jsonrpc": "2.0", "error": {"code": -32600, "message": "Invalid Request"}, "id": null}

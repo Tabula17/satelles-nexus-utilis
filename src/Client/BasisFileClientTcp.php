@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Tabula17\Satelles\Nexus\Utilis\Client;
+namespace Tabula17\Satelles\Utilis\Client;
 
 use JsonException;
 use RuntimeException;
 use Swoole\Coroutine\Client;
-use Tabula17\Satelles\Nexus\Utilis\Protocol\FileServerActionsEnum;
+use Tabula17\Satelles\Utilis\Protocol\FileServerActionsEnum;
 use Tabula17\Satelles\Utilis\Config\TCPServerConfig;
 
 /**

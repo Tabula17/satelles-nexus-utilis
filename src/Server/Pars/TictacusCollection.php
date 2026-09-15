@@ -1,6 +1,6 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Pars;
+namespace Tabula17\Satelles\Utilis\Server\Pars;
 
 use Tabula17\Satelles\Utilis\Collection\GenericCollection;
 

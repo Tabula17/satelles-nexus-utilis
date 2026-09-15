@@ -1,6 +1,6 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Connector\Database;
+namespace Tabula17\Satelles\Utilis\Connector\Database;
 
 use Swoole\Coroutine\Channel;
 use Throwable;
@@ -12,8 +12,6 @@ use Throwable;
 class DbPool
 {
     private Channel $pool;
-    private(set) int $size;
-
     private(set) int $available = 0;
     private(set) int $used = 0;
     private(set) PoolStatusEnum $status = PoolStatusEnum::EMPTY;
@@ -25,15 +23,14 @@ class DbPool
      * @param int $size The size of the channel pool. Defaults to 10.
      * @return void
      */
-    public function __construct(private readonly DbConfig $dbConfig, int $size = 10)
+    public function __construct(private readonly DbConfig $dbConfig, private(set) readonly int $size = 10)
     {
-        $this->size = $size;
-        $this->pool = new Channel($size);
+        $this->pool = new Channel($this->size);
     }
 
     /**
      * Fills the connection pool by initializing connectors and adding them to the pool.
-     * Resets the available and used counters, and updates the pool's status based on connectivity.
+     * Resets the available and used counters and updates the pool's status based on connectivity.
      *
      * @return void
      */

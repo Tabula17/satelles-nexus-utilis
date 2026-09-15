@@ -1,8 +1,8 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request;
+namespace Tabula17\Satelles\Utilis\Server\Protocol\Request;
 
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\ResponseCollection;
+use Tabula17\Satelles\Utilis\Server\Protocol\Response\ResponseCollection;
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
 use Tabula17\Satelles\Utilis\Exception\UnexpectedValueException;
 

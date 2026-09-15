@@ -1,6 +1,6 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Connector;
+namespace Tabula17\Satelles\Utilis\Connector;
 
 enum Status:string
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response;
+namespace Tabula17\Satelles\Utilis\Server\Protocol\Response;
 
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\Type\StatusDescriptor;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status ;
+use Tabula17\Satelles\Utilis\Server\Protocol\Response\Type\StatusDescriptor;
+use Tabula17\Satelles\Utilis\Server\Protocol\Status ;
 
 class StatusResponse extends Base
 {

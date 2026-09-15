@@ -1,13 +1,13 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Process;
+namespace Tabula17\Satelles\Utilis\Process;
 
 use Psr\Log\LoggerInterface;
 use Redis;
 use Swoole\Coroutine;
 use Swoole\Timer;
-use Tabula17\Satelles\Nexus\Utilis\Exception\RuntimeException;
-use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
+use Tabula17\Satelles\Utilis\Exception\RuntimeException;
+use Tabula17\Satelles\Utilis\Server\Hamum\HamumServerInterface;
 use Tabula17\Satelles\Utilis\Config\RedisConfig;
 use Tabula17\Satelles\Utilis\Trait\CoroutineHelper;
 use Throwable;

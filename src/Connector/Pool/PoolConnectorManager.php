@@ -1,14 +1,14 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Connector\Pool;
+namespace Tabula17\Satelles\Utilis\Connector\Pool;
 
 use Psr\Log\LoggerInterface;
 use Swoole\ConnectionPool;
 use Swoole\Coroutine;
 use Swoole\Database\PDOProxy;
-use Tabula17\Satelles\Nexus\Utilis\Connector\ConnectionPoolInterface;
-use Tabula17\Satelles\Nexus\Utilis\Exception\ExceptionDefinitions;
-use Tabula17\Satelles\Nexus\Utilis\Exception\InvalidArgumentException;
+use Tabula17\Satelles\Utilis\Connector\ConnectionPoolInterface;
+use Tabula17\Satelles\Utilis\Exception\ExceptionDefinitions;
+use Tabula17\Satelles\Utilis\Exception\InvalidArgumentException;
 use Tabula17\Satelles\Utilis\Collection\ConnectionCollection;
 use Tabula17\Satelles\Utilis\Config\ConnectionConfig;
 use Tabula17\Satelles\Utilis\Trait\CoroutineHelper;

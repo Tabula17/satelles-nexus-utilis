@@ -1,6 +1,6 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response;
+namespace Tabula17\Satelles\Utilis\Server\Protocol\Response;
 
 use Tabula17\Satelles\Utilis\Collection\ClassCollection;
 use Tabula17\Satelles\Utilis\Collection\TypedCollection;

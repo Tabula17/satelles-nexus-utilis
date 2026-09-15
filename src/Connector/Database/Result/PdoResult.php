@@ -1,9 +1,9 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Connector\Database\Result;
+namespace Tabula17\Satelles\Utilis\Connector\Database\Result;
 
 use PDOStatement;
-use Tabula17\Satelles\Nexus\Utilis\Connector\Database\ResultInterface;
+use Tabula17\Satelles\Utilis\Connector\Database\ResultInterface;
 use Tabula17\Satelles\Utilis\Collection\DataModelCollection;
 
  class PdoResult implements ResultInterface

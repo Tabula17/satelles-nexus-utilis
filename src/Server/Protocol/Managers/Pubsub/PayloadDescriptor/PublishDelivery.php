@@ -1,9 +1,9 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\Pubsub\PayloadDescriptor;
+namespace Tabula17\Satelles\Utilis\Server\Protocol\Managers\Pubsub\PayloadDescriptor;
 
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\Base;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
+use Tabula17\Satelles\Utilis\Server\Protocol\Response\Base;
+use Tabula17\Satelles\Utilis\Server\Protocol\Status;
 
 class PublishDelivery extends Base
 {

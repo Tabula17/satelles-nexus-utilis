@@ -1,14 +1,14 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Connector\Pool;
+namespace Tabula17\Satelles\Utilis\Connector\Pool;
 
 use DateTime;
 use PDO;
 use Swoole\ConnectionPool;
 use Swoole\Database\PDOConfig;
 use Swoole\Database\PDOProxy;
-use Tabula17\Satelles\Nexus\Utilis\Connector\Status;
-use Tabula17\Satelles\Nexus\Utilis\Exception\RuntimeException;
+use Tabula17\Satelles\Utilis\Connector\Status;
+use Tabula17\Satelles\Utilis\Exception\RuntimeException;
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
 use Tabula17\Satelles\Utilis\Config\ConnectionConfig;
 

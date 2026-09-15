@@ -1,6 +1,6 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Protocol;
+namespace Tabula17\Satelles\Utilis\Protocol;
 
 use Generator;
 use Swoole\Coroutine\Channel;

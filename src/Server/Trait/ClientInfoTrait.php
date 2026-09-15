@@ -1,6 +1,6 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Trait;
+namespace Tabula17\Satelles\Utilis\Server\Trait;
 
 use Swoole\Table;
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Processor;
+namespace Tabula17\Satelles\Utilis\Server\Processor;
 
-use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
+use Tabula17\Satelles\Utilis\Server\Hamum\HamumServerInterface;
 
 interface EndpointProcessorInterface
 {

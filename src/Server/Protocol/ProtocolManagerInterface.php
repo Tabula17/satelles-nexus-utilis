@@ -1,10 +1,10 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol;
+namespace Tabula17\Satelles\Utilis\Server\Protocol;
 
 
-use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request\Action;
+use Tabula17\Satelles\Utilis\Server\Hamum\HamumServerInterface;
+use Tabula17\Satelles\Utilis\Server\Protocol\Request\Action;
 
 interface ProtocolManagerInterface
 {

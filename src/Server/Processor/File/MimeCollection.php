@@ -1,6 +1,6 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Processor\File;
+namespace Tabula17\Satelles\Utilis\Server\Processor\File;
 
 use Tabula17\Satelles\Utilis\Collection\TypedEnumCollection;
 use Tabula17\Satelles\Utilis\File\MimeTypes;

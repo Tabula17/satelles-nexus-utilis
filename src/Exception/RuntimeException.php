@@ -1,8 +1,8 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Exception;
+namespace Tabula17\Satelles\Utilis\Exception;
 
-use Tabula17\Satelles\Nexus\Utilis\Exception\NexusException;
+use Tabula17\Satelles\Utilis\Exception\NexusException;
 
 class RuntimeException extends NexusException
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Data;
+namespace Tabula17\Satelles\Utilis\Server\Protocol\Data;
 
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
 

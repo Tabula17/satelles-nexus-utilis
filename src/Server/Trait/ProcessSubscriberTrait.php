@@ -1,8 +1,8 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Trait;
+namespace Tabula17\Satelles\Utilis\Server\Trait;
 
-use Tabula17\Satelles\Nexus\Utilis\Process\AbstractSubscriberProcess;
+use Tabula17\Satelles\Utilis\Process\AbstractSubscriberProcess;
 
 trait ProcessSubscriberTrait
 {

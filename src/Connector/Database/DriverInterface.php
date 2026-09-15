@@ -1,6 +1,6 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Connector\Database;
+namespace Tabula17\Satelles\Utilis\Connector\Database;
 
 interface DriverInterface
 {

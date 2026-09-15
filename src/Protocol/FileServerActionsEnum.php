@@ -1,8 +1,8 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Protocol;
+namespace Tabula17\Satelles\Utilis\Protocol;
 
-use Tabula17\Satelles\Nexus\Utilis\Exception\InvalidArgumentException;
+use Tabula17\Satelles\Utilis\Exception\InvalidArgumentException;
 
 enum FileServerActionsEnum
 {

@@ -1,17 +1,17 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\FileTransfer;
+namespace Tabula17\Satelles\Utilis\Server\Protocol\FileTransfer;
 
 use Psr\Log\LoggerInterface;
 use Swoole\Server;
 use Swoole\Table;
 use Swoole\Timer;
-use Tabula17\Satelles\Nexus\Utilis\Exception\RuntimeException;
-use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumServerInterface;
-use Tabula17\Satelles\Nexus\Utilis\Server\Hamum\HamumTypes;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ProtocolManagerInterface;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request\Action;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\ServiceProtocol;
+use Tabula17\Satelles\Utilis\Exception\RuntimeException;
+use Tabula17\Satelles\Utilis\Server\Hamum\HamumServerInterface;
+use Tabula17\Satelles\Utilis\Server\Hamum\HamumTypes;
+use Tabula17\Satelles\Utilis\Server\Protocol\ProtocolManagerInterface;
+use Tabula17\Satelles\Utilis\Server\Protocol\Request\Action;
+use Tabula17\Satelles\Utilis\Server\Protocol\ServiceProtocol;
 use Throwable;
 
 class FileTransferProtocol implements ProtocolManagerInterface

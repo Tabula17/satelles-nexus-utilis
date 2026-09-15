@@ -1,9 +1,9 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Connector\Database;
+namespace Tabula17\Satelles\Utilis\Connector\Database;
 
-use Tabula17\Satelles\Nexus\Utilis\Exception\ExceptionDefinitions;
-use Tabula17\Satelles\Nexus\Utilis\Exception\InvalidArgumentException;
+use Tabula17\Satelles\Utilis\Exception\ExceptionDefinitions;
+use Tabula17\Satelles\Utilis\Exception\InvalidArgumentException;
 
 enum DriversEnum: string
 {

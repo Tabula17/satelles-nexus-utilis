@@ -1,13 +1,13 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Trait;
+namespace Tabula17\Satelles\Utilis\Server\Trait;
 
 use Psr\Log\LoggerInterface;
 use Swoole\Server as TcpUdpServer;
 use Swoole\Http\Server as HttpServer;
 use Swoole\WebSocket\Server as WebSocketServer;
 use Swoole\Server\Task;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
+use Tabula17\Satelles\Utilis\Server\Protocol\Status;
 use Tabula17\Satelles\Utilis\Collection\CallableCollection;
 
 trait HamumTrait

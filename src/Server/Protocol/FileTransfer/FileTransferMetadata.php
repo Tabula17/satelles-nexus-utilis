@@ -1,6 +1,6 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\FileTransfer;
+namespace Tabula17\Satelles\Utilis\Server\Protocol\FileTransfer;
 
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
 

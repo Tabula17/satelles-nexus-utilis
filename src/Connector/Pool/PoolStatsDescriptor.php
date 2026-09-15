@@ -1,6 +1,6 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Connector\Pool;
+namespace Tabula17\Satelles\Utilis\Connector\Pool;
 
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
 

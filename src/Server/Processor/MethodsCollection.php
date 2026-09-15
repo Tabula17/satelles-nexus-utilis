@@ -1,6 +1,6 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Processor;
+namespace Tabula17\Satelles\Utilis\Server\Processor;
 
 use Tabula17\Satelles\Utilis\Collection\TypedCollection;
 

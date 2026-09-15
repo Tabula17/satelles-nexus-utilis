@@ -1,15 +1,15 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Connector\Database\Driver;
+namespace Tabula17\Satelles\Utilis\Connector\Database\Driver;
 
 use PDO;
 use PDOStatement;
-use Tabula17\Satelles\Nexus\Utilis\Connector\Database\DbConfig;
-use Tabula17\Satelles\Nexus\Utilis\Connector\Database\DriverInterface;
-use Tabula17\Satelles\Nexus\Utilis\Connector\Database\OperationsEnum;
-use Tabula17\Satelles\Nexus\Utilis\Connector\Database\Result\PdoResult;
-use Tabula17\Satelles\Nexus\Utilis\Connector\Database\ResultInterface;
-use Tabula17\Satelles\Nexus\Utilis\Exception\InvalidArgumentException;
+use Tabula17\Satelles\Utilis\Connector\Database\DbConfig;
+use Tabula17\Satelles\Utilis\Connector\Database\DriverInterface;
+use Tabula17\Satelles\Utilis\Connector\Database\OperationsEnum;
+use Tabula17\Satelles\Utilis\Connector\Database\Result\PdoResult;
+use Tabula17\Satelles\Utilis\Connector\Database\ResultInterface;
+use Tabula17\Satelles\Utilis\Exception\InvalidArgumentException;
 use Tabula17\Satelles\Utilis\Collection\DataModelCollection;
 
 class PdoDriver implements DriverInterface

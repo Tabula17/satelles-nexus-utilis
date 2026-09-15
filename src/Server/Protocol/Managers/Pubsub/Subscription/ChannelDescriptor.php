@@ -1,6 +1,6 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\Pubsub\Subscription;
+namespace Tabula17\Satelles\Utilis\Server\Protocol\Managers\Pubsub\Subscription;
 
 use Swoole\Table;
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;

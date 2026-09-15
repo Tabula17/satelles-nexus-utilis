@@ -1,9 +1,9 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Managers\JsonRpc\ResponseDescriptor;
+namespace Tabula17\Satelles\Utilis\Server\Protocol\Managers\JsonRpc\ResponseDescriptor;
 
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Response\Base;
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Status;
+use Tabula17\Satelles\Utilis\Server\Protocol\Response\Base;
+use Tabula17\Satelles\Utilis\Server\Protocol\Status;
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
 
 /**

@@ -1,8 +1,8 @@
 <?php
 
-namespace Tabula17\Satelles\Nexus\Utilis\Server\Protocol\FileTransfer;
+namespace Tabula17\Satelles\Utilis\Server\Protocol\FileTransfer;
 
-use Tabula17\Satelles\Nexus\Utilis\Server\Protocol\Request\Action;
+use Tabula17\Satelles\Utilis\Server\Protocol\Request\Action;
 
 class Definition extends Action
 {
