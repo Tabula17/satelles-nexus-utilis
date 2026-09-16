@@ -36,8 +36,15 @@ abstract class ApiResponse
 
     abstract protected function configureBody(?ApiProcessResultCollection $results = null): void;
 
-    final public function prepare(ApiPathConfig $apiPathConfig, ApiProcessResultCollection $results): self
+    final public function prepare(ApiPathConfig $apiPathConfig, ApiProcessResultCollection $results, ?HttpStatusEnum $status = null, array $errors = []): self
     {
+        if ($status && $status->isError() && !empty($errors)) {
+            $this->errors = $errors;
+            $this->statusCode = $status;
+            $this->contentType = $apiPathConfig->headers->has('Content-Type') ? $apiPathConfig->headers->get('Content-Type') : MimeTypes::JSON;
+            $this->configureBody();
+            return $this;
+        }
         try {
             $this->configure($apiPathConfig);
             $this->configureBody($results);

@@ -62,6 +62,14 @@ enum HttpMethodEnum implements JsonSerializable
             default => self::GET,
         };
     }
+    public function isNot(string $method): bool
+    {
+        return $this->value() !== $method;
+    }
+    public function is(string $method): bool
+    {
+        return $this->value() === $method;
+    }
     public function isPost(): bool
     {
         return $this === self::POST;

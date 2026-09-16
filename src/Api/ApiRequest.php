@@ -4,6 +4,7 @@ namespace Tabula17\Satelles\Utilis\Api;
 
 
 use Tabula17\Satelles\Utilis\Config\ApiPathConfig;
+use Tabula17\Satelles\Utilis\Definition\HttpStatusEnum;
 use Tabula17\Satelles\Utilis\Utilities\Request;
 
 /**
@@ -46,5 +47,13 @@ class ApiRequest
             $this->results->add($processor->process($this->apiPathConfig, $this->payload));
         });
         return $this->response->prepare($this->apiPathConfig, $this->results);
+    }
+    private function validateMethod():bool
+    {
+        if( PHP_SAPI !== 'cli' && $this->apiPathConfig->method->isNot($_SERVER['REQUEST_METHOD'])) {
+            $this->response->set('statusCode', HttpStatusEnum::METHOD_NOT_ALLOWED);
+            return false;
+        }
+        return true;
     }
 }
