@@ -16,7 +16,7 @@ enum DriversEnum: string
     /**
      * @throws InvalidArgumentException
      */
-    public static function fromName(string $value): DriversEnum
+    public static function fromName(string $value): self
     {
         return match ($value) {
             'mysql', 'mysqli', 'mariadb', 'maria' => self::MYSQL,

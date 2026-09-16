@@ -63,7 +63,7 @@ class DbPool
      *
      * @return mixed The connection object retrieved from the pool, or null if no connection is available.
      */
-    public function pop()
+    public function pop(): mixed
     {
         $conn = $this->pool->pop();
         if ($conn && $this->available > 0) {

@@ -4,7 +4,7 @@ namespace Tabula17\Satelles\Utilis\Definition;
 
 use JsonSerializable;
 
-enum GraphemaHttpCodes implements JsonSerializable
+enum HttpStatusEnum implements JsonSerializable
 {
     // 1xx: Informational
     case CONTINUE;
@@ -477,7 +477,7 @@ enum GraphemaHttpCodes implements JsonSerializable
     <h1>{$this->httpCode()}</h1>
     <p>{$this->message()}</p>
     <footer>
-        <p>&copy; Nexus Graphema Server by Tabula 17</p>
+        <p>&copy; Nexus Http Status by Tabula 17</p>
     </footer>
 </body>
 </html>

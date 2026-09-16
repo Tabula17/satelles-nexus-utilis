@@ -6,7 +6,7 @@ use Psr\Log\LoggerInterface;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\Http\Server;
-use Tabula17\Satelles\Utilis\Definition\GraphemaHttpCodes;
+use Tabula17\Satelles\Utilis\Definition\HttpStatusEnum;
 use Tabula17\Satelles\Utilis\Server\Trait\HamumTrait;
 use Tabula17\Satelles\Utilis\Collection\CallableCollection;
 use Tabula17\Satelles\Utilis\Config\TCPServerConfig;
@@ -94,7 +94,7 @@ abstract class Graphema extends Server implements HamumServerInterface
             $response->end(file_get_contents($filePath));
         } else {
             $this->logger?->debug("🙅🏼‍♂️ 404 Not Found: {$filePath}");
-            $this->sendHttpError($response, GraphemaHttpCodes::NOT_FOUND);
+            $this->sendHttpError($response, HttpStatusEnum::NOT_FOUND);
         }
     }
 
@@ -105,7 +105,7 @@ abstract class Graphema extends Server implements HamumServerInterface
         return $file;
     }
 
-    protected function sendHttpError(Response $response, GraphemaHttpCodes $err = GraphemaHttpCodes::NOT_FOUND): void
+    protected function sendHttpError(Response $response, HttpStatusEnum $err = HttpStatusEnum::NOT_FOUND): void
     {
         $response->header('Content-Type', 'text/html; charset=utf-8');
         $content = $err->fromPath($this->htmlFilesPath);
@@ -177,7 +177,7 @@ abstract class Graphema extends Server implements HamumServerInterface
                 $this->handleHtmlContent($ifFile, $response);
                 return;
             }
-            $this->sendHttpError($response, GraphemaHttpCodes::NOT_FOUND);
+            $this->sendHttpError($response, HttpStatusEnum::NOT_FOUND);
         } else {
             $this->logger?->debug("🧩 Executing request handlers for {$cleanRequestUri}");
             foreach ($eventHandlers as $callback) {

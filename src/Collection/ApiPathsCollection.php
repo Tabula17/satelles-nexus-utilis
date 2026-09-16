@@ -3,7 +3,6 @@
 namespace Tabula17\Satelles\Utilis\Collection;
 
 use Tabula17\Satelles\Utilis\Definition\HttpMethodEnum;
-use Tabula17\Satelles\Utilis\Collection\TypedCollection;
 use Tabula17\Satelles\Utilis\Config\ApiPathConfig;
 use Throwable;
 

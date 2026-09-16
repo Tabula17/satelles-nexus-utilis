@@ -7,7 +7,7 @@ use Swoole\Coroutine;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\Table;
-use Tabula17\Satelles\Utilis\Definition\GraphemaHttpCodes;
+use Tabula17\Satelles\Utilis\Definition\HttpStatusEnum;
 use Tabula17\Satelles\Utilis\Server\Hamum\HamumServerInterface;
 use Tabula17\Satelles\Utilis\Server\Protocol\Managers\JsonRpc\ResponseDescriptor\ResultResponse;
 use Tabula17\Satelles\Utilis\Server\Protocol\ProtocolManagerInterface;
@@ -255,7 +255,7 @@ class JsonRpcManager implements ProtocolManagerInterface
     {
         if (trim($request->server['request_uri'], '/') !== $this->definition->call) {
             $this->logger?->debug("Requesting RPC API for {$request->server['request_uri']} is different from {$this->definition->call}");
-            $err = GraphemaHttpCodes::NOT_FOUND;
+            $err = HttpStatusEnum::NOT_FOUND;
             $response->status($err->httpCode());
             $response->end($err->fromPath($request->server['html_files_path']));
             return;
@@ -263,7 +263,7 @@ class JsonRpcManager implements ProtocolManagerInterface
 
         if($request->getMethod()!=='POST') {
             $this->logger?->debug("Bad request method {$request->getMethod()} for {$request->server['request_uri']}");
-            $err = GraphemaHttpCodes::BAD_REQUEST;
+            $err = HttpStatusEnum::BAD_REQUEST;
             $response->status($err->httpCode());
             $response->end($err->fromPath($request->server['html_files_path']));
             return;
@@ -367,7 +367,7 @@ class JsonRpcManager implements ProtocolManagerInterface
     public function getHttpRpcJsonInfo(Request $request, Response $response): void
     {
         if (trim($request->server['request_uri'], '/') !== $this->definition->call . '/info') {
-            $err = GraphemaHttpCodes::NOT_FOUND;
+            $err = HttpStatusEnum::NOT_FOUND;
             $response->status($err->httpCode());
             $response->end($err->fromPath($request->server['html_files_path']));
             return;

@@ -2,7 +2,10 @@
 
 namespace Tabula17\Satelles\Utilis\Api;
 
-class ApiProcessResult
-{
+use Tabula17\Satelles\Utilis\File\MimeTypes;
 
+abstract class ApiProcessResult
+{
+    protected(set) MimeTypes $outputType = MimeTypes::JSON;
+    abstract public function getOutput(): string;
 }

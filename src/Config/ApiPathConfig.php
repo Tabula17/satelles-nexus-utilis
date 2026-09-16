@@ -131,7 +131,7 @@ class ApiPathConfig extends AbstractDescriptor
     {
         $pathParams = $this->getPathParams();
         $params = $withPlaceholders ? $pathParams->getPlaceholders($onlyValid) : $pathParams->getValues($onlyValid);
-        return '/' . implode('/', array_merge(...array_map(fn($k, $v) => [$k, $v], array_keys($params), $params)));
+        return '/' . implode('/', array_merge(...array_map(static fn($k, $v) => [$k, $v], array_keys($params), $params)));
     }
 
     public function getPathParams(): BaseParamsCollection

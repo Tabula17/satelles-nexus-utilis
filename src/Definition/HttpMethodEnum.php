@@ -48,10 +48,9 @@ enum HttpMethodEnum implements JsonSerializable
         }
         return $method;
     }
-    public static function fromString(string $method): ?self
+    public static function fromString(string $method): self
     {
         return match (strtoupper($method)) {
-            'GET' => self::GET,
             'POST' => self::POST,
             'PUT' => self::PUT,
             'DELETE' => self::DELETE,
@@ -60,8 +59,44 @@ enum HttpMethodEnum implements JsonSerializable
             'OPTIONS' => self::OPTIONS,
             'TRACE' => self::TRACE,
             'CONNECT' => self::CONNECT,
-            default => null,
+            default => self::GET,
         };
+    }
+    public function isPost(): bool
+    {
+        return $this === self::POST;
+    }
+    public function isGet(): bool
+    {
+        return $this === self::GET;
+    }
+    public function isPut(): bool
+    {
+        return $this === self::PUT;
+    }
+    public function isPatch(): bool
+    {
+        return $this === self::PATCH;
+    }
+    public function isDelete(): bool
+    {
+        return $this === self::DELETE;
+    }
+    public function isHead(): bool
+    {
+        return $this === self::HEAD;
+    }
+    public function isOptions(): bool
+    {
+        return $this === self::OPTIONS;
+    }
+    public function isTrace(): bool
+    {
+        return $this === self::TRACE;
+    }
+    public function isConnect(): bool
+    {
+        return $this === self::CONNECT;
     }
 
     public function jsonSerialize(): mixed
