@@ -42,7 +42,6 @@ class ApiRequest
     public function process(): ApiResponse
     {
         $this->payload = new Request();
-
         $this->processors->each(function(ApiProcessInterface $processor){
             $this->results->add($processor->process($this->apiPathConfig, $this->payload));
         });

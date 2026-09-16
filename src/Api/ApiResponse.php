@@ -34,7 +34,7 @@ abstract class ApiResponse
 
     abstract protected function configure(ApiPathConfig $apiPathConfig): void;
 
-    abstract protected function configureBody(ApiProcessResultCollection $results): void;
+    abstract protected function configureBody(?ApiProcessResultCollection $results = null): void;
 
     final public function prepare(ApiPathConfig $apiPathConfig, ApiProcessResultCollection $results): self
     {
