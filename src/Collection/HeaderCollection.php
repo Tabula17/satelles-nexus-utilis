@@ -55,7 +55,7 @@ class HeaderCollection extends TypedCollection
 
     public function getHeaders(): array
     {
-        $headers = $this->getHeaders();
+        $headers = $this->toArray();
         array_walk($headers, static fn(&$value) => $value = (string)$value);
         return $headers;
     }
