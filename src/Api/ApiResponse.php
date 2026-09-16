@@ -45,7 +45,8 @@ abstract class ApiResponse
             $this->errors[] = $err->getMessage();
             $this->statusCode = HttpStatusEnum::INTERNAL_SERVER_ERROR;
             $this->contentType = MimeTypes::JSON;
-            $this->body = json_encode(['errors' => $this->errors]);
+            //$this->body = json_encode(['errors' => $this->errors]);
+            $this->configureBody(); //dejamos la implementación de la salida de errores a la clase derivada. `configureBody` se ejecuta sin parámetros, los errores se a,macenan en `errors`
         }
         return $this;
     }
