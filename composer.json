@@ -56,6 +56,7 @@
   },
   "require-dev": {
     "swoole/ide-helper": "@dev",
+    "guzzlehttp/guzzle": "8.2.x-dev",
     "monolog/monolog": "^3.0@dev",
     "bramus/monolog-colored-line-formatter": "dev-master"
   },
@@ -67,6 +68,7 @@
     "ext-sqlite3": "SQLite3 extension for database connectivity",
     "ext-oci8": "Oracle extension for database connectivity",
     "ext-sqlsrv": "SQL Server extension for database connectivity",
+    "guzzlehttp/guzzle": "Cliente HTTP para PHP (usado x por el Trait HttpClientTrait)",
     "monolog/monolog": "Logging",
     "bramus/monolog-colored-line-formatter": "dev-master"
   }
