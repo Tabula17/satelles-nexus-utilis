@@ -2,9 +2,11 @@
 
 namespace Tabula17\Satelles\Utilis\Config;
 
+use Tabula17\Satelles\Utilis\Collection\HeaderCollection;
 use Tabula17\Satelles\Utilis\Definition\HttpMethodEnum;
 use Tabula17\Satelles\Utilis\Collection\BaseParamsCollection;
 use Tabula17\Satelles\Utilis\Config\AbstractDescriptor;
+use Tabula17\Satelles\Utilis\Exception\InvalidArgumentException;
 
 class ApiPathConfig extends AbstractDescriptor
 {
@@ -25,37 +27,19 @@ class ApiPathConfig extends AbstractDescriptor
                 $this->method = $value;
             }
         }
-    protected(set) array $headers = []
+    /**
+     * Headers to be sent with the request/response.
+     * @var HeaderCollection $headers
+     */
+    protected(set) HeaderCollection $headers
         {
-            set {
-                $value = array_map(
-                    static function ($value) {
-                        if (!is_string(is_callable($value) ? $value() : $value)) {
-                            throw new \InvalidArgumentException('Los valores de los headers deben ser cadenas');
-                        }
-                        return $value;
-                    }, $value
-                );
-                $this->headers = $value;
+            set(array|HeaderCollection $value) {
+                $this->headers = is_array($value) ? new HeaderCollection($value) : $value;
             }
             get {
-                $normalizer = static function ($value) {
-                    return is_callable($value) ? $value() : $value;
-                };
-
-                return array_map($normalizer, $this->headers);
+                return $this->headers ?? new HeaderCollection();
             }
         }
-    public array $headersAsStrings {
-        get {
-            $normalizer = static function ($value, $key) {
-                return is_numeric($key) && str_contains($value, ":") ? ucfirst($value) : "$key: $value";
-            };
-
-            return array_map($normalizer, $this->headers, array_keys($this->headers));
-        }
-
-    }
     protected(set) bool $requiresAuth = false;
     protected(set) bool $pathParams = false;
     protected(set) string $placeholder = ':%%name%%'; //{%%name%%} // etc ;
@@ -99,18 +83,20 @@ class ApiPathConfig extends AbstractDescriptor
                 return $this->options;
             }
         }
-    protected(set) BaseParamsCollection $requestHeaders //todo: generar una clase derviada de BaseOParams y BaseParamsCollection para headers
+    /**
+     * Accept headers to specify the media types that are acceptable.
+     * @var HeaderCollection $acceptHeaders
+     */
+    protected(set) HeaderCollection $acceptHeaders
         {
-            set (BaseParamsCollection|array $value) {
-                if (is_array($value)) {
-                    $value = BaseParamsCollection::fromArray($value);
-                }
-                $this->requestHeaders = $value;
+            set(array|HeaderCollection $value) {
+                $this->acceptHeaders = is_array($value) ? new HeaderCollection($value) : $value;
             }
             get {
-                return $this->requestHeaders ?? new BaseParamsCollection();
+                return $this->acceptHeaders ?? new HeaderCollection();
             }
         }
+
     protected(set) string $baseUrl
         {
             set {
@@ -134,12 +120,12 @@ class ApiPathConfig extends AbstractDescriptor
         return '/' . implode('/', array_merge(...array_map(static fn($k, $v) => [$k, $v], array_keys($params), $params)));
     }
 
-    public function getPathParams(): BaseParamsCollection
+    public function getPathParams(): ?BaseParamsCollection
     {
         return $this->params->filter(fn($value, $key) => $value instanceof ApiParam && $value->pathParam);
     }
 
-    public function getQueryParams(): BaseParamsCollection
+    public function getQueryParams(): ?BaseParamsCollection
     {
         return $this->params->filter(fn($value, $key) => $value instanceof ApiParam ? $value->queryParam : true);
     }
