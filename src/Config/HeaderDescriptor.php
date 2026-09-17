@@ -23,11 +23,21 @@ class HeaderDescriptor extends AbstractDescriptor
         }
 
 
-    public function __construct(string $name, string|Closure $value, protected(set) bool $readonly = false)
+    public function __construct(string $name, string|Closure $value, protected bool $readonly = false)
     {
         $this->name = $name;
         $this->value = $value;
         parent::__construct();
+    }
+
+    public function isReadonly(): bool
+    {
+        return $this->readonly;
+    }
+
+    public function asArray(): array
+    {
+        return [$this->name => $this->value];
     }
 
     public function __toString(): string
