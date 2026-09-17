@@ -64,7 +64,13 @@ class HeaderCollection extends TypedCollection
             }
         }
         $value = self::cast($value);
-        $this->set($value->name, $value);
+        if ($value instanceof HeaderDescriptor) {
+            if (isset($this->values[$value->name])) {
+                $this->values[$value->name]->set('value', $value->value);
+            } else {
+                $this->values[$value->name] = $value;
+            }
+        }
         //  parent::add($value);
     }
 
