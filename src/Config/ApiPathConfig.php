@@ -34,6 +34,8 @@ class ApiPathConfig extends AbstractDescriptor
     protected(set) HeaderCollection $headers
         {
             set(array|HeaderCollection $value) {
+
+
                 $this->headers = is_array($value) ? new HeaderCollection($value) : $value;
             }
             get {

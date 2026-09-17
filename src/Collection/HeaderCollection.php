@@ -14,7 +14,29 @@ class HeaderCollection extends TypedCollection
      */
     public function __construct(iterable $headers = [])
     {
-        foreach ($headers as $header) {
+        /*
+         * posibilidades:
+         * - array de HeaderDescriptor
+         * - array de string con el formato "nombre: valor"
+         * - array de array con el formato ["nombre" => "valor"]
+         * - string con el formato "nombre: valor"
+         * - string con el formato "nombre: valor\r\n otro: valor"
+         *
+         * 1. Si es un array de HeaderDescriptor, se crea una instancia de HeaderCollection con esos headers.
+         * 2. Si es un array de string con el formato "nombre: valor", se crea una instancia de HeaderDescriptor con esos headers.
+         * 3. Si es un array de array con el formato ["nombre" => "valor"], se crea una instancia de HeaderDescriptor con esos headers.
+         * 4. Si es una cadena con el formato "nombre: valor", se crea una instancia de HeaderDescriptor con esos headers.
+         * 5. Si es una cadena con el formato "nombre: valor\r\n otro: valor", se crea una instancia de HeaderDescriptor con esos headers.
+         */
+
+        foreach ($headers as $key => $header) {
+            if (is_string($key)) {
+                if (is_array($header)) {
+                    $header = new HeaderDescriptor($key, ...$header);
+                } else {
+                    $header = new HeaderDescriptor($key, $header);
+                }
+            }
             $this->add($header);
         }
         parent::__construct();
