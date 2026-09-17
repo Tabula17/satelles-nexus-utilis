@@ -37,6 +37,9 @@ class HeaderCollection extends TypedCollection
                     $header = new HeaderDescriptor($key, $header);
                 }
             }
+            if (is_int($key) && is_array($header) && count($header) === 1) {
+                $header = new HeaderDescriptor(key($header), current($header));
+            }
             $this->add($header);
         }
         parent::__construct();
