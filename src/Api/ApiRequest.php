@@ -26,9 +26,9 @@ class ApiRequest
      */
     public function __construct(
         public readonly ApiPathConfig $apiPathConfig,
-        public readonly ApiResponse $response,
-        ?ApiProcessorsCollection $processors = null,
-        ?ApiProcessResultCollection $results = null)
+        public readonly ApiResponse   $response,
+        ?ApiProcessorsCollection      $processors = null,
+        ?ApiProcessResultCollection   $results = null)
     {
         $this->processors = $processors ?? new ApiProcessorsCollection();
         $this->results = $results ?? new ApiProcessResultCollection();
@@ -43,17 +43,20 @@ class ApiRequest
     public function process(): ApiResponse
     {
         $this->payload = new Request();
-        $this->processors->each(function(ApiProcessInterface $processor){
-            $this->results->add($processor->process($this->apiPathConfig, $this->payload));
+        if (PHP_SAPI !== 'cli' && $this->apiPathConfig->method !== $this->payload->method) {
+            return $this->response->prepare($this->apiPathConfig, $this->results, HttpStatusEnum::METHOD_NOT_ALLOWED, [
+                HttpStatusEnum::METHOD_NOT_ALLOWED->message()
+            ]);
+        }
+        $this->processors->until(function (ApiProcessInterface $processor) {
+            try {
+                $result = $processor->process($this->apiPathConfig, $this->payload);
+                $this->results->add($result);
+                return $result->halt();
+            } catch (\Throwable $ignored) {
+                return false;
+            }
         });
         return $this->response->prepare($this->apiPathConfig, $this->results);
-    }
-    private function validateMethod():bool
-    {
-        if( PHP_SAPI !== 'cli' && $this->apiPathConfig->method->isNot($_SERVER['REQUEST_METHOD'])) {
-            $this->response->set('statusCode', HttpStatusEnum::METHOD_NOT_ALLOWED);
-            return false;
-        }
-        return true;
     }
 }

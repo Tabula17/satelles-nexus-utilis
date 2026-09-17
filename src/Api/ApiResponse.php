@@ -10,7 +10,12 @@ use Tabula17\Satelles\Utilis\File\MimeTypes;
 abstract class ApiResponse
 {
     protected(set) MimeTypes $contentType;
-    protected(set) HttpStatusEnum $statusCode;
+    public HttpStatusEnum $statusCode
+        {
+            set(string|HttpStatusEnum $status) {
+                $this->statusCode = is_string($status) ? HttpStatusEnum::tryFrom($status) : $status;
+            }
+        }
     protected(set) array $headers;
     abstract protected(set) mixed $body {
         set;

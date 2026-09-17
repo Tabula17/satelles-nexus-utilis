@@ -8,4 +8,5 @@ abstract class ApiProcessResult
 {
     protected(set) MimeTypes $outputType = MimeTypes::JSON;
     abstract public function getOutput(): mixed;
+    abstract public function halt(): bool;
 }
