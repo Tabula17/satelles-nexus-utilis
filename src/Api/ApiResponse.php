@@ -14,6 +14,7 @@ abstract class ApiResponse
     protected(set) array $headers;
     abstract protected(set) mixed $body {
         set;
+        get;
     }
 
     /**
