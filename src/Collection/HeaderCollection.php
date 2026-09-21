@@ -61,13 +61,20 @@ class HeaderCollection extends TypedCollection
     }
 
     /**
+     * @param array<HeaderDescriptor> $headers
      * @throws UnexpectedValueException
      * @throws InvalidArgumentException
      */
-    public function load(array $headers): void
+    public function load(array $headers, bool $replace = true): void
     {
+
         foreach ($headers as $header) {
-            $this->add($header);
+            if (!($header instanceof HeaderDescriptor)) {
+                $header = self::cast($header);
+            }
+            if ($replace || !$this->has($header->name)) {
+                $this->add($header);
+            }
         }
 
     }
@@ -98,5 +105,10 @@ class HeaderCollection extends TypedCollection
     public function getHeaderNames(): array
     {
         return $this->keys();
+    }
+
+    public function hasHeader(string $name): bool
+    {
+        return $this->has($name);
     }
 }
