@@ -44,6 +44,7 @@ abstract class ApiResponse
 
     final public function prepare(ApiPathConfig $apiPathConfig, ApiProcessResultCollection $results, ?HttpStatusEnum $status = null, array $errors = []): self
     {
+        $this->configure($apiPathConfig);
         if ($status && $status->isError() && !empty($errors)) {
             $this->errors = $errors;
             $this->statusCode = $status;
@@ -52,7 +53,6 @@ abstract class ApiResponse
             return $this;
         }
         try {
-            $this->configure($apiPathConfig);
             $this->configureBody($results);
         } catch (\Throwable $err) {
             $this->errors[] = $err->getMessage();
