@@ -39,7 +39,10 @@ class ApiPathConfig extends AbstractDescriptor
                 $this->headers = is_array($value) ? new HeaderCollection($value) : $value;
             }
             get {
-                return $this->headers ?? new HeaderCollection();
+                if (!$this->headers) {
+                    $this->headers = new HeaderCollection();
+                }
+                return $this->headers;
             }
         }
     protected(set) bool $requiresAuth = false;
@@ -95,7 +98,10 @@ class ApiPathConfig extends AbstractDescriptor
                 $this->acceptHeaders = is_array($value) ? new HeaderCollection($value) : $value;
             }
             get {
-                return $this->acceptHeaders ?? new HeaderCollection();
+                if (!$this->acceptHeaders) {
+                    $this->acceptHeaders = new HeaderCollection();
+                }
+                return $this->acceptHeaders;
             }
         }
 
