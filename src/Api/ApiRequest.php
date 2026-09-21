@@ -53,7 +53,7 @@ class ApiRequest
             try {
                 $result = $processor->process($this->apiPathConfig, $this->payload);
                 $this->results->add($result);
-                return $result->halt();
+                return !$result->halt();
             } catch (\Throwable $exception) {
                 $this->runtimeError = $exception->getMessage();
                 return false;
