@@ -39,7 +39,7 @@ class ApiPathConfig extends AbstractDescriptor
                 $this->headers = is_array($value) ? new HeaderCollection($value) : $value;
             }
             get {
-                if (!$this->headers) {
+                if (!isset($this->headers)) {
                     $this->headers = new HeaderCollection();
                 }
                 return $this->headers;
