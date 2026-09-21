@@ -476,9 +476,7 @@ enum HttpStatusEnum implements JsonSerializable
 <body>
     <h1>{$this->httpCode()}</h1>
     <p>{$this->message()}</p>
-    <footer>
-        <p>&copy; Nexus Http Status by Tabula 17</p>
-    </footer>
+    <footer>&copy; Nexus Http Status by Tabula 17</footer>
 </body>
 </html>
 HTML;
