@@ -16,7 +16,7 @@ class ApiRequest
     public ApiProcessorsCollection $processors;
     public ApiProcessResultCollection $results;
     private(set) Request $payload;
-    private string $lastError = '';
+    private string $runtimeError = '';
 
     /**
      *
@@ -55,12 +55,12 @@ class ApiRequest
                 $this->results->add($result);
                 return $result->halt();
             } catch (\Throwable $exception) {
-                $this->lastError = $exception->getMessage();
+                $this->runtimeError = $exception->getMessage();
                 return false;
             }
         });
-        if (!empty($this->lastError)) {
-            return $this->response->prepare($this->apiPathConfig, $this->results, HttpStatusEnum::BAD_REQUEST, [$this->lastError]);
+        if (!empty($this->runtimeError)) {
+            return $this->response->prepare($this->apiPathConfig, $this->results, HttpStatusEnum::BAD_REQUEST, [$this->runtimeError]);
         }
         return $this->response->prepare($this->apiPathConfig, $this->results);
     }
