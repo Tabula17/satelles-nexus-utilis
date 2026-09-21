@@ -60,6 +60,18 @@ class HeaderCollection extends TypedCollection
         //  parent::add($value);
     }
 
+    /**
+     * @throws UnexpectedValueException
+     * @throws InvalidArgumentException
+     */
+    public function load(array $headers): void
+    {
+        foreach ($headers as $header) {
+            $this->add($header);
+        }
+
+    }
+
     public function getHeader(string $name): ?HeaderDescriptor
     {
         return $this->get($name);
