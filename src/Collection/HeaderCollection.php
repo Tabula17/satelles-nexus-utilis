@@ -16,19 +16,7 @@ class HeaderCollection extends TypedCollection
     {
 
         parent::__construct();
-        foreach ($headers as $key => $header) {
-            if (is_string($key)) {
-                if (is_array($header)) {
-                    $header = new HeaderDescriptor($key, ...$header);
-                } else {
-                    $header = new HeaderDescriptor($key, $header);
-                }
-            }
-            if (is_int($key) && is_array($header) && count($header) === 1) {
-                $header = new HeaderDescriptor(key($header), current($header));
-            }
-            $this->add($header);
-        }
+        $this->load($headers);
     }
 
     protected static function getType(): string
@@ -67,10 +55,18 @@ class HeaderCollection extends TypedCollection
      */
     public function load(array $headers, bool $replace = true): void
     {
-
-        foreach ($headers as $header) {
+        foreach ($headers as $key => $header) {
             if (!($header instanceof HeaderDescriptor)) {
-                $header = self::cast($header);
+                if (is_string($key)) {
+                    if (is_array($header)) {
+                        $header = new HeaderDescriptor($key, ...$header);
+                    } else {
+                        $header = new HeaderDescriptor($key, $header);
+                    }
+                }
+                if (is_int($key) && is_array($header) && count($header) === 1) {
+                    $header = new HeaderDescriptor(key($header), current($header));
+                }
             }
             if ($replace || !$this->has($header->name)) {
                 $this->add($header);
