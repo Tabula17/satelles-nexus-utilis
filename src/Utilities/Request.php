@@ -73,7 +73,24 @@ class Request
         }
 
         // 3. Unificar parámetros para el pre-procesamiento posterior
-        $this->params = array_merge($urlParams, $bodyParams);
+        $cliParams = [];
+        if (PHP_SAPI === 'cli') {
+            $argv = $_SERVER['argv'] ?? [];
+            foreach (array_slice($argv, 1) as $arg) {
+                if (str_contains($arg, '=')) {
+                    [$key, $value] = explode('=', $arg, 2);
+                    $key = ltrim($key, '-');
+                    $cliParams[$key] = $value;
+                } else {
+                    $key = ltrim($arg, '-');
+                    if ($key !== '') {
+                        $cliParams[$key] = true;
+                    }
+                }
+            }
+        }
+
+        $this->params = array_merge($urlParams, $bodyParams, $cliParams);
     }
 
     /**
