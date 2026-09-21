@@ -33,6 +33,8 @@ class ApiRequest
     {
         $this->processors = $processors ?? new ApiProcessorsCollection();
         $this->results = $results ?? new ApiProcessResultCollection();
+        $this->payload = new Request();
+        $this->apiPathConfig->options->setValues($this->payload->params);
     }
 
     /**
@@ -43,7 +45,6 @@ class ApiRequest
      */
     public function process(): ApiResponse
     {
-        $this->payload = new Request();
         if (PHP_SAPI !== 'cli' && $this->apiPathConfig->method !== $this->payload->method) {
             return $this->response->prepare($this->apiPathConfig, $this->results, HttpStatusEnum::METHOD_NOT_ALLOWED, [
                 HttpStatusEnum::METHOD_NOT_ALLOWED->message()
