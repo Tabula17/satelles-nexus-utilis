@@ -45,10 +45,12 @@ abstract class ApiResponse
     final public function prepare(ApiPathConfig $apiPathConfig, ApiProcessResultCollection $results, ?HttpStatusEnum $status = null, array $errors = []): self
     {
         $this->configure($apiPathConfig);
-        if ($status && $status->isError() && !empty($errors)) {
+        if ($status && !empty($errors) && $status->isError()) {
             $this->errors = $errors;
             $this->statusCode = $status;
-            $this->contentType = $apiPathConfig->headers->has('Content-Type') ? $apiPathConfig->headers->get('Content-Type') : MimeTypes::JSON;
+            if (!isset($this->contentType)) { // El contentType se puede definir en `configure` o sobreescribir luego en `configureBody`
+                $this->contentType = $apiPathConfig->headers->has('Content-Type') ? $apiPathConfig->headers->get('Content-Type') : MimeTypes::JSON;
+            }
             $this->configureBody();
             return $this;
         }
@@ -57,7 +59,9 @@ abstract class ApiResponse
         } catch (\Throwable $err) {
             $this->errors[] = $err->getMessage();
             $this->statusCode = HttpStatusEnum::INTERNAL_SERVER_ERROR;
-            $this->contentType = MimeTypes::JSON;
+            if (!isset($this->contentType)) {
+                $this->contentType = $apiPathConfig->headers->has('Content-Type') ? $apiPathConfig->headers->get('Content-Type') : MimeTypes::JSON;
+            }
             //$this->body = json_encode(['errors' => $this->errors]);
             $this->configureBody(); //dejamos la implementación de la salida de errores a la clase derivada. `configureBody` se ejecuta sin parámetros, los errores se a,macenan en `errors`
         }
@@ -66,7 +70,6 @@ abstract class ApiResponse
 
     final public function output()
     {
-
         http_response_code($this->statusCode->httpCode());
         header('Content-type: ' . $this->contentType->mime());
         foreach ($this->headers as $header => $value) {
