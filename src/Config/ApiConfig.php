@@ -93,7 +93,10 @@ class ApiConfig extends ConnectionConfig
 
     public function httpClient(): Client
     {
-        $client = new Client($this->protocol . '://' . $this->host . $this->basePath);
+        $port = $this->port ?? $this->protocol === 'https' ? 443 : 80;
+        $ssl = $this->protocol === 'https';
+
+        $client = new Client($this->host, $port, $ssl);
         $client->set([
             'timeout' => $this->timeout
         ]);
