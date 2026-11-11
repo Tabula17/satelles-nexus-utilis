@@ -155,7 +155,7 @@ class ApiPathConfig extends AbstractDescriptor
                         $paths[] = ($value->pathWithKey ? $value->name . '/' : '') . ($withPlaceholders ? $value->placeholder : $value->value);
                     }
                 });
-                return rtrim($this->path, '/') . '/' . ltrim(implode('/', $paths) . '/');
+                return rtrim($this->path, '/') . '/' . trim(implode('/', $paths) . '/');
             }
         }
         return $this->path;
