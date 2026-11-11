@@ -140,6 +140,12 @@ class ApiPathConfig extends AbstractDescriptor
 
     public function endpointUrl(bool $withPathParams = false, bool $withPlaceholders = false): string
     {
+        $path = $this->endpointPath($withPathParams, $withPlaceholders);
+        return rtrim($this->baseUrl, '/') . '/' . ltrim($path . '/');
+    }
+
+    public function endpointPath(bool $withPathParams = false, bool $withPlaceholders = false): string
+    {
         if ($withPathParams) {
             $pathParams = $this->getPathParams();
             if ($pathParams) {
@@ -149,10 +155,11 @@ class ApiPathConfig extends AbstractDescriptor
                         $paths[] = ($value->pathWithKey ? $value->name . '/' : '') . ($withPlaceholders ? $value->placeholder : $value->value);
                     }
                 });
-                return rtrim($this->baseUrl, '/') . '/' . trim($this->path, '/') . '/' . ltrim(implode('/', $paths) . '/');
+                return rtrim($this->path, '/') . '/' . ltrim(implode('/', $paths) . '/');
             }
         }
-        return rtrim($this->baseUrl, '/') . $this->path;
+        return $this->path;
+
     }
 
 }
