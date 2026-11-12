@@ -15,7 +15,7 @@ class ApiPathConfig extends AbstractDescriptor
     protected(set) ?string $responseDescription = null;
     protected(set) string $path {
         set {
-            $this->path = '/' . ltrim($value, '/');
+            $this->path = '/' . trim($value, '/');
         }
     }
     protected(set) ?HttpMethodEnum $method = null
@@ -141,7 +141,7 @@ class ApiPathConfig extends AbstractDescriptor
     public function endpointUrl(bool $withPathParams = false, bool $withPlaceholders = false): string
     {
         $path = $this->endpointPath($withPathParams, $withPlaceholders);
-        return rtrim($this->baseUrl, '/') . '/' . ltrim($path . '/');
+        return rtrim($this->baseUrl, '/') . '/' . ltrim($path , '/');
     }
 
     public function endpointPath(bool $withPathParams = false, bool $withPlaceholders = false): string
