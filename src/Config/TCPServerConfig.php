@@ -59,14 +59,14 @@ class TCPServerConfig extends AbstractDescriptor
             : $this->port = $value;
     }
     protected(set) int $mode = SWOOLE_PROCESS {
-        set => $this->type = match ($value) {
+        set => match ($value) {
             SWOOLE_BASE,
             SWOOLE_PROCESS => $value,
             default => SWOOLE_PROCESS,
         };
     }
     protected(set) int $type = SWOOLE_SOCK_TCP {
-        set => $this->type = match ($value) {
+        set => match ($value) {
             SWOOLE_SOCK_TCP,
             SWOOLE_SOCK_TCP6,
             SWOOLE_SOCK_UDP,
