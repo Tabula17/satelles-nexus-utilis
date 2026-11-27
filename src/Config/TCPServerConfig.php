@@ -97,7 +97,7 @@ class TCPServerConfig extends AbstractDescriptor
         int           $mode = SWOOLE_PROCESS,
         int           $type = SWOOLE_SOCK_TCP,
         ?array        $options = null,
-        ?TCPSSLConfig $ssl = null
+        TCPSSLConfig|array|null $ssl = null
     )
     {
         $this->host = $host;
